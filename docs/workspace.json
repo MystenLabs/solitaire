@@ -1,0 +1,361 @@
+{
+  "id" : 1,
+  "name" : "Name",
+  "description" : "Description",
+  "lastModifiedDate" : "2024-01-03T09:32:36Z",
+  "lastModifiedAgent" : "structurizr-javascript",
+  "properties" : {
+    "structurizr.dsl" : "IWNvbnN0YW50IFNZU1RFTV9OQU1FICJTb2xpdGFpcmUgZEFwcCIKCndvcmtzcGFjZSB7CiAgICBtb2RlbCB7CiAgICAgICAgdXNlciA9IHBlcnNvbiAiVXNlciIgIkEgdXNlciBoYXZpbmcgYSB3YWxsZXQgdGhhdCBzdXBwb3J0cyBTdWkuIgoKICAgICAgICBnYW1lID0gc29mdHdhcmVTeXN0ZW0gIiR7U1lTVEVNX05BTUV9IiAiQWxsb3dzIHVzZXJzIHRvIHBsYXkgc29saXRhaXJlIG9uIHRoZSBTdWkgbmV0d29yay4iIHsKICAgICAgICAgICAgZ3JvdXAgIkZyb250ZW5kIiB7CiAgICAgICAgICAgICAgICB3ZWJhcHBDb21wID0gY29udGFpbmVyICJXZWIgQXBwbGljYXRpb24iICJEZWxpdmVycyB0aGUgVUkgYXMgYSBzaW5nbGUgcGFnZSBhcHBsaWNhdGlvbi4iICJuZXh0LmpzIgogICAgICAgICAgICAgICAgc2luZ2xlUGFnZUFwcGxpY2F0aW9uQ29udCA9IGNvbnRhaW5lciAiU2luZ2xlLVBhZ2UtQXBwbGljYXRpb24iICJBIHNpbmdsZSBwYWdlIGFwcGxpY2F0aW9uIHdlcmUgdGhlIHBsYXllciBpbnRlcmFjdHMgd2l0aCB0aGUgZ2FtZS4iICJSZWFjdCIgewogICAgICAgICAgICAgICAgICAgIGF1dGhlbnRpY2F0b3IgPSBjb21wb25lbnQgIkF1dGhlbnRpY2F0b3IiICJIYW5kbGVzIHRoZSB1c2VyJ3MgdHJhbnNhY3Rpb24gYXV0aGVudGljYXRpb24uIiAiemtsb2dpbiIKICAgICAgICAgICAgICAgICAgICBnYW1lQm9hcmQgPSBjb21wb25lbnQgIkdhbWUgQm9hcmQiICJBbGxvd3MgdGhlIHVzZXIgdG8gaW50ZXJhY3Qgd2l0aCB0aGUgZ2FtZSBib2FyZCBhbmQgdGhlIGNhcmRzLiIgIlJlYWN0LCBTdWkgVFMtU0RLIiB7CiAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgImdhbWUgYm9hcmQiCiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIGFzc2V0cyA9IGNvbXBvbmVudCAiQXNzZXRzIiAiQ29udGFpbnMgY2FyZCBpY29ucywgcG9rZXIgdGFibGUgbG9vayBhbmQgb3RoZXIgZGVzaWducy4iICJQTkcsIEpQRUcsIFNWRyIgewogICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJhc3NldHMiCiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIHRhZ3MgIlNQQSIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQogICAgICAgICAgICBncm91cCAiV2ViMyBMYXllciIgewogICAgICAgICAgICAgICAgc21hcnRDb250cmFjdENvbnQgPSBjb250YWluZXIgIlNtYXJ0IENvbnRyYWN0IiAiQ29udGFpbnMgYWxsIHRoZSBnYW1lIGxvZ2ljL3J1bGVzLiBFYWNoIHBsYXllciBtb3ZlIGlzIGEgY2FsbCB0byB0aGUgc21hcnQgY29udHJhY3QuIiAiU3VpIE1vdmUiIHsKICAgICAgICAgICAgICAgICAgICB0YWdzICJzbWFydCBjb250cmFjdCIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQogICAgICAgIH0KCiAgICAgICAgIyBDb250ZXh0IGxldmVsIHJlbGF0aW9uc2hpcHMKICAgICAgICB1c2VyIC0+IGdhbWUgIlBsYXlzIgoKICAgICAgICAjIENvbXBvbmVudCBsZXZlbCByZWxhdGlvbnNoaXBzCiAgICAgICAgdXNlciAtPiBzaW5nbGVQYWdlQXBwbGljYXRpb25Db250ICJTaWducyBpbiwgc3RhcnRzL2VuZHMgZ2FtZSwgbW92ZXMgY2FyZHMgYXJvdW5kIgogICAgICAgIHVzZXIgLT4gd2ViYXBwQ29tcCAiUmVxdWVzdHMgcGFnZSBmcm9tIiAiSFRUUCIKICAgICAgICB3ZWJhcHBDb21wIC0+IHNpbmdsZVBhZ2VBcHBsaWNhdGlvbkNvbnQgIkRlbGl2ZXJzIHRvIHRoZSB1c2VyJ3MgYnJvd3NlciIgIkhUVFAiCiAgICAgICAgc2luZ2xlUGFnZUFwcGxpY2F0aW9uQ29udCAtPiBzbWFydENvbnRyYWN0Q29udCAiTWFrZXMgbW92ZSBjYWxscyIKICAgICAgICBhdXRoZW50aWNhdG9yIC0+IGdhbWVCb2FyZCAiQXV0aGVudGljYXRlcyB0cmFuc2FjdGlvbnMgb2YiCiAgICAgICAgYXNzZXRzIC0+IGdhbWVCb2FyZCAiR2V0IGRpc3BsYXllZCBvbiIKCiAgICAgICAgdXNlciAtPiBhdXRoZW50aWNhdG9yICJTaWducyBpbiB3aXRoIgogICAgICAgIHVzZXIgLT4gZ2FtZUJvYXJkICJQbGF5cyBvbiIKCiAgICAgICAgZ2FtZUJvYXJkIC0+IHNtYXJ0Q29udHJhY3RDb250ICJNYWtlcyBtb3ZlIGNhbGxzIHRvIgogICAgfQoKICAgIHZpZXdzIHsKICAgICAgICBzeXN0ZW1Db250ZXh0IGdhbWUgIkNvbnRleHQiIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgICAgIGF1dG9sYXlvdXQgbHIKICAgICAgICB9CgogICAgICAgIGNvbnRhaW5lciBnYW1lICJDb250YWluZXIiIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgICAgIGF1dG9sYXlvdXQKICAgICAgICB9CgogICAgICAgIGNvbXBvbmVudCBzaW5nbGVQYWdlQXBwbGljYXRpb25Db250ICJDb21wb25lbnQiIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgICAgIGF1dG9sYXlvdXQKICAgICAgICB9CgogICAgICAgIHN0eWxlcyB7CiAgICAgICAgICAgIGVsZW1lbnQgIlNQQSIgewogICAgICAgICAgICAgICAgc2hhcGUgV2ViQnJvd3NlcgogICAgICAgICAgICB9CiAgICAgICAgICAgIGVsZW1lbnQgImFzc2V0cyIgewogICAgICAgICAgICAgICAgc2hhcGUgRm9sZGVyCiAgICAgICAgICAgIH0KICAgICAgICAgICAgZWxlbWVudCAiZ2FtZSBib2FyZCIgewogICAgICAgICAgICAgICAgYmFja2dyb3VuZCAjMTA3QzEwCiAgICAgICAgICAgICAgICBjb2xvciAjRkZGRkZGCiAgICAgICAgICAgIH0KICAgICAgICB9CgogICAgICAgIHRoZW1lcyBkZWZhdWx0CiAgICB9Cgp9Cg=="
+  },
+  "configuration" : { },
+  "model" : {
+    "people" : [ {
+      "id" : "1",
+      "tags" : "Element,Person",
+      "properties" : {
+        "structurizr.dsl.identifier" : "user"
+      },
+      "name" : "User",
+      "description" : "A user having a wallet that supports Sui.",
+      "relationships" : [ {
+        "id" : "16",
+        "tags" : "Relationship",
+        "properties" : {
+          "structurizr.dsl.identifier" : "67f094af-6329-47fe-af15-77dbfcd3f30c"
+        },
+        "sourceId" : "1",
+        "destinationId" : "5",
+        "description" : "Signs in with"
+      }, {
+        "id" : "10",
+        "tags" : "Relationship",
+        "properties" : {
+          "structurizr.dsl.identifier" : "df6589f1-3c3b-4799-b5de-fd0c26c8dbc6"
+        },
+        "sourceId" : "1",
+        "destinationId" : "4",
+        "description" : "Signs in, starts/ends game, moves cards around"
+      }, {
+        "id" : "9",
+        "tags" : "Relationship",
+        "properties" : {
+          "structurizr.dsl.identifier" : "68e5a4a1-3041-4630-bf0a-948c8bba0445"
+        },
+        "sourceId" : "1",
+        "destinationId" : "2",
+        "description" : "Plays"
+      }, {
+        "id" : "17",
+        "tags" : "Relationship",
+        "properties" : {
+          "structurizr.dsl.identifier" : "b220a25b-8f2a-419a-a9c6-7bc1a6fb2841"
+        },
+        "sourceId" : "1",
+        "destinationId" : "6",
+        "description" : "Plays on"
+      }, {
+        "id" : "11",
+        "tags" : "Relationship",
+        "properties" : {
+          "structurizr.dsl.identifier" : "33e73edf-9059-4bd0-b638-e59dff173275"
+        },
+        "sourceId" : "1",
+        "destinationId" : "3",
+        "description" : "Requests page from",
+        "technology" : "HTTP"
+      } ],
+      "location" : "Unspecified"
+    } ],
+    "softwareSystems" : [ {
+      "id" : "2",
+      "tags" : "Element,Software System",
+      "properties" : {
+        "structurizr.dsl.identifier" : "game"
+      },
+      "name" : "Solitaire dApp",
+      "description" : "Allows users to play solitaire on the Sui network.",
+      "location" : "Unspecified",
+      "containers" : [ {
+        "id" : "4",
+        "tags" : "Element,Container,SPA",
+        "properties" : {
+          "structurizr.dsl.identifier" : "singlepageapplicationcont"
+        },
+        "name" : "Single-Page-Application",
+        "description" : "A single page application were the player interacts with the game.",
+        "relationships" : [ {
+          "id" : "13",
+          "tags" : "Relationship",
+          "properties" : {
+            "structurizr.dsl.identifier" : "d0a6036a-9432-4c71-8b3d-ea833adc13c1"
+          },
+          "sourceId" : "4",
+          "destinationId" : "8",
+          "description" : "Makes move calls"
+        } ],
+        "group" : "Frontend",
+        "technology" : "React",
+        "components" : [ {
+          "id" : "7",
+          "tags" : "Element,Component,assets",
+          "properties" : {
+            "structurizr.dsl.identifier" : "assets"
+          },
+          "name" : "Assets",
+          "description" : "Contains card icons, poker table look and other designs.",
+          "relationships" : [ {
+            "id" : "15",
+            "tags" : "Relationship",
+            "properties" : {
+              "structurizr.dsl.identifier" : "e19571ff-c0f2-4c7b-9f31-4018e1f30e75"
+            },
+            "sourceId" : "7",
+            "destinationId" : "6",
+            "description" : "Get displayed on"
+          } ],
+          "technology" : "PNG, JPEG, SVG",
+          "documentation" : { }
+        }, {
+          "id" : "5",
+          "tags" : "Element,Component",
+          "properties" : {
+            "structurizr.dsl.identifier" : "authenticator"
+          },
+          "name" : "Authenticator",
+          "description" : "Handles the user's transaction authentication.",
+          "relationships" : [ {
+            "id" : "14",
+            "tags" : "Relationship",
+            "properties" : {
+              "structurizr.dsl.identifier" : "cd8bdc4d-ac75-46b1-a3df-fc44d0fdf23e"
+            },
+            "sourceId" : "5",
+            "destinationId" : "6",
+            "description" : "Authenticates transactions of"
+          } ],
+          "technology" : "zklogin",
+          "documentation" : { }
+        }, {
+          "id" : "6",
+          "tags" : "Element,Component,game board",
+          "properties" : {
+            "structurizr.dsl.identifier" : "gameboard"
+          },
+          "name" : "Game Board",
+          "description" : "Allows the user to interact with the game board and the cards.",
+          "relationships" : [ {
+            "id" : "18",
+            "tags" : "Relationship",
+            "properties" : {
+              "structurizr.dsl.identifier" : "2c2af722-2d0c-4ff5-863f-8cf46c739de3"
+            },
+            "sourceId" : "6",
+            "destinationId" : "8",
+            "description" : "Makes move calls to"
+          } ],
+          "technology" : "React, Sui TS-SDK",
+          "documentation" : { }
+        } ],
+        "documentation" : { }
+      }, {
+        "id" : "8",
+        "tags" : "Element,Container,smart contract",
+        "properties" : {
+          "structurizr.dsl.identifier" : "smartcontractcont"
+        },
+        "name" : "Smart Contract",
+        "description" : "Contains all the game logic/rules. Each player move is a call to the smart contract.",
+        "group" : "Web3 Layer",
+        "technology" : "Sui Move",
+        "documentation" : { }
+      }, {
+        "id" : "3",
+        "tags" : "Element,Container",
+        "properties" : {
+          "structurizr.dsl.identifier" : "webappcomp"
+        },
+        "name" : "Web Application",
+        "description" : "Delivers the UI as a single page application.",
+        "relationships" : [ {
+          "id" : "12",
+          "tags" : "Relationship",
+          "properties" : {
+            "structurizr.dsl.identifier" : "cdd39a4d-8096-4575-8b27-f521c8cd3072"
+          },
+          "sourceId" : "3",
+          "destinationId" : "4",
+          "description" : "Delivers to the user's browser",
+          "technology" : "HTTP"
+        } ],
+        "group" : "Frontend",
+        "technology" : "next.js",
+        "documentation" : { }
+      } ],
+      "documentation" : { }
+    } ]
+  },
+  "documentation" : { },
+  "views" : {
+    "systemContextViews" : [ {
+      "key" : "Context",
+      "order" : 1,
+      "softwareSystemId" : "2",
+      "dimensions" : {
+        "width" : 1600,
+        "height" : 800
+      },
+      "automaticLayout" : {
+        "implementation" : "Graphviz",
+        "rankDirection" : "LeftRight",
+        "rankSeparation" : 300,
+        "nodeSeparation" : 300,
+        "edgeSeparation" : 0,
+        "vertices" : false,
+        "applied" : true
+      },
+      "enterpriseBoundaryVisible" : true,
+      "elements" : [ {
+        "id" : "1",
+        "x" : 200,
+        "y" : 200
+      }, {
+        "id" : "2",
+        "x" : 950,
+        "y" : 200
+      } ],
+      "relationships" : [ {
+        "id" : "9"
+      } ]
+    } ],
+    "containerViews" : [ {
+      "key" : "Container",
+      "order" : 2,
+      "softwareSystemId" : "2",
+      "dimensions" : {
+        "width" : 1177,
+        "height" : 2665
+      },
+      "automaticLayout" : {
+        "implementation" : "Graphviz",
+        "rankDirection" : "TopBottom",
+        "rankSeparation" : 300,
+        "nodeSeparation" : 300,
+        "edgeSeparation" : 0,
+        "vertices" : false,
+        "applied" : true
+      },
+      "externalSoftwareSystemBoundariesVisible" : true,
+      "elements" : [ {
+        "id" : "1",
+        "x" : 577,
+        "y" : 199
+      }, {
+        "id" : "3",
+        "x" : 240,
+        "y" : 799
+      }, {
+        "id" : "4",
+        "x" : 240,
+        "y" : 1399
+      }, {
+        "id" : "8",
+        "x" : 240,
+        "y" : 1999
+      } ],
+      "relationships" : [ {
+        "id" : "13"
+      }, {
+        "id" : "11"
+      }, {
+        "id" : "12"
+      }, {
+        "id" : "10",
+        "vertices" : [ {
+          "x" : 840,
+          "y" : 591
+        }, {
+          "x" : 840,
+          "y" : 1099
+        } ]
+      } ]
+    } ],
+    "componentViews" : [ {
+      "key" : "Component",
+      "order" : 3,
+      "dimensions" : {
+        "width" : 1907,
+        "height" : 2500
+      },
+      "automaticLayout" : {
+        "implementation" : "Graphviz",
+        "rankDirection" : "TopBottom",
+        "rankSeparation" : 300,
+        "nodeSeparation" : 300,
+        "edgeSeparation" : 0,
+        "vertices" : false,
+        "applied" : true
+      },
+      "containerId" : "4",
+      "externalContainerBoundariesVisible" : true,
+      "elements" : [ {
+        "id" : "1",
+        "x" : 1306,
+        "y" : 200
+      }, {
+        "id" : "5",
+        "x" : 969,
+        "y" : 800
+      }, {
+        "id" : "6",
+        "x" : 969,
+        "y" : 1400
+      }, {
+        "id" : "7",
+        "x" : 219,
+        "y" : 800
+      }, {
+        "id" : "8",
+        "x" : 969,
+        "y" : 2000
+      } ],
+      "relationships" : [ {
+        "id" : "18"
+      }, {
+        "id" : "17",
+        "vertices" : [ {
+          "x" : 1569,
+          "y" : 696
+        }, {
+          "x" : 1569,
+          "y" : 1100
+        } ]
+      }, {
+        "id" : "16"
+      }, {
+        "id" : "15"
+      }, {
+        "id" : "14"
+      } ]
+    } ],
+    "configuration" : {
+      "branding" : { },
+      "styles" : {
+        "elements" : [ {
+          "tag" : "SPA",
+          "shape" : "WebBrowser"
+        }, {
+          "tag" : "assets",
+          "shape" : "Folder"
+        }, {
+          "tag" : "game board",
+          "background" : "#107c10",
+          "color" : "#ffffff"
+        } ]
+      },
+      "themes" : [ "https://static.structurizr.com/themes/default/theme.json" ],
+      "terminology" : { },
+      "metadataSymbols" : "SquareBrackets",
+      "lastSavedView" : "Component"
+    }
+  }
+}
