@@ -37,6 +37,7 @@ module solitaire::solitaire {
         deck: Deck,
         piles: vector<Pile>,
         columns: vector<Column>,
+        // This is the stack with all the cards that are not revealed yet
         available_cards: vector<u64>,
         player: address,
         start_time: u64,
@@ -64,17 +65,20 @@ module solitaire::solitaire {
 
     public fun init_normal_game(clock: &Clock, ctx: &mut TxContext) {
         let i: u64 = 0;
+        // Initialize the stack with all the available cards.
         let available_cards = vector::empty<u64>();
         while (i < CARD_COUNT) {
             vector::push_back(&mut available_cards, i);
             i = i + 1;
         };
         
+        // Initialize the Deck with 24 hidden cards and an empty vector of cards.
         let deck = Deck {
             hidden_cards: 24,
             cards: vector::empty(),
         };
 
+        // Initialize the Piles with an empty vector of cards.
         let piles = vector::singleton<Pile>(Pile {cards: vector::empty()});
         vector::push_back(&mut piles, Pile {cards: vector::empty()});
         vector::push_back(&mut piles, Pile {cards: vector::empty()});
@@ -96,6 +100,7 @@ module solitaire::solitaire {
         transfer::share_object(game);
     }
 
+    /// An easy game has all the Aces placed on the Piles by default.
     public fun init_easy_game(clock: &Clock, ctx: &mut TxContext) {
         let i: u64 = 0;
         let available_cards = vector::empty<u64>();
@@ -146,6 +151,7 @@ module solitaire::solitaire {
             let card_to_place = vector::remove(&mut game.deck.cards, index);
             vector::push_back(&mut column.cards, card_to_place);
         } else {
+            // Get the card at the top of the column
             let last_card_index = vector::length(&column.cards) - 1;
             let column_card = vector::borrow(&column.cards, last_card_index);
             // edge case where the column card is an ace
@@ -178,6 +184,7 @@ module solitaire::solitaire {
             let pile_card = vector::borrow(&pile.cards, 0);
             // edge case where the pile card is a king
             assert!(*pile_card % 13 != 12, ECannotPlaceOnKing);
+            // the card to place must be the next card in the pile and of the same suit
             assert!(card == *pile_card + 1, EInvalidPlacement);
             let card_to_place = vector::remove(&mut game.deck.cards, index);
             vector::push_back(&mut pile.cards, card_to_place);
@@ -195,6 +202,7 @@ module solitaire::solitaire {
         if (vector::is_empty(&pile.cards)) {
             assert!(column_card % 13 == 0, ENotAceCard);
             vector::push_back(&mut pile.cards, column_card);
+            // Check if there are hidden cards in the column and reveal one if needed
             if (column.hidden_cards > 0 && vector::is_empty(&column.cards)) {
                 column.hidden_cards = column.hidden_cards - 1;
                 let card = reveal_card(clock, &mut game.available_cards);
@@ -206,6 +214,7 @@ module solitaire::solitaire {
             assert!(*pile_card % 13 != 12, ECannotPlaceOnKing);
             assert!(column_card == *pile_card + 1, EInvalidPlacement);
             vector::push_back(&mut pile.cards, column_card);
+            // Check if there are hidden cards in the column and reveal one if needed
             if (column.hidden_cards > 0 && vector::is_empty(&column.cards)) {
                 column.hidden_cards = column.hidden_cards - 1;
                 let card = reveal_card(clock, &mut game.available_cards);
@@ -218,13 +227,15 @@ module solitaire::solitaire {
         assert!(game.player == tx_context::sender(ctx), EInvalidGamePlayer);
         assert!(src_column_index < COLUMN_COUNT, EInvalidColumnIndex);
         assert!(dest_column_index < COLUMN_COUNT, EInvalidColumnIndex);
-        // one column needs to be removed because I cannot take 2 mutable references to the same vector
+        // One column needs to be removed because it is not allowed to take 2 mutable references to the same vector.
         let dest_column = vector::remove(&mut game.columns, dest_column_index);
         let src_column = vector::borrow_mut(&mut game.columns, src_column_index);
         let (exist, index) = vector::index_of(&game.deck.cards, &card);
         assert!(exist, ECardNotInColumn);
         if (vector::is_empty(&dest_column.cards)) {
             assert!(card % 13 == 12, ENotKingCard);
+            // Because more than one card can be moved at once, we need to iterate over the vector with starting point
+            // the index of the card to move.
             while (vector::length(&src_column.cards) >= index) {
                 let card_to_move = vector::remove(&mut src_column.cards, index);
                 vector::push_back(&mut dest_column.cards, card_to_move);
@@ -293,6 +304,7 @@ module solitaire::solitaire {
         }
     }
 
+    /// This function is used to reveal a card from the deck if there are still hidden cards.
     public fun open_deck_card(game: &mut Game, clock: &Clock, ctx: &mut TxContext) {
         assert!(game.player == tx_context::sender(ctx), EInvalidGamePlayer);
         assert!(game.deck.hidden_cards > 0, ENoMoreHiddenCards);
@@ -301,8 +313,23 @@ module solitaire::solitaire {
         vector::push_back(&mut game.deck.cards, card);
     }
 
-    //fun game_won(game: &mut Game, ctx: TxContext) {}
+    /// This funtion is used to return the status of the game.
+    public fun game_status(game: &Game, _ctx: &mut TxContext) : String {
+        let i = 0;
+        let pile = vector::borrow(&game.piles, i);
+        while (i < PILE_COUNT) {
+            if (vector::length(&pile.cards) != 13) {
+                return utf8(b"GAME_NOT_WON")
+            };
+            i = i + 1;
+            pile = vector::borrow(&game.piles, i);
+        };
+        return utf8(b"GAME_WON")
+    }
 
+    /// Internal function that sets up the 7 columns of cards.
+    /// Each column has the top card revealed and the a number of hidden cards that is equal to the
+    /// index of the column, starting from 0.
     fun set_up_columns(clock: &Clock, available_cards: &mut vector<u64>): vector<Column> {
         let columns = vector::empty<Column>();
         let i = 0;
@@ -319,12 +346,15 @@ module solitaire::solitaire {
     }
 
     fun reveal_card (clock: &Clock, available_cards: &mut vector<u64>): u64 {
+        // The randomness will be retrieved from the timestamp of the current block.
         let timestamp = clock::timestamp_ms(clock);
         let length = vector::length(available_cards);
+        // A card is removed from the stack of the available cards based on the modulo of the timestamp.
+        // Module length will ensure that we cannot got out of bounds.
         vector::remove(available_cards, timestamp % length)
     }
     
-    // We consider the following mapping between Move Contract and FrontEnd:
+    // We consider the following mapping between Move Contract and Application:
     //
     // index= 0,  suit: "Clubs", name-on-card: "A", 
     // index= 1,  suit: "Clubs", name-on-card: "2",  
