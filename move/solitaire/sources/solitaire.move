@@ -15,6 +15,10 @@ module solitaire::solitaire {
     const ECannotPlaceOnAce: u64 = 5;
     const ENotAceCard: u64 = 6;
     const ECannotPlaceOnKing: u64 = 7;
+    const EColumnIsEmpty: u64 = 8;
+    const ECardNotInColumn: u64 = 9;
+    const EInvalidColumnIndex: u64 = 10;
+    const EInvalidPileIndex: u64 = 11;
 
 // =================== Constants ===================
     const CARD_COUNT: u64 = 52;
@@ -132,6 +136,7 @@ module solitaire::solitaire {
 
     public fun from_deck_to_column(game: &mut Game, card: u64, column_index: u64, ctx: &mut TxContext) {
         assert!(game.player == tx_context::sender(ctx), EInvalidGamePlayer);
+        assert!(column_index < COLUMN_COUNT, EInvalidColumnIndex);
         let (exist, index) = vector::index_of(&game.deck.cards, &card);
         assert!(exist, ECardNotInDeck);
         let column = vector::borrow_mut(&mut game.columns, column_index);
@@ -160,6 +165,7 @@ module solitaire::solitaire {
 
     public fun from_deck_to_pile(game: &mut Game, card: u64, pile_index: u64, ctx: &mut TxContext) {
         assert!(game.player == tx_context::sender(ctx), EInvalidGamePlayer);
+        assert!(pile_index < PILE_COUNT, EInvalidPileIndex);
         let (exist, index) = vector::index_of(&game.deck.cards, &card);
         assert!(exist, ECardNotInDeck);
         let pile = vector::borrow_mut(&mut game.piles, pile_index);
@@ -180,26 +186,90 @@ module solitaire::solitaire {
 
     public fun from_column_to_pile(game: &mut Game, column_index: u64, pile_index: u64, clock: &Clock, ctx: &mut TxContext) {
         assert!(game.player == tx_context::sender(ctx), EInvalidGamePlayer);
+        assert!(column_index < COLUMN_COUNT, EInvalidColumnIndex);
+        assert!(pile_index < PILE_COUNT, EInvalidPileIndex);
         let column = vector::borrow_mut(&mut game.columns, column_index);
+        assert!(!vector::is_empty(&column.cards), EColumnIsEmpty);
         let pile = vector::borrow_mut(&mut game.piles, pile_index);
         let column_card = vector::pop_back(&mut column.cards);
         if (vector::is_empty(&pile.cards)) {
             assert!(column_card % 13 == 0, ENotAceCard);
             vector::push_back(&mut pile.cards, column_card);
+            if (column.hidden_cards > 0 && vector::is_empty(&column.cards)) {
+                column.hidden_cards = column.hidden_cards - 1;
+                let card = reveal_card(clock, &mut game.available_cards);
+                vector::push_back(&mut column.cards, card);
+            }
         } else {
-            let pile_card = vector::borrow(&pile.cards, 0);
+            let last_card_index = vector::length(&pile.cards) - 1;
+            let pile_card = vector::borrow(&pile.cards, last_card_index);
             assert!(*pile_card % 13 != 12, ECannotPlaceOnKing);
             assert!(column_card == *pile_card + 1, EInvalidPlacement);
             vector::push_back(&mut pile.cards, column_card);
+            if (column.hidden_cards > 0 && vector::is_empty(&column.cards)) {
+                column.hidden_cards = column.hidden_cards - 1;
+                let card = reveal_card(clock, &mut game.available_cards);
+                vector::push_back(&mut column.cards, card);
+            }
         }
     }
 
-    public fun from_column_to_column(game: &mut Game, column_index: u64, card_index: u64, pile_index: u64, clock: &Clock, ctx: &mut TxContext) {
+    public fun from_column_to_column(game: &mut Game, src_column_index: u64, card: u64, dest_column_index: u64, clock: &Clock, ctx: &mut TxContext) {
         assert!(game.player == tx_context::sender(ctx), EInvalidGamePlayer);
+        assert!(src_column_index < COLUMN_COUNT, EInvalidColumnIndex);
+        assert!(dest_column_index < COLUMN_COUNT, EInvalidColumnIndex);
+        // one column needs to be removed because I cannot take 2 mutable references to the same vector
+        let dest_column = vector::remove(&mut game.columns, dest_column_index);
+        let src_column = vector::borrow_mut(&mut game.columns, src_column_index);
+        let (exist, index) = vector::index_of(&game.deck.cards, &card);
+        assert!(exist, ECardNotInColumn);
+        if (vector::is_empty(&dest_column.cards)) {
+            assert!(card % 13 == 12, ENotKingCard);
+            while (vector::length(&src_column.cards) >= index) {
+                let card_to_move = vector::remove(&mut src_column.cards, index);
+                vector::push_back(&mut dest_column.cards, card_to_move);
+            };
+            if (src_column.hidden_cards > 0 && vector::is_empty(&src_column.cards)) {
+                src_column.hidden_cards = src_column.hidden_cards - 1;
+                let card = reveal_card(clock, &mut game.available_cards);
+                vector::push_back(&mut src_column.cards, card);
+            }
+        } else {
+            let last_card_index = vector::length(&dest_column.cards) - 1;
+            let dest_column_card = vector::borrow(&dest_column.cards, last_card_index);
+            assert!(*dest_column_card % 13 != 0, ECannotPlaceOnAce);
+            let card_mod = card % 13;
+            if (card >= HEARTS_INDEX) {
+                assert!((card_mod == *dest_column_card - SPADES_INDEX - 1) || (card_mod == *dest_column_card - CLUBS_INDEX - 1), EInvalidPlacement);
+                while (vector::length(&src_column.cards) >= index) {
+                    let card_to_move = vector::remove(&mut src_column.cards, index);
+                    vector::push_back(&mut dest_column.cards, card_to_move);
+                };
+                if (src_column.hidden_cards > 0 && vector::is_empty(&src_column.cards)) {
+                    src_column.hidden_cards = src_column.hidden_cards - 1;
+                    let card = reveal_card(clock, &mut game.available_cards);
+                    vector::push_back(&mut src_column.cards, card);
+                }
+            } else {
+                assert!((card_mod == *dest_column_card - HEARTS_INDEX - 1) || (card_mod == *dest_column_card - DIAMONDS_INDEX - 1), EInvalidPlacement);
+                while (vector::length(&src_column.cards) >= index) {
+                    let card_to_move = vector::remove(&mut src_column.cards, index);
+                    vector::push_back(&mut dest_column.cards, card_to_move);
+                };
+                if (src_column.hidden_cards > 0 && vector::is_empty(&src_column.cards)) {
+                    src_column.hidden_cards = src_column.hidden_cards - 1;
+                    let card = reveal_card(clock, &mut game.available_cards);
+                    vector::push_back(&mut src_column.cards, card);
+                }
+            }
+        };
+        vector::insert(&mut game.columns, dest_column, dest_column_index);
     }
 
     public fun from_pile_to_column(game: &mut Game, pile_index: u64, column_index: u64, ctx: &mut TxContext) {
         assert!(game.player == tx_context::sender(ctx), EInvalidGamePlayer);
+        assert!(pile_index < PILE_COUNT, EInvalidPileIndex);
+        assert!(column_index < COLUMN_COUNT, EInvalidColumnIndex);
         let pile = vector::borrow_mut(&mut game.piles, pile_index);
         let column = vector::borrow_mut(&mut game.columns, column_index);
         let pile_card = vector::pop_back(&mut pile.cards);
@@ -231,9 +301,7 @@ module solitaire::solitaire {
         vector::push_back(&mut game.deck.cards, card);
     }
 
-    fun game_won(game: &mut Game, ctx: TxContext) {
-
-    }
+    //fun game_won(game: &mut Game, ctx: TxContext) {}
 
     fun set_up_columns(clock: &Clock, available_cards: &mut vector<u64>): vector<Column> {
         let columns = vector::empty<Column>();
