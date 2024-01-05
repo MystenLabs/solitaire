@@ -18,6 +18,8 @@ module solitaire::solitaire {
     const ECardNotInColumn: u64 = 8;
     const EInvalidColumnIndex: u64 = 9;
     const EInvalidPileIndex: u64 = 10;
+    const EGameNotFinished: u64 = 11;
+    const EGameHasFinished: u64 = 12;
 
 // =================== Constants ===================
     const CARD_COUNT: u64 = 52;
@@ -40,6 +42,7 @@ module solitaire::solitaire {
         available_cards: vector<u64>,
         player: address,
         start_time: u64,
+        end_time: u64,
         player_moves: u64,
         difficulty: String,
     }
@@ -95,6 +98,7 @@ module solitaire::solitaire {
             player: tx_context::sender(ctx),
             player_moves: 0,
             start_time: clock::timestamp_ms(clock),
+            end_time: 0,
             difficulty: utf8(b"NORMAL"),
         };
 
@@ -135,6 +139,7 @@ module solitaire::solitaire {
             player: tx_context::sender(ctx),
             player_moves: 0,
             start_time: clock::timestamp_ms(clock),
+            end_time: 0,
             difficulty: utf8(b"EASY"),
         };
 
@@ -282,6 +287,7 @@ module solitaire::solitaire {
     public fun from_pile_to_column(game: &mut Game, pile_index: u64, column_index: u64, _ctx: &mut TxContext) {
         assert!(pile_index < PILE_COUNT, EInvalidPileIndex);
         assert!(column_index < COLUMN_COUNT, EInvalidColumnIndex);
+        assert!(game.end_time == 0, EGameHasFinished);
         let pile = vector::borrow_mut(&mut game.piles, pile_index);
         let column = vector::borrow_mut(&mut game.columns, column_index);
         let pile_card = vector::pop_back(&mut pile.cards);
@@ -314,18 +320,16 @@ module solitaire::solitaire {
         vector::push_back(&mut game.deck.cards, card);
     }
 
-    /// This funtion is used to return the status of the game.
-    public fun game_status(game: &Game, _ctx: &mut TxContext) : String {
+    /// This funtion needs to be called when the player has finished the game.
+    public fun finish_game(game: &mut Game, clock: &Clock, _ctx: &mut TxContext) {
         let i = 0;
         let pile = vector::borrow(&game.piles, i);
         while (i < PILE_COUNT) {
-            if (vector::length(&pile.cards) != 13) {
-                return utf8(b"GAME_NOT_WON")
-            };
+            assert!(vector::length(&pile.cards) == 13, EGameNotFinished);
             i = i + 1;
             pile = vector::borrow(&game.piles, i);
         };
-        return utf8(b"GAME_WON")
+        game.end_time = clock::timestamp_ms(clock);
     }
 
     /// Internal function that sets up the 7 columns of cards.
