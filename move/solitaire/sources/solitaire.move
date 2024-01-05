@@ -7,18 +7,17 @@ module solitaire::solitaire {
     use std::string::{String, utf8};
 
 // =================== Error Codes ===================
-    const EInvalidGamePlayer: u64 = 0;
-    const ENoMoreHiddenCards: u64 = 1;
-    const ECardNotInDeck: u64 = 2;
-    const ENotKingCard: u64 = 3;
-    const EInvalidPlacement: u64 = 4;
-    const ECannotPlaceOnAce: u64 = 5;
-    const ENotAceCard: u64 = 6;
-    const ECannotPlaceOnKing: u64 = 7;
-    const EColumnIsEmpty: u64 = 8;
-    const ECardNotInColumn: u64 = 9;
-    const EInvalidColumnIndex: u64 = 10;
-    const EInvalidPileIndex: u64 = 11;
+    const ENoMoreHiddenCards: u64 = 0;
+    const ECardNotInDeck: u64 = 1;
+    const ENotKingCard: u64 = 2;
+    const EInvalidPlacement: u64 = 3;
+    const ECannotPlaceOnAce: u64 = 4;
+    const ENotAceCard: u64 = 5;
+    const ECannotPlaceOnKing: u64 = 6;
+    const EColumnIsEmpty: u64 = 7;
+    const ECardNotInColumn: u64 = 8;
+    const EInvalidColumnIndex: u64 = 9;
+    const EInvalidPileIndex: u64 = 10;
 
 // =================== Constants ===================
     const CARD_COUNT: u64 = 52;
@@ -41,6 +40,7 @@ module solitaire::solitaire {
         available_cards: vector<u64>,
         player: address,
         start_time: u64,
+        player_moves: u64,
         difficulty: String,
     }
 
@@ -93,11 +93,12 @@ module solitaire::solitaire {
             columns,
             available_cards,
             player: tx_context::sender(ctx),
+            player_moves: 0,
             start_time: clock::timestamp_ms(clock),
             difficulty: utf8(b"NORMAL"),
         };
 
-        transfer::share_object(game);
+        transfer::transfer(game, tx_context::sender(ctx));
     }
 
     /// An easy game has all the Aces placed on the Piles by default.
@@ -132,15 +133,15 @@ module solitaire::solitaire {
             columns,
             available_cards,
             player: tx_context::sender(ctx),
+            player_moves: 0,
             start_time: clock::timestamp_ms(clock),
             difficulty: utf8(b"EASY"),
         };
 
-        transfer::share_object(game);
+        transfer::transfer(game, tx_context::sender(ctx));
     }
 
-    public fun from_deck_to_column(game: &mut Game, card: u64, column_index: u64, ctx: &mut TxContext) {
-        assert!(game.player == tx_context::sender(ctx), EInvalidGamePlayer);
+    public fun from_deck_to_column(game: &mut Game, card: u64, column_index: u64, _ctx: &mut TxContext) {
         assert!(column_index < COLUMN_COUNT, EInvalidColumnIndex);
         let (exist, index) = vector::index_of(&game.deck.cards, &card);
         assert!(exist, ECardNotInDeck);
@@ -165,12 +166,12 @@ module solitaire::solitaire {
                 assert!((card_mod == *column_card - HEARTS_INDEX - 1) || (card_mod == *column_card - DIAMONDS_INDEX - 1), EInvalidPlacement);
                 let card_to_place = vector::remove(&mut game.deck.cards, index);
                 vector::push_back(&mut column.cards, card_to_place);
-            }
-        }
+            };
+        };
+        game.player_moves = game.player_moves + 1;
     }
 
-    public fun from_deck_to_pile(game: &mut Game, card: u64, pile_index: u64, ctx: &mut TxContext) {
-        assert!(game.player == tx_context::sender(ctx), EInvalidGamePlayer);
+    public fun from_deck_to_pile(game: &mut Game, card: u64, pile_index: u64, _ctx: &mut TxContext) {
         assert!(pile_index < PILE_COUNT, EInvalidPileIndex);
         let (exist, index) = vector::index_of(&game.deck.cards, &card);
         assert!(exist, ECardNotInDeck);
@@ -188,11 +189,11 @@ module solitaire::solitaire {
             assert!(card == *pile_card + 1, EInvalidPlacement);
             let card_to_place = vector::remove(&mut game.deck.cards, index);
             vector::push_back(&mut pile.cards, card_to_place);
-        }
+        };
+        game.player_moves = game.player_moves + 1;
     }
 
-    public fun from_column_to_pile(game: &mut Game, column_index: u64, pile_index: u64, clock: &Clock, ctx: &mut TxContext) {
-        assert!(game.player == tx_context::sender(ctx), EInvalidGamePlayer);
+    public fun from_column_to_pile(game: &mut Game, column_index: u64, pile_index: u64, clock: &Clock, _ctx: &mut TxContext) {
         assert!(column_index < COLUMN_COUNT, EInvalidColumnIndex);
         assert!(pile_index < PILE_COUNT, EInvalidPileIndex);
         let column = vector::borrow_mut(&mut game.columns, column_index);
@@ -207,7 +208,7 @@ module solitaire::solitaire {
                 column.hidden_cards = column.hidden_cards - 1;
                 let card = reveal_card(clock, &mut game.available_cards);
                 vector::push_back(&mut column.cards, card);
-            }
+            };
         } else {
             let last_card_index = vector::length(&pile.cards) - 1;
             let pile_card = vector::borrow(&pile.cards, last_card_index);
@@ -219,12 +220,12 @@ module solitaire::solitaire {
                 column.hidden_cards = column.hidden_cards - 1;
                 let card = reveal_card(clock, &mut game.available_cards);
                 vector::push_back(&mut column.cards, card);
-            }
-        }
+            };
+        };
+        game.player_moves = game.player_moves + 1;
     }
 
-    public fun from_column_to_column(game: &mut Game, src_column_index: u64, card: u64, dest_column_index: u64, clock: &Clock, ctx: &mut TxContext) {
-        assert!(game.player == tx_context::sender(ctx), EInvalidGamePlayer);
+    public fun from_column_to_column(game: &mut Game, src_column_index: u64, card: u64, dest_column_index: u64, clock: &Clock, _ctx: &mut TxContext) {
         assert!(src_column_index < COLUMN_COUNT, EInvalidColumnIndex);
         assert!(dest_column_index < COLUMN_COUNT, EInvalidColumnIndex);
         // One column needs to be removed because it is not allowed to take 2 mutable references to the same vector.
@@ -244,7 +245,7 @@ module solitaire::solitaire {
                 src_column.hidden_cards = src_column.hidden_cards - 1;
                 let card = reveal_card(clock, &mut game.available_cards);
                 vector::push_back(&mut src_column.cards, card);
-            }
+            };
         } else {
             let last_card_index = vector::length(&dest_column.cards) - 1;
             let dest_column_card = vector::borrow(&dest_column.cards, last_card_index);
@@ -260,7 +261,7 @@ module solitaire::solitaire {
                     src_column.hidden_cards = src_column.hidden_cards - 1;
                     let card = reveal_card(clock, &mut game.available_cards);
                     vector::push_back(&mut src_column.cards, card);
-                }
+                };
             } else {
                 assert!((card_mod == *dest_column_card - HEARTS_INDEX - 1) || (card_mod == *dest_column_card - DIAMONDS_INDEX - 1), EInvalidPlacement);
                 while (vector::length(&src_column.cards) >= index) {
@@ -271,14 +272,14 @@ module solitaire::solitaire {
                     src_column.hidden_cards = src_column.hidden_cards - 1;
                     let card = reveal_card(clock, &mut game.available_cards);
                     vector::push_back(&mut src_column.cards, card);
-                }
-            }
+                };
+            };
         };
+        game.player_moves = game.player_moves + 1;
         vector::insert(&mut game.columns, dest_column, dest_column_index);
     }
 
-    public fun from_pile_to_column(game: &mut Game, pile_index: u64, column_index: u64, ctx: &mut TxContext) {
-        assert!(game.player == tx_context::sender(ctx), EInvalidGamePlayer);
+    public fun from_pile_to_column(game: &mut Game, pile_index: u64, column_index: u64, _ctx: &mut TxContext) {
         assert!(pile_index < PILE_COUNT, EInvalidPileIndex);
         assert!(column_index < COLUMN_COUNT, EInvalidColumnIndex);
         let pile = vector::borrow_mut(&mut game.piles, pile_index);
@@ -300,13 +301,13 @@ module solitaire::solitaire {
             } else {
                 assert!((pile_card_mod == *column_card - HEARTS_INDEX - 1) || (pile_card_mod == *column_card - DIAMONDS_INDEX - 1), EInvalidPlacement);
                 vector::push_back(&mut column.cards, pile_card);
-            }
-        }
+            };
+        };
+        game.player_moves = game.player_moves + 1;
     }
 
     /// This function is used to reveal a card from the deck if there are still hidden cards.
-    public fun open_deck_card(game: &mut Game, clock: &Clock, ctx: &mut TxContext) {
-        assert!(game.player == tx_context::sender(ctx), EInvalidGamePlayer);
+    public fun open_deck_card(game: &mut Game, clock: &Clock, _ctx: &mut TxContext) {
         assert!(game.deck.hidden_cards > 0, ENoMoreHiddenCards);
         game.deck.hidden_cards = game.deck.hidden_cards - 1;
         let card = reveal_card(clock, &mut game.available_cards);
