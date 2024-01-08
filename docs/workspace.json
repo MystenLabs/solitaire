@@ -2,10 +2,10 @@
   "id" : 1,
   "name" : "Name",
   "description" : "Description",
-  "lastModifiedDate" : "2024-01-03T09:32:36Z",
+  "lastModifiedDate" : "2024-01-08T11:22:24Z",
   "lastModifiedAgent" : "structurizr-javascript",
   "properties" : {
-    "structurizr.dsl" : "IWNvbnN0YW50IFNZU1RFTV9OQU1FICJTb2xpdGFpcmUgZEFwcCIKCndvcmtzcGFjZSB7CiAgICBtb2RlbCB7CiAgICAgICAgdXNlciA9IHBlcnNvbiAiVXNlciIgIkEgdXNlciBoYXZpbmcgYSB3YWxsZXQgdGhhdCBzdXBwb3J0cyBTdWkuIgoKICAgICAgICBnYW1lID0gc29mdHdhcmVTeXN0ZW0gIiR7U1lTVEVNX05BTUV9IiAiQWxsb3dzIHVzZXJzIHRvIHBsYXkgc29saXRhaXJlIG9uIHRoZSBTdWkgbmV0d29yay4iIHsKICAgICAgICAgICAgZ3JvdXAgIkZyb250ZW5kIiB7CiAgICAgICAgICAgICAgICB3ZWJhcHBDb21wID0gY29udGFpbmVyICJXZWIgQXBwbGljYXRpb24iICJEZWxpdmVycyB0aGUgVUkgYXMgYSBzaW5nbGUgcGFnZSBhcHBsaWNhdGlvbi4iICJuZXh0LmpzIgogICAgICAgICAgICAgICAgc2luZ2xlUGFnZUFwcGxpY2F0aW9uQ29udCA9IGNvbnRhaW5lciAiU2luZ2xlLVBhZ2UtQXBwbGljYXRpb24iICJBIHNpbmdsZSBwYWdlIGFwcGxpY2F0aW9uIHdlcmUgdGhlIHBsYXllciBpbnRlcmFjdHMgd2l0aCB0aGUgZ2FtZS4iICJSZWFjdCIgewogICAgICAgICAgICAgICAgICAgIGF1dGhlbnRpY2F0b3IgPSBjb21wb25lbnQgIkF1dGhlbnRpY2F0b3IiICJIYW5kbGVzIHRoZSB1c2VyJ3MgdHJhbnNhY3Rpb24gYXV0aGVudGljYXRpb24uIiAiemtsb2dpbiIKICAgICAgICAgICAgICAgICAgICBnYW1lQm9hcmQgPSBjb21wb25lbnQgIkdhbWUgQm9hcmQiICJBbGxvd3MgdGhlIHVzZXIgdG8gaW50ZXJhY3Qgd2l0aCB0aGUgZ2FtZSBib2FyZCBhbmQgdGhlIGNhcmRzLiIgIlJlYWN0LCBTdWkgVFMtU0RLIiB7CiAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgImdhbWUgYm9hcmQiCiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIGFzc2V0cyA9IGNvbXBvbmVudCAiQXNzZXRzIiAiQ29udGFpbnMgY2FyZCBpY29ucywgcG9rZXIgdGFibGUgbG9vayBhbmQgb3RoZXIgZGVzaWducy4iICJQTkcsIEpQRUcsIFNWRyIgewogICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJhc3NldHMiCiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIHRhZ3MgIlNQQSIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQogICAgICAgICAgICBncm91cCAiV2ViMyBMYXllciIgewogICAgICAgICAgICAgICAgc21hcnRDb250cmFjdENvbnQgPSBjb250YWluZXIgIlNtYXJ0IENvbnRyYWN0IiAiQ29udGFpbnMgYWxsIHRoZSBnYW1lIGxvZ2ljL3J1bGVzLiBFYWNoIHBsYXllciBtb3ZlIGlzIGEgY2FsbCB0byB0aGUgc21hcnQgY29udHJhY3QuIiAiU3VpIE1vdmUiIHsKICAgICAgICAgICAgICAgICAgICB0YWdzICJzbWFydCBjb250cmFjdCIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQogICAgICAgIH0KCiAgICAgICAgIyBDb250ZXh0IGxldmVsIHJlbGF0aW9uc2hpcHMKICAgICAgICB1c2VyIC0+IGdhbWUgIlBsYXlzIgoKICAgICAgICAjIENvbXBvbmVudCBsZXZlbCByZWxhdGlvbnNoaXBzCiAgICAgICAgdXNlciAtPiBzaW5nbGVQYWdlQXBwbGljYXRpb25Db250ICJTaWducyBpbiwgc3RhcnRzL2VuZHMgZ2FtZSwgbW92ZXMgY2FyZHMgYXJvdW5kIgogICAgICAgIHVzZXIgLT4gd2ViYXBwQ29tcCAiUmVxdWVzdHMgcGFnZSBmcm9tIiAiSFRUUCIKICAgICAgICB3ZWJhcHBDb21wIC0+IHNpbmdsZVBhZ2VBcHBsaWNhdGlvbkNvbnQgIkRlbGl2ZXJzIHRvIHRoZSB1c2VyJ3MgYnJvd3NlciIgIkhUVFAiCiAgICAgICAgc2luZ2xlUGFnZUFwcGxpY2F0aW9uQ29udCAtPiBzbWFydENvbnRyYWN0Q29udCAiTWFrZXMgbW92ZSBjYWxscyIKICAgICAgICBhdXRoZW50aWNhdG9yIC0+IGdhbWVCb2FyZCAiQXV0aGVudGljYXRlcyB0cmFuc2FjdGlvbnMgb2YiCiAgICAgICAgYXNzZXRzIC0+IGdhbWVCb2FyZCAiR2V0IGRpc3BsYXllZCBvbiIKCiAgICAgICAgdXNlciAtPiBhdXRoZW50aWNhdG9yICJTaWducyBpbiB3aXRoIgogICAgICAgIHVzZXIgLT4gZ2FtZUJvYXJkICJQbGF5cyBvbiIKCiAgICAgICAgZ2FtZUJvYXJkIC0+IHNtYXJ0Q29udHJhY3RDb250ICJNYWtlcyBtb3ZlIGNhbGxzIHRvIgogICAgfQoKICAgIHZpZXdzIHsKICAgICAgICBzeXN0ZW1Db250ZXh0IGdhbWUgIkNvbnRleHQiIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgICAgIGF1dG9sYXlvdXQgbHIKICAgICAgICB9CgogICAgICAgIGNvbnRhaW5lciBnYW1lICJDb250YWluZXIiIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgICAgIGF1dG9sYXlvdXQKICAgICAgICB9CgogICAgICAgIGNvbXBvbmVudCBzaW5nbGVQYWdlQXBwbGljYXRpb25Db250ICJDb21wb25lbnQiIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgICAgIGF1dG9sYXlvdXQKICAgICAgICB9CgogICAgICAgIHN0eWxlcyB7CiAgICAgICAgICAgIGVsZW1lbnQgIlNQQSIgewogICAgICAgICAgICAgICAgc2hhcGUgV2ViQnJvd3NlcgogICAgICAgICAgICB9CiAgICAgICAgICAgIGVsZW1lbnQgImFzc2V0cyIgewogICAgICAgICAgICAgICAgc2hhcGUgRm9sZGVyCiAgICAgICAgICAgIH0KICAgICAgICAgICAgZWxlbWVudCAiZ2FtZSBib2FyZCIgewogICAgICAgICAgICAgICAgYmFja2dyb3VuZCAjMTA3QzEwCiAgICAgICAgICAgICAgICBjb2xvciAjRkZGRkZGCiAgICAgICAgICAgIH0KICAgICAgICB9CgogICAgICAgIHRoZW1lcyBkZWZhdWx0CiAgICB9Cgp9Cg=="
+    "structurizr.dsl" : "IWNvbnN0YW50IFNZU1RFTV9OQU1FICJTb2xpdGFpcmUgZEFwcCIKCndvcmtzcGFjZSB7CiAgICBtb2RlbCB7CiAgICAgICAgdXNlciA9IHBlcnNvbiAiVXNlciIgIkEgdXNlciBoYXZpbmcgYSB3YWxsZXQgdGhhdCBzdXBwb3J0cyBTdWkuIgoKICAgICAgICBnYW1lID0gc29mdHdhcmVTeXN0ZW0gIiR7U1lTVEVNX05BTUV9IiAiQWxsb3dzIHVzZXJzIHRvIHBsYXkgc29saXRhaXJlIG9uIHRoZSBTdWkgbmV0d29yay4iIHsKICAgICAgICAgICAgZ3JvdXAgIkZyb250ZW5kIiB7CiAgICAgICAgICAgICAgICB3ZWJhcHBDb21wID0gY29udGFpbmVyICJXZWIgQXBwbGljYXRpb24iICJEZWxpdmVycyB0aGUgVUkgYXMgYSBzaW5nbGUgcGFnZSBhcHBsaWNhdGlvbi4iICJuZXh0LmpzIgogICAgICAgICAgICAgICAgc2luZ2xlUGFnZUFwcGxpY2F0aW9uQ29udCA9IGNvbnRhaW5lciAiU2luZ2xlLVBhZ2UtQXBwbGljYXRpb24iICJBIHNpbmdsZSBwYWdlIGFwcGxpY2F0aW9uIHdlcmUgdGhlIHBsYXllciBpbnRlcmFjdHMgd2l0aCB0aGUgZ2FtZS4iICJSZWFjdCIgewogICAgICAgICAgICAgICAgICAgIGF1dGhlbnRpY2F0b3IgPSBjb21wb25lbnQgIkF1dGhlbnRpY2F0b3IiICJIYW5kbGVzIHRoZSB1c2VyJ3MgdHJhbnNhY3Rpb24gYXV0aGVudGljYXRpb24uIiAiemtsb2dpbiIKICAgICAgICAgICAgICAgICAgICBnYW1lQm9hcmQgPSBjb21wb25lbnQgIkdhbWUgQm9hcmQiICJBbGxvd3MgdGhlIHVzZXIgdG8gaW50ZXJhY3Qgd2l0aCB0aGUgZ2FtZSBib2FyZCBhbmQgdGhlIGNhcmRzLiIgIlJlYWN0LCBTdWkgVFMtU0RLIiB7CiAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgImdhbWUgYm9hcmQiCiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIGFzc2V0cyA9IGNvbXBvbmVudCAiQXNzZXRzIiAiQ29udGFpbnMgY2FyZCBpY29ucywgcG9rZXIgdGFibGUgbG9vayBhbmQgb3RoZXIgZGVzaWducy4iICJQTkcsIEpQRUcsIFNWRyIgewogICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJhc3NldHMiCiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIHRhZ3MgIlNQQSIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQogICAgICAgICAgICBncm91cCAiV2ViMyBMYXllciIgewogICAgICAgICAgICAgICAgc21hcnRDb250cmFjdENvbnQgPSBjb250YWluZXIgIlNtYXJ0IENvbnRyYWN0IiAiQ29udGFpbnMgYWxsIHRoZSBnYW1lIGxvZ2ljL3J1bGVzLiBFYWNoIHBsYXllciBtb3ZlIGlzIGEgY2FsbCB0byB0aGUgc21hcnQgY29udHJhY3QuIiAiU3VpIE1vdmUiIHsKICAgICAgICAgICAgICAgICAgICB0YWdzICJzbWFydCBjb250cmFjdCIKICAgICAgICAgICAgICAgICAgICAvLwogICAgICAgICAgICAgICAgICAgIHNvbGl0YWlyZU1vZHVsZSA9IGNvbXBvbmVudCAiU29saXRhaXJlIE1vZHVsZSIgIkNvbnRhaW5zIHRoZSBnYW1lIGxvZ2ljL3J1bGVzLiIKCiAgICAgICAgICAgICAgICAgICAgZ3JvdXAgIkdhbWUgbW9kZXMiIHsKICAgICAgICAgICAgICAgICAgICAgICAgbm9ybWFsTW9kZSA9IGNvbXBvbmVudCAiaW5pdF9ub3JtYWxfZ2FtZSguLi4pIiAiUHJvZHVjZXMgYSBHYW1lIG9iamVjdCB3aXRoIGEgc2h1ZmZsZWQgRGVjayBhbmQgZW1wdHkgUGlsZXMuIgogICAgICAgICAgICAgICAgICAgICAgICBlYXN5TW9kZSA9IGNvbXBvbmVudCAiaW5pdF9lYXN5X2dhbWUoLi4uKSIgIlByb2R1Y2VzIGEgR2FtZSB3aGljaCBoYXMgYWxsIHRoZSBBY2VzIHBsYWNlZCBvbiB0aGUgUGlsZXMuIgogICAgICAgICAgICAgICAgICAgIH0KCiAgICAgICAgICAgICAgICAgICAgZ3JvdXAgIkdhbWUgc3RhdGUiIHsKICAgICAgICAgICAgICAgICAgICAgICAgZ2FtZVN0cnVjdCA9IGNvbXBvbmVudCAiR2FtZSBTdHJ1Y3QiICJDb250YWlucyB0aGUgZ2FtZSdzIHN0YXRlOiBUaGUgUGxheWVyIGFkZHJlc3MsIERlY2ssIHRoZSBQaWxlcywgdGhlIENvbHVtbnMsIGV0Yy4iCiAgICAgICAgICAgICAgICAgICAgICAgIGRlY2tTdHJ1Y3QgPSBjb21wb25lbnQgIkRlY2sgU3RydWN0IiAiQ29udGFpbnMgMjQgY2FyZHMgdGhhdCBhcmUgbm90IHlldCBpbiB0aGUgZ2FtZSAodGhleSBhcmUgaGlkZGVuKTsgbmV3IGNhcmRzIGFyZSBwdWxsZWQgZnJvbSBoZXJlLiIKICAgICAgICAgICAgICAgICAgICAgICAgcGlsZVN0cnVjdCA9IGNvbXBvbmVudCAiUGlsZSBTdHJ1Y3QiICJUaGUgZ2FtZSdzIGdvYWw6IFRvIHdpbiwgZWFjaCBQaWxlIChvZiBjYXJkcykgc2hvdWxkIGJlIG9yZGVyZWQgZnJvbSBBY2UgdG8gS2luZyBvZiB0aGUgc2FtZSBzdWl0LiIKICAgICAgICAgICAgICAgICAgICAgICAgY29sdW1uU3RydWN0ID0gY29tcG9uZW50ICJDb2x1bW4gU3RydWN0IiAiVGhlIGdhbWUncyBtYWluIGFyZWE6IFRoZSBDb2x1bW5zLiBFYWNoIENvbHVtbiBjYW4gY29udGFpbiBhIHN0YWNrIG9mIGNhcmRzLCB3aGljaCBhcmUgb3JkZXJlZCBmcm9tIEtpbmcgdG8gQWNlLCBhbHRlcm5hdGluZyBiZXR3ZWVuIHJlZCBhbmQgYmxhY2suIgogICAgICAgICAgICAgICAgICAgIH0KCiAgICAgICAgICAgICAgICAgICAgZ3JvdXAgIkdhbWUgYWN0aW9ucyIgewogICAgICAgICAgICAgICAgICAgICAgICBmcm9tRGVja1RvQ29sdW1uID0gY29tcG9uZW50ICJmcm9tX2RlY2tfdG9fY29sdW1uKC4uLikiICJNb3ZlcyBhIGNhcmQgZnJvbSB0aGUgRGVjayB0byBhIENvbHVtbi4iCiAgICAgICAgICAgICAgICAgICAgICAgIGZyb21EZWNrVG9QaWxlID0gY29tcG9uZW50ICJmcm9tX2RlY2tfdG9fcGlsZSguLi4pIiAiTW92ZXMgYSBjYXJkIGZyb20gdGhlIERlY2sgdG8gYSBQaWxlLiIKICAgICAgICAgICAgICAgICAgICAgICAgZnJvbUNvbHVtblRvUGlsZSA9IGNvbXBvbmVudCAiZnJvbV9jb2x1bW5fdG9fcGlsZSguLi4pIiAiTW92ZXMgYSBjYXJkIGZyb20gYSBDb2x1bW4gdG8gYSBQaWxlLiIKICAgICAgICAgICAgICAgICAgICAgICAgZnJvbUNvbHVtblRvQ29sdW1uID0gY29tcG9uZW50ICJmcm9tX2NvbHVtbl90b19jb2x1bW4oLi4uKSIgIk1vdmVzIGEgY2FyZCBmcm9tIGEgQ29sdW1uIHRvIGFub3RoZXIgQ29sdW1uLiIKICAgICAgICAgICAgICAgICAgICAgICAgZnJvbVBpbGVUb0NvbHVtbiA9IGNvbXBvbmVudCAiZnJvbV9waWxlX3RvX2NvbHVtbiguLi4pIiAiTW92ZXMgYSBjYXJkIGZyb20gYSBQaWxlIHRvIGEgQ29sdW1uLiIKICAgICAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgfQoKICAgICAgICAjIENvbnRleHQgbGV2ZWwgcmVsYXRpb25zaGlwcwogICAgICAgIHVzZXIgLT4gZ2FtZSAiUGxheXMiCgogICAgICAgICMgQ29tcG9uZW50IGxldmVsIHJlbGF0aW9uc2hpcHMKICAgICAgICB1c2VyIC0+IHNpbmdsZVBhZ2VBcHBsaWNhdGlvbkNvbnQgIlNpZ25zIGluLCBzdGFydHMvZW5kcyBnYW1lLCBtb3ZlcyBjYXJkcyBhcm91bmQiCiAgICAgICAgdXNlciAtPiB3ZWJhcHBDb21wICJSZXF1ZXN0cyBwYWdlIGZyb20iICJIVFRQIgogICAgICAgIHdlYmFwcENvbXAgLT4gc2luZ2xlUGFnZUFwcGxpY2F0aW9uQ29udCAiRGVsaXZlcnMgdG8gdGhlIHVzZXIncyBicm93c2VyIiAiSFRUUCIKICAgICAgICBzaW5nbGVQYWdlQXBwbGljYXRpb25Db250IC0+IHNtYXJ0Q29udHJhY3RDb250ICJNYWtlcyBtb3ZlIGNhbGxzIgogICAgICAgIGF1dGhlbnRpY2F0b3IgLT4gZ2FtZUJvYXJkICJBdXRoZW50aWNhdGVzIHRyYW5zYWN0aW9ucyBvZiIKICAgICAgICBhc3NldHMgLT4gZ2FtZUJvYXJkICJHZXQgZGlzcGxheWVkIG9uIgoKICAgICAgICB1c2VyIC0+IGF1dGhlbnRpY2F0b3IgIlNpZ25zIGluIHdpdGgiCiAgICAgICAgdXNlciAtPiBnYW1lQm9hcmQgIlBsYXlzIG9uIgoKICAgICAgICBnYW1lQm9hcmQgLT4gc21hcnRDb250cmFjdENvbnQgIk1ha2VzIG1vdmUgY2FsbHMgdG8iCgogICAgICAgICMgU21hcnQgY29udHJhY3QncyBjb21wb25lbnQgcmVsYXRpb25zaGlwcwogICAgICAgIGdhbWVCb2FyZCAtPiBzb2xpdGFpcmVNb2R1bGUgIk1ha2VzIG1vdmUgY2FsbHMgdG8iCiAgICAgICAgc29saXRhaXJlTW9kdWxlIC0+IG5vcm1hbE1vZGUgIlVzZXMgdG8gaW5pdGlhbGl6ZSBhIGdhbWUgb2JqZWN0IgogICAgICAgIHNvbGl0YWlyZU1vZHVsZSAtPiBlYXN5TW9kZSAiVXNlcyB0byBpbml0aWFsaXplIGEgZ2FtZSBvYmplY3QiCiAgICAgICAgbm9ybWFsTW9kZSAtPiBnYW1lU3RydWN0ICJHZW5lcmF0ZXMiCiAgICAgICAgZWFzeU1vZGUgLT4gZ2FtZVN0cnVjdCAiR2VuZXJhdGVzIgoKICAgICAgICAvLyBTdHJ1Y3Qgb3duZXJzaGlwCiAgICAgICAgZ2FtZVN0cnVjdCAtPiBkZWNrU3RydWN0ICJPd25zIgogICAgICAgIGdhbWVTdHJ1Y3QgLT4gcGlsZVN0cnVjdCAiT3ducyIKICAgICAgICBnYW1lU3RydWN0IC0+IGNvbHVtblN0cnVjdCAiT3ducyIKCiAgICAgICAgLy8gRnVuY3Rpb24gY2FsbHMKICAgICAgICBmcm9tRGVja1RvQ29sdW1uIC0+IGRlY2tTdHJ1Y3QgIk1vZGlmaWVzIgogICAgICAgIGZyb21EZWNrVG9Db2x1bW4gLT4gY29sdW1uU3RydWN0ICJNb2RpZmllcyIKCiAgICAgICAgZnJvbURlY2tUb1BpbGUgLT4gZGVja1N0cnVjdCAiTW9kaWZpZXMiCiAgICAgICAgZnJvbURlY2tUb1BpbGUgLT4gcGlsZVN0cnVjdCAiTW9kaWZpZXMiCgogICAgICAgIGZyb21Db2x1bW5Ub1BpbGUgLT4gY29sdW1uU3RydWN0ICJNb2RpZmllcyIKICAgICAgICBmcm9tQ29sdW1uVG9QaWxlIC0+IHBpbGVTdHJ1Y3QgIk1vZGlmaWVzIgoKICAgICAgICBmcm9tQ29sdW1uVG9Db2x1bW4gLT4gY29sdW1uU3RydWN0ICJNb2RpZmllcyIKCiAgICAgICAgZnJvbVBpbGVUb0NvbHVtbiAtPiBwaWxlU3RydWN0ICJNb2RpZmllcyIKICAgICAgICBmcm9tUGlsZVRvQ29sdW1uIC0+IGNvbHVtblN0cnVjdCAiTW9kaWZpZXMiCiAgICB9CgogICAgdmlld3MgewogICAgICAgIHN5c3RlbUNvbnRleHQgZ2FtZSAiR2FtZUNvbnRleHRWaWV3IiB7CiAgICAgICAgICAgIGluY2x1ZGUgKgogICAgICAgICAgICBhdXRvbGF5b3V0IGxyCiAgICAgICAgfQoKICAgICAgICBjb250YWluZXIgZ2FtZSAiR2FtZUNvbnRhaW5lclZpZXciIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgICAgIGF1dG9sYXlvdXQKICAgICAgICB9CgogICAgICAgIGNvbXBvbmVudCBzaW5nbGVQYWdlQXBwbGljYXRpb25Db250ICJTaW5nbGVQYWdlQXBwbGljYXRpb25Db21wb25lbnRWaWV3IiB7CiAgICAgICAgICAgIGluY2x1ZGUgKgogICAgICAgICAgICBhdXRvbGF5b3V0CiAgICAgICAgfQoKICAgICAgICBjb21wb25lbnQgc21hcnRDb250cmFjdENvbnQgIlNtYXJ0Q29udHJhY3RDb21wb25lbnRWaWV3IiB7CiAgICAgICAgICAgIGluY2x1ZGUgKgogICAgICAgIH0KCiAgICAgICAgc3R5bGVzIHsKICAgICAgICAgICAgZWxlbWVudCAiU1BBIiB7CiAgICAgICAgICAgICAgICBzaGFwZSBXZWJCcm93c2VyCiAgICAgICAgICAgIH0KICAgICAgICAgICAgZWxlbWVudCAiYXNzZXRzIiB7CiAgICAgICAgICAgICAgICBzaGFwZSBGb2xkZXIKICAgICAgICAgICAgfQogICAgICAgICAgICBlbGVtZW50ICJnYW1lIGJvYXJkIiB7CiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kICMxMDdDMTAKICAgICAgICAgICAgICAgIGNvbG9yICNGRkZGRkYKICAgICAgICAgICAgfQogICAgICAgIH0KCiAgICAgICAgdGhlbWVzIGRlZmF1bHQKICAgIH0KCn0K"
   },
   "configuration" : { },
   "model" : {
@@ -18,51 +18,51 @@
       "name" : "User",
       "description" : "A user having a wallet that supports Sui.",
       "relationships" : [ {
-        "id" : "16",
+        "id" : "23",
         "tags" : "Relationship",
         "properties" : {
-          "structurizr.dsl.identifier" : "67f094af-6329-47fe-af15-77dbfcd3f30c"
-        },
-        "sourceId" : "1",
-        "destinationId" : "5",
-        "description" : "Signs in with"
-      }, {
-        "id" : "10",
-        "tags" : "Relationship",
-        "properties" : {
-          "structurizr.dsl.identifier" : "df6589f1-3c3b-4799-b5de-fd0c26c8dbc6"
-        },
-        "sourceId" : "1",
-        "destinationId" : "4",
-        "description" : "Signs in, starts/ends game, moves cards around"
-      }, {
-        "id" : "9",
-        "tags" : "Relationship",
-        "properties" : {
-          "structurizr.dsl.identifier" : "68e5a4a1-3041-4630-bf0a-948c8bba0445"
-        },
-        "sourceId" : "1",
-        "destinationId" : "2",
-        "description" : "Plays"
-      }, {
-        "id" : "17",
-        "tags" : "Relationship",
-        "properties" : {
-          "structurizr.dsl.identifier" : "b220a25b-8f2a-419a-a9c6-7bc1a6fb2841"
-        },
-        "sourceId" : "1",
-        "destinationId" : "6",
-        "description" : "Plays on"
-      }, {
-        "id" : "11",
-        "tags" : "Relationship",
-        "properties" : {
-          "structurizr.dsl.identifier" : "33e73edf-9059-4bd0-b638-e59dff173275"
+          "structurizr.dsl.identifier" : "1c2c8f22-71bd-4030-878a-0f1ba2e7ed77"
         },
         "sourceId" : "1",
         "destinationId" : "3",
         "description" : "Requests page from",
         "technology" : "HTTP"
+      }, {
+        "id" : "21",
+        "tags" : "Relationship",
+        "properties" : {
+          "structurizr.dsl.identifier" : "a32b5063-7436-4b0c-a38c-156a57cfd045"
+        },
+        "sourceId" : "1",
+        "destinationId" : "2",
+        "description" : "Plays"
+      }, {
+        "id" : "28",
+        "tags" : "Relationship",
+        "properties" : {
+          "structurizr.dsl.identifier" : "71344cf9-cba8-4869-bb26-349cd7c54ebe"
+        },
+        "sourceId" : "1",
+        "destinationId" : "5",
+        "description" : "Signs in with"
+      }, {
+        "id" : "29",
+        "tags" : "Relationship",
+        "properties" : {
+          "structurizr.dsl.identifier" : "550d70a7-41a9-4177-8daf-ceabbe03cdcb"
+        },
+        "sourceId" : "1",
+        "destinationId" : "6",
+        "description" : "Plays on"
+      }, {
+        "id" : "22",
+        "tags" : "Relationship",
+        "properties" : {
+          "structurizr.dsl.identifier" : "e507755b-df2f-4590-9182-72902cbd07e3"
+        },
+        "sourceId" : "1",
+        "destinationId" : "4",
+        "description" : "Signs in, starts/ends game, moves cards around"
       } ],
       "location" : "Unspecified"
     } ],
@@ -84,36 +84,51 @@
         "name" : "Single-Page-Application",
         "description" : "A single page application were the player interacts with the game.",
         "relationships" : [ {
-          "id" : "13",
+          "id" : "25",
           "tags" : "Relationship",
           "properties" : {
-            "structurizr.dsl.identifier" : "d0a6036a-9432-4c71-8b3d-ea833adc13c1"
+            "structurizr.dsl.identifier" : "bc3ccbd4-b73a-42d0-a788-fbad2d51a8ac"
           },
           "sourceId" : "4",
           "destinationId" : "8",
           "description" : "Makes move calls"
+        }, {
+          "id" : "32",
+          "sourceId" : "4",
+          "destinationId" : "9",
+          "description" : "Makes move calls to",
+          "linkedRelationshipId" : "31"
         } ],
         "group" : "Frontend",
         "technology" : "React",
         "components" : [ {
-          "id" : "7",
-          "tags" : "Element,Component,assets",
+          "id" : "6",
+          "tags" : "Element,Component,game board",
           "properties" : {
-            "structurizr.dsl.identifier" : "assets"
+            "structurizr.dsl.identifier" : "gameboard"
           },
-          "name" : "Assets",
-          "description" : "Contains card icons, poker table look and other designs.",
+          "name" : "Game Board",
+          "description" : "Allows the user to interact with the game board and the cards.",
           "relationships" : [ {
-            "id" : "15",
+            "id" : "30",
             "tags" : "Relationship",
             "properties" : {
-              "structurizr.dsl.identifier" : "e19571ff-c0f2-4c7b-9f31-4018e1f30e75"
+              "structurizr.dsl.identifier" : "0ce6ac7d-9dbe-4235-8091-e72f05f25918"
             },
-            "sourceId" : "7",
-            "destinationId" : "6",
-            "description" : "Get displayed on"
+            "sourceId" : "6",
+            "destinationId" : "8",
+            "description" : "Makes move calls to"
+          }, {
+            "id" : "31",
+            "tags" : "Relationship",
+            "properties" : {
+              "structurizr.dsl.identifier" : "613e85c8-0237-4413-8b98-97922b241555"
+            },
+            "sourceId" : "6",
+            "destinationId" : "9",
+            "description" : "Makes move calls to"
           } ],
-          "technology" : "PNG, JPEG, SVG",
+          "technology" : "React, Sui TS-SDK",
           "documentation" : { }
         }, {
           "id" : "5",
@@ -124,10 +139,10 @@
           "name" : "Authenticator",
           "description" : "Handles the user's transaction authentication.",
           "relationships" : [ {
-            "id" : "14",
+            "id" : "26",
             "tags" : "Relationship",
             "properties" : {
-              "structurizr.dsl.identifier" : "cd8bdc4d-ac75-46b1-a3df-fc44d0fdf23e"
+              "structurizr.dsl.identifier" : "9fd4c93f-c523-4fdc-9a44-f4e645f564e7"
             },
             "sourceId" : "5",
             "destinationId" : "6",
@@ -136,26 +151,48 @@
           "technology" : "zklogin",
           "documentation" : { }
         }, {
-          "id" : "6",
-          "tags" : "Element,Component,game board",
+          "id" : "7",
+          "tags" : "Element,Component,assets",
           "properties" : {
-            "structurizr.dsl.identifier" : "gameboard"
+            "structurizr.dsl.identifier" : "assets"
           },
-          "name" : "Game Board",
-          "description" : "Allows the user to interact with the game board and the cards.",
+          "name" : "Assets",
+          "description" : "Contains card icons, poker table look and other designs.",
           "relationships" : [ {
-            "id" : "18",
+            "id" : "27",
             "tags" : "Relationship",
             "properties" : {
-              "structurizr.dsl.identifier" : "2c2af722-2d0c-4ff5-863f-8cf46c739de3"
+              "structurizr.dsl.identifier" : "e8c54e53-d2dd-4717-b73c-b322dfa8cb29"
             },
-            "sourceId" : "6",
-            "destinationId" : "8",
-            "description" : "Makes move calls to"
+            "sourceId" : "7",
+            "destinationId" : "6",
+            "description" : "Get displayed on"
           } ],
-          "technology" : "React, Sui TS-SDK",
+          "technology" : "PNG, JPEG, SVG",
           "documentation" : { }
         } ],
+        "documentation" : { }
+      }, {
+        "id" : "3",
+        "tags" : "Element,Container",
+        "properties" : {
+          "structurizr.dsl.identifier" : "webappcomp"
+        },
+        "name" : "Web Application",
+        "description" : "Delivers the UI as a single page application.",
+        "relationships" : [ {
+          "id" : "24",
+          "tags" : "Relationship",
+          "properties" : {
+            "structurizr.dsl.identifier" : "77b7180a-3468-4bc8-98d9-ffa10ce7443a"
+          },
+          "sourceId" : "3",
+          "destinationId" : "4",
+          "description" : "Delivers to the user's browser",
+          "technology" : "HTTP"
+        } ],
+        "group" : "Frontend",
+        "technology" : "next.js",
         "documentation" : { }
       }, {
         "id" : "8",
@@ -167,28 +204,279 @@
         "description" : "Contains all the game logic/rules. Each player move is a call to the smart contract.",
         "group" : "Web3 Layer",
         "technology" : "Sui Move",
-        "documentation" : { }
-      }, {
-        "id" : "3",
-        "tags" : "Element,Container",
-        "properties" : {
-          "structurizr.dsl.identifier" : "webappcomp"
-        },
-        "name" : "Web Application",
-        "description" : "Delivers the UI as a single page application.",
-        "relationships" : [ {
-          "id" : "12",
-          "tags" : "Relationship",
+        "components" : [ {
+          "id" : "13",
+          "tags" : "Element,Component",
           "properties" : {
-            "structurizr.dsl.identifier" : "cdd39a4d-8096-4575-8b27-f521c8cd3072"
+            "structurizr.dsl.identifier" : "deckstruct"
           },
-          "sourceId" : "3",
-          "destinationId" : "4",
-          "description" : "Delivers to the user's browser",
-          "technology" : "HTTP"
+          "name" : "Deck Struct",
+          "description" : "Contains 24 cards that are not yet in the game (they are hidden); new cards are pulled from here.",
+          "group" : "Game state",
+          "documentation" : { }
+        }, {
+          "id" : "19",
+          "tags" : "Element,Component",
+          "properties" : {
+            "structurizr.dsl.identifier" : "fromcolumntocolumn"
+          },
+          "name" : "from_column_to_column(...)",
+          "description" : "Moves a card from a Column to another Column.",
+          "relationships" : [ {
+            "id" : "46",
+            "tags" : "Relationship",
+            "properties" : {
+              "structurizr.dsl.identifier" : "47a51671-40a1-4745-ac1b-97d81a1e5c37"
+            },
+            "sourceId" : "19",
+            "destinationId" : "15",
+            "description" : "Modifies"
+          } ],
+          "group" : "Game actions",
+          "documentation" : { }
+        }, {
+          "id" : "10",
+          "tags" : "Element,Component",
+          "properties" : {
+            "structurizr.dsl.identifier" : "normalmode"
+          },
+          "name" : "init_normal_game(...)",
+          "description" : "Produces a Game object with a shuffled Deck and empty Piles.",
+          "relationships" : [ {
+            "id" : "35",
+            "tags" : "Relationship",
+            "properties" : {
+              "structurizr.dsl.identifier" : "21d81663-0188-4bbe-9980-b17e18cd240a"
+            },
+            "sourceId" : "10",
+            "destinationId" : "12",
+            "description" : "Generates"
+          } ],
+          "group" : "Game modes",
+          "documentation" : { }
+        }, {
+          "id" : "16",
+          "tags" : "Element,Component",
+          "properties" : {
+            "structurizr.dsl.identifier" : "fromdecktocolumn"
+          },
+          "name" : "from_deck_to_column(...)",
+          "description" : "Moves a card from the Deck to a Column.",
+          "relationships" : [ {
+            "id" : "40",
+            "tags" : "Relationship",
+            "properties" : {
+              "structurizr.dsl.identifier" : "435432b5-b49f-456e-87b7-9a3cb8498a7f"
+            },
+            "sourceId" : "16",
+            "destinationId" : "13",
+            "description" : "Modifies"
+          }, {
+            "id" : "41",
+            "tags" : "Relationship",
+            "properties" : {
+              "structurizr.dsl.identifier" : "1b3629e8-2024-40c5-a6ba-43c7fd6f54ec"
+            },
+            "sourceId" : "16",
+            "destinationId" : "15",
+            "description" : "Modifies"
+          } ],
+          "group" : "Game actions",
+          "documentation" : { }
+        }, {
+          "id" : "18",
+          "tags" : "Element,Component",
+          "properties" : {
+            "structurizr.dsl.identifier" : "fromcolumntopile"
+          },
+          "name" : "from_column_to_pile(...)",
+          "description" : "Moves a card from a Column to a Pile.",
+          "relationships" : [ {
+            "id" : "44",
+            "tags" : "Relationship",
+            "properties" : {
+              "structurizr.dsl.identifier" : "10865941-75ba-4404-8795-ddd12f3dddcf"
+            },
+            "sourceId" : "18",
+            "destinationId" : "15",
+            "description" : "Modifies"
+          }, {
+            "id" : "45",
+            "tags" : "Relationship",
+            "properties" : {
+              "structurizr.dsl.identifier" : "4989aabb-6693-4404-adc7-f933ffba8634"
+            },
+            "sourceId" : "18",
+            "destinationId" : "14",
+            "description" : "Modifies"
+          } ],
+          "group" : "Game actions",
+          "documentation" : { }
+        }, {
+          "id" : "11",
+          "tags" : "Element,Component",
+          "properties" : {
+            "structurizr.dsl.identifier" : "easymode"
+          },
+          "name" : "init_easy_game(...)",
+          "description" : "Produces a Game which has all the Aces placed on the Piles.",
+          "relationships" : [ {
+            "id" : "36",
+            "tags" : "Relationship",
+            "properties" : {
+              "structurizr.dsl.identifier" : "7b9f44f1-9f25-4fe7-90c1-94248adea76c"
+            },
+            "sourceId" : "11",
+            "destinationId" : "12",
+            "description" : "Generates"
+          } ],
+          "group" : "Game modes",
+          "documentation" : { }
+        }, {
+          "id" : "12",
+          "tags" : "Element,Component",
+          "properties" : {
+            "structurizr.dsl.identifier" : "gamestruct"
+          },
+          "name" : "Game Struct",
+          "description" : "Contains the game's state: The Player address, Deck, the Piles, the Columns, etc.",
+          "relationships" : [ {
+            "id" : "38",
+            "tags" : "Relationship",
+            "properties" : {
+              "structurizr.dsl.identifier" : "1254fb9d-281c-4233-a224-5681b90c9b47"
+            },
+            "sourceId" : "12",
+            "destinationId" : "14",
+            "description" : "Owns"
+          }, {
+            "id" : "39",
+            "tags" : "Relationship",
+            "properties" : {
+              "structurizr.dsl.identifier" : "efb56ddf-6478-4e0b-bd34-5016be0e13c8"
+            },
+            "sourceId" : "12",
+            "destinationId" : "15",
+            "description" : "Owns"
+          }, {
+            "id" : "37",
+            "tags" : "Relationship",
+            "properties" : {
+              "structurizr.dsl.identifier" : "4b5f4817-a084-40da-992e-4c57414c64bb"
+            },
+            "sourceId" : "12",
+            "destinationId" : "13",
+            "description" : "Owns"
+          } ],
+          "group" : "Game state",
+          "documentation" : { }
+        }, {
+          "id" : "9",
+          "tags" : "Element,Component",
+          "properties" : {
+            "structurizr.dsl.identifier" : "solitairemodule"
+          },
+          "name" : "Solitaire Module",
+          "description" : "Contains the game logic/rules.",
+          "relationships" : [ {
+            "id" : "33",
+            "tags" : "Relationship",
+            "properties" : {
+              "structurizr.dsl.identifier" : "4bab4d1f-8284-412d-a0ee-c22a0c78f2c0"
+            },
+            "sourceId" : "9",
+            "destinationId" : "10",
+            "description" : "Uses to initialize a game object"
+          }, {
+            "id" : "34",
+            "tags" : "Relationship",
+            "properties" : {
+              "structurizr.dsl.identifier" : "fc46e5fe-d282-4008-b177-d77d8fe376f1"
+            },
+            "sourceId" : "9",
+            "destinationId" : "11",
+            "description" : "Uses to initialize a game object"
+          } ],
+          "documentation" : { }
+        }, {
+          "id" : "14",
+          "tags" : "Element,Component",
+          "properties" : {
+            "structurizr.dsl.identifier" : "pilestruct"
+          },
+          "name" : "Pile Struct",
+          "description" : "The game's goal: To win, each Pile (of cards) should be ordered from Ace to King of the same suit.",
+          "group" : "Game state",
+          "documentation" : { }
+        }, {
+          "id" : "20",
+          "tags" : "Element,Component",
+          "properties" : {
+            "structurizr.dsl.identifier" : "frompiletocolumn"
+          },
+          "name" : "from_pile_to_column(...)",
+          "description" : "Moves a card from a Pile to a Column.",
+          "relationships" : [ {
+            "id" : "47",
+            "tags" : "Relationship",
+            "properties" : {
+              "structurizr.dsl.identifier" : "6384fe82-74e2-4f3e-9b3e-91c9bf8cc49d"
+            },
+            "sourceId" : "20",
+            "destinationId" : "14",
+            "description" : "Modifies"
+          }, {
+            "id" : "48",
+            "tags" : "Relationship",
+            "properties" : {
+              "structurizr.dsl.identifier" : "376315cd-4a68-4b61-a044-86a723911898"
+            },
+            "sourceId" : "20",
+            "destinationId" : "15",
+            "description" : "Modifies"
+          } ],
+          "group" : "Game actions",
+          "documentation" : { }
+        }, {
+          "id" : "15",
+          "tags" : "Element,Component",
+          "properties" : {
+            "structurizr.dsl.identifier" : "columnstruct"
+          },
+          "name" : "Column Struct",
+          "description" : "The game's main area: The Columns. Each Column can contain a stack of cards, which are ordered from King to Ace, alternating between red and black.",
+          "group" : "Game state",
+          "documentation" : { }
+        }, {
+          "id" : "17",
+          "tags" : "Element,Component",
+          "properties" : {
+            "structurizr.dsl.identifier" : "fromdecktopile"
+          },
+          "name" : "from_deck_to_pile(...)",
+          "description" : "Moves a card from the Deck to a Pile.",
+          "relationships" : [ {
+            "id" : "42",
+            "tags" : "Relationship",
+            "properties" : {
+              "structurizr.dsl.identifier" : "5c923042-40cb-400a-9866-af6814fdf4f7"
+            },
+            "sourceId" : "17",
+            "destinationId" : "13",
+            "description" : "Modifies"
+          }, {
+            "id" : "43",
+            "tags" : "Relationship",
+            "properties" : {
+              "structurizr.dsl.identifier" : "715b4d8d-1666-4f5b-9f77-f2073a93f5b1"
+            },
+            "sourceId" : "17",
+            "destinationId" : "14",
+            "description" : "Modifies"
+          } ],
+          "group" : "Game actions",
+          "documentation" : { }
         } ],
-        "group" : "Frontend",
-        "technology" : "next.js",
         "documentation" : { }
       } ],
       "documentation" : { }
@@ -197,13 +485,9 @@
   "documentation" : { },
   "views" : {
     "systemContextViews" : [ {
-      "key" : "Context",
+      "key" : "GameContextView",
       "order" : 1,
       "softwareSystemId" : "2",
-      "dimensions" : {
-        "width" : 1600,
-        "height" : 800
-      },
       "automaticLayout" : {
         "implementation" : "Graphviz",
         "rankDirection" : "LeftRight",
@@ -211,30 +495,26 @@
         "nodeSeparation" : 300,
         "edgeSeparation" : 0,
         "vertices" : false,
-        "applied" : true
+        "applied" : false
       },
       "enterpriseBoundaryVisible" : true,
       "elements" : [ {
         "id" : "1",
-        "x" : 200,
-        "y" : 200
+        "x" : 0,
+        "y" : 0
       }, {
         "id" : "2",
-        "x" : 950,
-        "y" : 200
+        "x" : 0,
+        "y" : 0
       } ],
       "relationships" : [ {
-        "id" : "9"
+        "id" : "21"
       } ]
     } ],
     "containerViews" : [ {
-      "key" : "Container",
+      "key" : "GameContainerView",
       "order" : 2,
       "softwareSystemId" : "2",
-      "dimensions" : {
-        "width" : 1177,
-        "height" : 2665
-      },
       "automaticLayout" : {
         "implementation" : "Graphviz",
         "rankDirection" : "TopBottom",
@@ -242,50 +522,39 @@
         "nodeSeparation" : 300,
         "edgeSeparation" : 0,
         "vertices" : false,
-        "applied" : true
+        "applied" : false
       },
       "externalSoftwareSystemBoundariesVisible" : true,
       "elements" : [ {
         "id" : "1",
-        "x" : 577,
-        "y" : 199
+        "x" : 0,
+        "y" : 0
       }, {
         "id" : "3",
-        "x" : 240,
-        "y" : 799
+        "x" : 0,
+        "y" : 0
       }, {
         "id" : "4",
-        "x" : 240,
-        "y" : 1399
+        "x" : 0,
+        "y" : 0
       }, {
         "id" : "8",
-        "x" : 240,
-        "y" : 1999
+        "x" : 0,
+        "y" : 0
       } ],
       "relationships" : [ {
-        "id" : "13"
+        "id" : "25"
       }, {
-        "id" : "11"
+        "id" : "24"
       }, {
-        "id" : "12"
+        "id" : "23"
       }, {
-        "id" : "10",
-        "vertices" : [ {
-          "x" : 840,
-          "y" : 591
-        }, {
-          "x" : 840,
-          "y" : 1099
-        } ]
+        "id" : "22"
       } ]
     } ],
     "componentViews" : [ {
-      "key" : "Component",
+      "key" : "SinglePageApplicationComponentView",
       "order" : 3,
-      "dimensions" : {
-        "width" : 1907,
-        "height" : 2500
-      },
       "automaticLayout" : {
         "implementation" : "Graphviz",
         "rankDirection" : "TopBottom",
@@ -293,48 +562,138 @@
         "nodeSeparation" : 300,
         "edgeSeparation" : 0,
         "vertices" : false,
-        "applied" : true
+        "applied" : false
       },
       "containerId" : "4",
       "externalContainerBoundariesVisible" : true,
       "elements" : [ {
         "id" : "1",
-        "x" : 1306,
-        "y" : 200
+        "x" : 0,
+        "y" : 0
       }, {
         "id" : "5",
-        "x" : 969,
-        "y" : 800
+        "x" : 0,
+        "y" : 0
       }, {
         "id" : "6",
-        "x" : 969,
-        "y" : 1400
+        "x" : 0,
+        "y" : 0
       }, {
         "id" : "7",
-        "x" : 219,
-        "y" : 800
+        "x" : 0,
+        "y" : 0
       }, {
         "id" : "8",
-        "x" : 969,
-        "y" : 2000
+        "x" : 0,
+        "y" : 0
       } ],
       "relationships" : [ {
-        "id" : "18"
+        "id" : "29"
+      }, {
+        "id" : "28"
+      }, {
+        "id" : "27"
+      }, {
+        "id" : "26"
+      }, {
+        "id" : "30"
+      } ]
+    }, {
+      "key" : "SmartContractComponentView",
+      "order" : 4,
+      "dimensions" : {
+        "width" : 3371,
+        "height" : 4166
+      },
+      "containerId" : "8",
+      "externalContainerBoundariesVisible" : true,
+      "elements" : [ {
+        "id" : "11",
+        "x" : 909,
+        "y" : 1399
+      }, {
+        "id" : "12",
+        "x" : 1305,
+        "y" : 2020
+      }, {
+        "id" : "13",
+        "x" : 1310,
+        "y" : 2542
+      }, {
+        "id" : "14",
+        "x" : 2335,
+        "y" : 2492
+      }, {
+        "id" : "15",
+        "x" : 414,
+        "y" : 2551
+      }, {
+        "id" : "16",
+        "x" : 1334,
+        "y" : 3490
       }, {
         "id" : "17",
-        "vertices" : [ {
-          "x" : 1569,
-          "y" : 696
-        }, {
-          "x" : 1569,
-          "y" : 1100
-        } ]
+        "x" : 2505,
+        "y" : 3480
       }, {
-        "id" : "16"
+        "id" : "18",
+        "x" : 1925,
+        "y" : 3485
       }, {
-        "id" : "15"
+        "id" : "19",
+        "x" : 239,
+        "y" : 3490
       }, {
-        "id" : "14"
+        "id" : "4",
+        "x" : 1284,
+        "y" : 199
+      }, {
+        "id" : "9",
+        "x" : 1284,
+        "y" : 799
+      }, {
+        "id" : "20",
+        "x" : 775,
+        "y" : 3490
+      }, {
+        "id" : "10",
+        "x" : 1659,
+        "y" : 1399
+      } ],
+      "relationships" : [ {
+        "id" : "40"
+      }, {
+        "id" : "41"
+      }, {
+        "id" : "42"
+      }, {
+        "id" : "43"
+      }, {
+        "id" : "32"
+      }, {
+        "id" : "37"
+      }, {
+        "id" : "36"
+      }, {
+        "id" : "35"
+      }, {
+        "id" : "34"
+      }, {
+        "id" : "33"
+      }, {
+        "id" : "44"
+      }, {
+        "id" : "45"
+      }, {
+        "id" : "46"
+      }, {
+        "id" : "47"
+      }, {
+        "id" : "48"
+      }, {
+        "id" : "38"
+      }, {
+        "id" : "39"
       } ]
     } ],
     "configuration" : {
@@ -355,7 +714,7 @@
       "themes" : [ "https://static.structurizr.com/themes/default/theme.json" ],
       "terminology" : { },
       "metadataSymbols" : "SquareBrackets",
-      "lastSavedView" : "Component"
+      "lastSavedView" : "SmartContractComponentView"
     }
   }
 }
