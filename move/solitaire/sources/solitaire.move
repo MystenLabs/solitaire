@@ -146,14 +146,14 @@ module solitaire::solitaire {
         transfer::transfer(game, tx_context::sender(ctx));
     }
 
-    public fun from_deck_to_column(game: &mut Game, card: u64, column_index: u64, _ctx: &mut TxContext) {
+    public fun from_deck_to_column(game: &mut Game, deck_card: u64, column_index: u64, _ctx: &mut TxContext) {
         assert!(column_index < COLUMN_COUNT, EInvalidColumnIndex);
-        let (exist, index) = vector::index_of(&game.deck.cards, &card);
+        let (exist, index) = vector::index_of(&game.deck.cards, &deck_card);
         assert!(exist, ECardNotInDeck);
         let column = vector::borrow_mut(&mut game.columns, column_index);
         // if the column is empty, the card must be a king
         if (vector::is_empty(&column.cards)) {
-            assert!(card % 13 == 12, ENotKingCard);
+            assert!(deck_card % 13 == 12, ENotKingCard);
             let card_to_place = vector::remove(&mut game.deck.cards, index);
             vector::push_back(&mut column.cards, card_to_place);
         } else {
@@ -162,8 +162,8 @@ module solitaire::solitaire {
             let column_card = vector::borrow(&column.cards, last_card_index);
             // edge case where the column card is an ace
             assert!(*column_card % 13 != 0, ECannotPlaceOnAce);
-            let card_mod = card % 13;
-            if (card >= HEARTS_INDEX) {
+            let card_mod = deck_card % 13;
+            if (deck_card >= HEARTS_INDEX) {
                 assert!((card_mod == *column_card - SPADES_INDEX - 1) || (card_mod == *column_card - CLUBS_INDEX - 1), EInvalidPlacement);
                 let card_to_place = vector::remove(&mut game.deck.cards, index);
                 vector::push_back(&mut column.cards, card_to_place);
@@ -176,22 +176,23 @@ module solitaire::solitaire {
         game.player_moves = game.player_moves + 1;
     }
 
-    public fun from_deck_to_pile(game: &mut Game, card: u64, pile_index: u64, _ctx: &mut TxContext) {
+    public fun from_deck_to_pile(game: &mut Game, deck_card: u64, pile_index: u64, _ctx: &mut TxContext) {
         assert!(pile_index < PILE_COUNT, EInvalidPileIndex);
-        let (exist, index) = vector::index_of(&game.deck.cards, &card);
+        let (exist, index) = vector::index_of(&game.deck.cards, &deck_card);
         assert!(exist, ECardNotInDeck);
         let pile = vector::borrow_mut(&mut game.piles, pile_index);
         // if the pile is empty, only Ace is allowed to be placed
         if (vector::is_empty(&pile.cards)) {
-            assert!(card % 13 == 0, ENotAceCard);
+            assert!(deck_card % 13 == 0, ENotAceCard);
             let card_to_place = vector::remove(&mut game.deck.cards, index);
             vector::push_back(&mut pile.cards, card_to_place);
         } else {
-            let pile_card = vector::borrow(&pile.cards, 0);
+            let last_card_index = vector::length(&pile.cards) - 1;
+            let pile_card = vector::borrow(&pile.cards, last_card_index);
             // edge case where the pile card is a king
             assert!(*pile_card % 13 != 12, ECannotPlaceOnKing);
             // the card to place must be the next card in the pile and of the same suit
-            assert!(card == *pile_card + 1, EInvalidPlacement);
+            assert!(deck_card == *pile_card + 1, EInvalidPlacement);
             let card_to_place = vector::remove(&mut game.deck.cards, index);
             vector::push_back(&mut pile.cards, card_to_place);
         };
