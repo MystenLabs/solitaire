@@ -6,7 +6,7 @@ workspace {
 
         game = softwareSystem "${SYSTEM_NAME}" "Allows users to play solitaire on the Sui network." {
             group "Frontend" {
-                webappComp = container "Web Application" "Delivers the UI as a single page application." "next.js"
+                webapp = container "Web Application" "Delivers the UI as a single page application." "next.js"
                 singlePageApplicationCont = container "Single-Page-Application" "A single page application were the player interacts with the game." "React" {
                     authenticator = component "Authenticator" "Handles the user's transaction authentication." "zklogin"
                     gameBoard = component "Game Board" "Allows the user to interact with the game board and the cards." "React, Sui TS-SDK" {
@@ -53,8 +53,8 @@ workspace {
 
         # Component level relationships
         user -> singlePageApplicationCont "Signs in, starts/ends game, moves cards around"
-        user -> webappComp "Requests page from" "HTTP"
-        webappComp -> singlePageApplicationCont "Delivers to the user's browser" "HTTP"
+        user -> webapp "Requests page from" "HTTP"
+        webapp -> singlePageApplicationCont "Delivers to the user's browser" "HTTP"
         singlePageApplicationCont -> smartContractCont "Makes move calls"
         authenticator -> gameBoard "Authenticates transactions of"
         assets -> gameBoard "Get displayed on"
