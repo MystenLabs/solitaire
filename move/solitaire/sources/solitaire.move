@@ -355,8 +355,24 @@ module solitaire::solitaire {
         let timestamp = clock::timestamp_ms(clock);
         let length = vector::length(available_cards);
         // A card is removed from the stack of the available cards based on the modulo of the timestamp.
-        // Module length will ensure that we cannot got out of bounds.
+        // Module length will ensure that we cannot get out of bounds.
         vector::remove(available_cards, timestamp % length)
+    }
+
+    #[test_only]
+    public fun reveal_card_test (clock: &Clock, available_cards: &mut vector<u64>): u64 {
+        reveal_card(clock, available_cards)
+    }
+
+    #[test_only]
+    public fun generate_cards(num_cards: u64): vector<u64>{
+        let i: u64 = 0;
+        let available_cards = vector::empty<u64>();
+        while (i < num_cards) {
+            vector::push_back(&mut available_cards, i);
+            i = i + 1;
+        };
+        available_cards
     }
     
     // We consider the following mapping between Move Contract and Application:
