@@ -430,6 +430,15 @@ module solitaire::solitaire {
         vector::remove(&mut game.available_cards, card);
     }
 
+    #[test_only]
+    // Use this when you want a test to interact with an empty column.
+    public fun remove_all_from_column(game: &mut Game, column_index: u64) {
+        let column = vector::borrow_mut(&mut game.columns, column_index);
+        while (!vector::is_empty(&column.cards)) {
+            vector::pop_back(&mut column.cards);
+        };
+    }
+
     // We consider the following mapping between Move Contract and Application:
     //
     // index= 0,  suit: "Clubs", name-on-card: "A", 

@@ -202,8 +202,20 @@ module solitaire::test_solitaire {
 
     #[test]
     public fun test_from_deck_to_column_valid_diamonds_K_on_empty() {
-        // TODO
-        assert!(false, 1)
+        let scenario_val = init_normal_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+
+            solitaire::remove_all_from_column(&mut game, 0);
+            solitaire::cheat_open_card_to_deck(&mut game, 38);
+            solitaire::from_deck_to_column(
+                &mut game, 38, 0, test_scenario::ctx(scenario)
+            );
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
     }
 
     #[test]
