@@ -1,4 +1,5 @@
 module solitaire::solitaire {
+    use std::debug;
     use sui::tx_context::{Self, TxContext};
     use sui::clock::{Self, Clock};
     use sui::object::{Self, UID};
@@ -176,6 +177,9 @@ module solitaire::solitaire {
             assert!(*column_card % 13 != 0, ECannotPlaceOnAce);
             let card_mod = deck_card % 13;
             if (deck_card >= HEARTS_INDEX) {
+
+                debug::print(column_card);
+
                 assert!((card_mod == *column_card - SPADES_INDEX - 1) || (card_mod == *column_card - CLUBS_INDEX - 1), EInvalidPlacement);
                 let card_to_place = vector::remove(&mut game.deck.cards, index);
                 vector::push_back(&mut column.cards, card_to_place);
@@ -419,6 +423,13 @@ module solitaire::solitaire {
         let length = vector::length(&game.deck.cards);
         let card = vector::borrow(&game.deck.cards, length - 1);
         *card
+    }
+
+    #[test_only]
+    /// Use this to set a custom deck for testing purposes.
+    public fun cheat_open_card_to_deck(game: &mut Game, card: u64) {
+        vector::push_back(&mut game.deck.cards, card);
+        vector::remove(&mut game.available_cards, card);
     }
 
     // We consider the following mapping between Move Contract and Application:
