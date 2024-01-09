@@ -122,14 +122,13 @@ module solitaire::test_solitaire {
 
     #[test]
     #[expected_failure(abort_code = EInvalidPlacement)]
-    // Try to do an illegal move by placing a card on a column that its top has the same color
-    // as the one that is to be placed.
     public fun test_from_deck_to_column_invalid_order_spades_8_on_hearts_5(){
         let scenario_val = init_normal_game_scenario_helper();
         let scenario = &mut scenario_val;
         test_scenario::next_tx(scenario, PLAYER);
         {   // Open a deck card and move it to a column
             let game = test_scenario::take_from_sender<Game>(scenario);
+
             let clock = clock::create_for_testing(test_scenario::ctx(scenario));
             clock::set_for_testing(&mut clock, 40);
             solitaire::open_deck_card(&mut game, &clock, test_scenario::ctx(scenario));
@@ -138,7 +137,6 @@ module solitaire::test_solitaire {
             // Top card should be {index= 20, suit: "Spades", name-on-card: "8"}
             let top_card_of_dock = solitaire::get_top_card_of_deck(&game);
 
-            debug::print(&game);
             // Placing {index= 20, suit: "Spades", name-on-card: "8"} on {index= 30, suit: "Hearts", name-on-card:"5"}
             solitaire::from_deck_to_column(
                 &mut game, top_card_of_dock, 4, test_scenario::ctx(scenario)
@@ -149,9 +147,35 @@ module solitaire::test_solitaire {
         test_scenario::end(scenario_val);
     }
 
-    // #[test]
-    // public fun test_should_only_move_card_top_of_deck() {}
+    #[test]
+    #[expected_failure(abort_code = EInvalidPlacement)]
+    public fun test_from_deck_to_column_invalid_color_hearts_4_on_hearts_5(){
+        let scenario_val = init_normal_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {   // Open a deck card and move it to a column
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+            // Get {hearts 4} with a cheat function:
+            solitaire::cheat_open_card_to_deck(&mut game, 29);
+            clock::destroy_for_testing(clock);
 
-    // #[test]
-    // public fun test_should_only_move_card_top_of_deck() {}
+            // Top card should be {index= 20, suit: "Spades", name-on-card: "8"}
+            let top_card_of_dock = solitaire::get_top_card_of_deck(&game);
+
+            // Placing {index= 20, suit: "Spades", name-on-card: "8"} on {index= 30, suit: "Hearts", name-on-card:"5"}
+            solitaire::from_deck_to_column(
+                &mut game, top_card_of_dock, 4, test_scenario::ctx(scenario)
+            );
+            test_scenario::return_to_sender(scenario, game);
+        };
+
+        test_scenario::end(scenario_val);
+    }
+
+    #[test]
+    #[expected_failure(abort_code = EInvalidPlacement)]
+    // Player should only be able to move only the top card of the deck
+    public fun test_from_deck_to_column_invalid_card_not_on_top_of_deck() {}
+
 }

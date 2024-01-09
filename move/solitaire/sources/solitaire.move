@@ -176,15 +176,12 @@ module solitaire::solitaire {
             // edge case where the column card is an ace
             assert!(*column_card % 13 != 0, ECannotPlaceOnAce);
             let card_mod = deck_card % 13;
-            if (deck_card >= HEARTS_INDEX) {
-
-                debug::print(column_card);
-
-                assert!((card_mod == *column_card - SPADES_INDEX - 1) || (card_mod == *column_card - CLUBS_INDEX - 1), EInvalidPlacement);
+            if (deck_card >= HEARTS_INDEX) { // check if card deck card is red
+                assert!((*column_card >= SPADES_INDEX && card_mod == *column_card - SPADES_INDEX - 1) || (card_mod == *column_card - CLUBS_INDEX - 1), EInvalidPlacement);
                 let card_to_place = vector::remove(&mut game.deck.cards, index);
                 vector::push_back(&mut column.cards, card_to_place);
-            } else {
-                assert!((card_mod == *column_card - HEARTS_INDEX - 1) || (card_mod == *column_card - DIAMONDS_INDEX - 1), EInvalidPlacement);
+            } else { // else, if it is black
+                assert!((card_mod == *column_card - HEARTS_INDEX - 1) || (*column_card >= DIAMONDS_INDEX && card_mod == *column_card - DIAMONDS_INDEX - 1), EInvalidPlacement);
                 let card_to_place = vector::remove(&mut game.deck.cards, index);
                 vector::push_back(&mut column.cards, card_to_place);
             };
