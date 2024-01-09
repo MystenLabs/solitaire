@@ -9,7 +9,7 @@ module solitaire::solitaire {
 
 // =================== Error Codes ===================
     const ENoMoreHiddenCards: u64 = 0;
-    const ECardNotInDeck: u64 = 1;
+    const ECardNotOnTopOFDeck: u64 = 1;
     const ENotKingCard: u64 = 2;
     const EInvalidPlacement: u64 = 3;
     const ECannotPlaceOnAce: u64 = 4;
@@ -161,8 +161,9 @@ module solitaire::solitaire {
 
     public fun from_deck_to_column(game: &mut Game, deck_card: u64, column_index: u64, _ctx: &mut TxContext) {
         assert!(column_index < COLUMN_COUNT, EInvalidColumnIndex);
-        let (exist, index) = vector::index_of(&game.deck.cards, &deck_card);
-        assert!(exist, ECardNotInDeck);
+        let top_card_index = vector::length(&game.deck.cards) - 1;
+        let (_, index) = vector::index_of(&game.deck.cards, &deck_card);
+        assert!(index == top_card_index, ECardNotOnTopOFDeck);
         let column = vector::borrow_mut(&mut game.columns, column_index);
         // if the column is empty, the card must be a king
         if (vector::is_empty(&column.cards)) {
@@ -192,7 +193,7 @@ module solitaire::solitaire {
     public fun from_deck_to_pile(game: &mut Game, deck_card: u64, pile_index: u64, _ctx: &mut TxContext) {
         assert!(pile_index < PILE_COUNT, EInvalidPileIndex);
         let (exist, index) = vector::index_of(&game.deck.cards, &deck_card);
-        assert!(exist, ECardNotInDeck);
+        assert!(exist, ECardNotOnTopOFDeck);
         let pile = vector::borrow_mut(&mut game.piles, pile_index);
         // if the pile is empty, only Ace is allowed to be placed
         if (vector::is_empty(&pile.cards)) {

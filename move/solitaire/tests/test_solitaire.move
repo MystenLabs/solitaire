@@ -15,7 +15,7 @@ module solitaire::test_solitaire {
         // Column,
         // Pile,
         // ENoMoreHiddenCards,
-        // ECardNotInDeck,
+        ECardNotOnTopOFDeck,
         // ENotKingCard,
         EInvalidPlacement,
         // ECannotPlaceOnAce,
@@ -174,8 +174,30 @@ module solitaire::test_solitaire {
     }
 
     #[test]
-    #[expected_failure(abort_code = EInvalidPlacement)]
+    #[expected_failure(abort_code = ECardNotOnTopOFDeck)]
     // Player should only be able to move only the top card of the deck
-    public fun test_from_deck_to_column_invalid_card_not_on_top_of_deck() {}
+    public fun test_from_deck_to_column_invalid_card_not_on_top_of_deck() {
+        let scenario_val = init_normal_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+
+            // Add 2 cards to the deck
+            solitaire::cheat_open_card_to_deck(&mut game, 29);
+            solitaire::cheat_open_card_to_deck(&mut game, 2);
+
+            clock::destroy_for_testing(clock);
+
+            // Try to pick the second card from the deck, which is not the top card
+            solitaire::from_deck_to_column(
+                &mut game, 29, 4, test_scenario::ctx(scenario)
+            );
+            test_scenario::return_to_sender(scenario, game);
+        };
+
+        test_scenario::end(scenario_val);
+    }
 
 }
