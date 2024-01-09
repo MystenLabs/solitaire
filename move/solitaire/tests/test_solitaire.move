@@ -207,11 +207,13 @@ module solitaire::test_solitaire {
         test_scenario::next_tx(scenario, PLAYER);
         {
             let game = test_scenario::take_from_sender<Game>(scenario);
-
+            // Empty the first column
             solitaire::remove_all_from_column(&mut game, 0);
-            solitaire::cheat_open_card_to_deck(&mut game, 38);
+            // Cheat to get the king of diamonds on top of the deck
+            solitaire::cheat_open_card_to_deck(&mut game, 51);
+            // Use the king of diamonds to place it on the empty column
             solitaire::from_deck_to_column(
-                &mut game, 38, 0, test_scenario::ctx(scenario)
+                &mut game, 51, 0, test_scenario::ctx(scenario)
             );
             test_scenario::return_to_sender(scenario, game);
         };
@@ -221,8 +223,22 @@ module solitaire::test_solitaire {
     #[test]
     #[expected_failure(abort_code = ENotKingCard)]
     public fun test_from_deck_to_column_invalid_order_diamonds_Q_on_empty() {
-        // TODO
-        assert!(false, 1)
+        let scenario_val = init_normal_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            // Empty the first column
+            solitaire::remove_all_from_column(&mut game, 0);
+            // Cheat to get the queen of diamonds on top of the deck
+            solitaire::cheat_open_card_to_deck(&mut game, 50);
+            // Use the queen of diamonds to try to place it on the empty column
+            solitaire::from_deck_to_column(
+                &mut game, 50, 0, test_scenario::ctx(scenario)
+            );
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
     }
 
     #[test]

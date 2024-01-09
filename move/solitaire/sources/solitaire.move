@@ -5,8 +5,10 @@ module solitaire::solitaire {
     use sui::transfer::{Self};
     use std::vector;
     use std::string::{String, utf8};
+    #[test_only]
+    use sui::test_scenario::num_user_events;
 
-// =================== Error Codes ===================
+    // =================== Error Codes ===================
     const ENoMoreHiddenCards: u64 = 0;
     const ECardNotOnTopOFDeck: u64 = 1;
     const ENotKingCard: u64 = 2;
@@ -427,7 +429,8 @@ module solitaire::solitaire {
     /// Use this to set a custom deck for testing purposes.
     public fun cheat_open_card_to_deck(game: &mut Game, card: u64) {
         vector::push_back(&mut game.deck.cards, card);
-        vector::remove(&mut game.available_cards, card);
+        let (_, index) = vector::index_of(&game.available_cards, &card);
+        vector::remove(&mut game.available_cards, index);
     }
 
     #[test_only]
