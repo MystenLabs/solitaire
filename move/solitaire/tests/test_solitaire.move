@@ -243,14 +243,40 @@ module solitaire::test_solitaire {
 
     #[test]
     public fun test_from_deck_to_pile_valid_hearts_A_on_empty() {
-        // TODO
-        assert!(false, 1)
+        let scenario_val = init_normal_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            // Cheat to get ace of hearts on top of the deck
+            solitaire::cheat_open_card_to_deck(&mut game, 26);
+            // Use the ace of hearts to place it on the empty pile
+            solitaire::from_deck_to_pile(
+                &mut game, 26, 0, test_scenario::ctx(scenario)
+            );
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
     }
 
     #[test]
     public fun test_from_deck_to_pile_valid_hearts_2_on_hearts_A() {
-        // TODO
-        assert!(false, 1)
+        // Init easy game to start with aces on the piles
+        let scenario_val = init_easy_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            // Cheat to get 2 of hearts on top of the deck
+            solitaire::cheat_open_card_to_deck(&mut game, 27);
+
+            // Use the 2 of hearts to place it on the hearts pile
+            solitaire::from_deck_to_pile(
+                &mut game, 27, 2, test_scenario::ctx(scenario)
+            );
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
     }
 
     #[test]

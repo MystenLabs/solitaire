@@ -130,11 +130,11 @@ module solitaire::solitaire {
         let piles = vector::singleton<Pile>(Pile {
             cards: vector::singleton(vector::remove(&mut available_cards, CLUBS_INDEX))});
         vector::push_back(&mut piles, Pile {
-            cards: vector::singleton(vector::remove(&mut available_cards, SPADES_INDEX))});
+            cards: vector::singleton(vector::remove(&mut available_cards, SPADES_INDEX-1))});
         vector::push_back(&mut piles, Pile {
-            cards: vector::singleton(vector::remove(&mut available_cards, HEARTS_INDEX))});
+            cards: vector::singleton(vector::remove(&mut available_cards, HEARTS_INDEX-2))});
         vector::push_back(&mut piles, Pile {
-            cards: vector::singleton(vector::remove(&mut available_cards, DIAMONDS_INDEX))});
+            cards: vector::singleton(vector::remove(&mut available_cards, DIAMONDS_INDEX-3))});
 
         let columns = vector::empty<Column>();
         let i: u64 = 0;
