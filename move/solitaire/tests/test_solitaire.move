@@ -1,6 +1,6 @@
 #[test_only]
+#[allow(unused_use)]
 module solitaire::test_solitaire {
-    // use std::string::{Self};
     use std::debug; // TODO - remove this
     use std::vector;
     use sui::test_scenario::{Self, Scenario};
@@ -11,20 +11,20 @@ module solitaire::test_solitaire {
     use solitaire::solitaire::{
         Self,
         Game,
-        // Deck,
-        // Column,
-        // Pile,
-        // ENoMoreHiddenCards,
+        Deck,
+        Column,
+        Pile,
+        ENoMoreHiddenCards,
         ECardNotOnTopOFDeck,
-        // ENotKingCard,
+        ENotKingCard,
         EInvalidPlacement,
-        // ECannotPlaceOnAce,
-        // ENotAceCard,
-        // ECannotPlaceOnKing,
-        // EColumnIsEmpty,
-        // ECardNotInColumn,
-        // EInvalidColumnIndex,
-        // EInvalidPileIndex,
+        ECannotPlaceOnAce,
+        ENotAceCard,
+        ECannotPlaceOnKing,
+        EColumnIsEmpty,
+        ECardNotInColumn,
+        EInvalidColumnIndex,
+        EInvalidPileIndex,
     };
 
     const PLAYER: address = @0xCAFE;
@@ -200,4 +200,123 @@ module solitaire::test_solitaire {
         test_scenario::end(scenario_val);
     }
 
+    #[test]
+    public fun test_from_deck_to_column_valid_diamonds_K_on_empty() {
+        // TODO
+        assert!(false, 1)
+    }
+
+    #[test]
+    #[expected_failure(abort_code = ENotKingCard)]
+    public fun test_from_deck_to_column_invalid_order_diamonds_Q_on_empty() {
+        // TODO
+        assert!(false, 1)
+    }
+
+    #[test]
+    public fun test_from_deck_to_pile_valid_hearts_A_on_empty() {
+        // TODO
+        assert!(false, 1)
+    }
+
+    #[test]
+    public fun test_from_deck_to_pile_valid_hearts_2_on_hearts_A() {
+        // TODO
+        assert!(false, 1)
+    }
+
+    #[test]
+    #[expected_failure(abort_code = ENotAceCard)]
+    public fun test_from_deck_to_pile_invalid_order_diamonds_7_on_empty() {
+        // TODO
+        assert!(false, 1)
+    }
+
+
+    #[test]
+    #[expected_failure(abort_code = EInvalidPlacement)]
+    public fun test_from_deck_to_pile_invalid_order_hearts_3_on_hearts_A() {
+        // TODO
+        assert!(false, 1)
+    }
+
+    #[test]
+    #[expected_failure(abort_code = EInvalidPlacement)]
+    public fun test_from_deck_to_pile_invalid_class_clubs_2_on_hearts_A() {
+        // TODO
+        assert!(false, 1)
+    }
+
+    #[test]
+    #[expected_failure(abort_code = ECardNotOnTopOFDeck)]
+    public fun test_from_deck_to_pile_invalid_card_not_on_top_of_deck() {
+        // TODO
+        assert!(false, 1)
+    }
+
+    #[test]
+    public fun test_from_column_to_pile_valid_hearts_A_on_empty() {
+        // TODO
+        assert!(false, 1)
+    }
+
+    #[test]
+    public fun test_from_column_to_pile_valid_hearts_2_on_hearts_A() {
+        // TODO
+        assert!(false, 1)
+    }
+
+    #[test]
+    #[expected_failure(abort_code = ENotAceCard)]
+    public fun test_from_column_to_pile_invalid_order_diamonds_7_on_empty() {
+        // TODO
+        assert!(false, 1)
+    }
+
+
+    #[test]
+    #[expected_failure(abort_code = EInvalidPlacement)]
+    public fun test_from_column_to_pile_invalid_order_hearts_3_on_hearts_A() {
+        // TODO
+        assert!(false, 1)
+    }
+
+    #[test]
+    #[expected_failure(abort_code = EInvalidPlacement)]
+    public fun test_from_column_to_pile_invalid_class_clubs_2_on_hearts_A() {
+        // TODO
+        assert!(false, 1)
+    }
+
+    #[test]
+    #[expected_failure(abort_code = ECardNotOnTopOFDeck)]
+    public fun test_from_column_to_pile_invalid_card_not_on_top_of_deck() {
+        // TODO
+        assert!(false, 1)
+    }
+
+    #[test]
+    public fun test_from_column_to_column_valid_spades_8_on_hearts_9() {
+        // TODO
+        assert!(false, 1)
+    }
+
+    #[test]
+    #[expected_failure(abort_code = EInvalidColumnIndex)]
+    public fun test_from_column_to_column_invalid_column_index() {
+        // TODO
+        assert!(false, 1)
+    }
+
+    #[test]
+    #[expected_failure(abort_code = EInvalidPileIndex)]
+    public fun test_from_column_to_column_invalid_pile_index() {
+        // TODO
+        assert!(false, 1)
+    }
+
+    public fun test_from_pile_to_column_valid_spades_8_on_hearts_9() {
+        // TODO
+        assert!(false, 1)
+    }
 }

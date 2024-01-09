@@ -1,5 +1,4 @@
 module solitaire::solitaire {
-    use std::debug;
     use sui::tx_context::{Self, TxContext};
     use sui::clock::{Self, Clock};
     use sui::object::{Self, UID};
@@ -192,8 +191,9 @@ module solitaire::solitaire {
 
     public fun from_deck_to_pile(game: &mut Game, deck_card: u64, pile_index: u64, _ctx: &mut TxContext) {
         assert!(pile_index < PILE_COUNT, EInvalidPileIndex);
-        let (exist, index) = vector::index_of(&game.deck.cards, &deck_card);
-        assert!(exist, ECardNotOnTopOFDeck);
+        let top_card_index = vector::length(&game.deck.cards) - 1;
+        let (_, index) = vector::index_of(&game.deck.cards, &deck_card);
+        assert!(index == top_card_index, ECardNotOnTopOFDeck);
         let pile = vector::borrow_mut(&mut game.piles, pile_index);
         // if the pile is empty, only Ace is allowed to be placed
         if (vector::is_empty(&pile.cards)) {
