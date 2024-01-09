@@ -87,7 +87,13 @@ module solitaire::solitaire {
         vector::push_back(&mut piles, Pile {cards: vector::empty()});
         vector::push_back(&mut piles, Pile {cards: vector::empty()});
 
-        let columns = set_up_columns(clock, &mut available_cards);
+        let columns = vector::empty<Column>();
+        let i: u64 = 0;
+        while(i < COLUMN_COUNT) {
+            let column = set_up_column(i, clock, &mut available_cards);
+            vector::push_back(&mut columns, column);
+            i = i + 1;
+        };
 
         let game = Game {
             id: object::new(ctx),
@@ -128,7 +134,13 @@ module solitaire::solitaire {
         vector::push_back(&mut piles, Pile {
             cards: vector::singleton(vector::remove(&mut available_cards, DIAMONDS_INDEX))});
 
-        let columns = set_up_columns(clock, &mut available_cards);
+        let columns = vector::empty<Column>();
+        let i: u64 = 0;
+        while(i < COLUMN_COUNT) {
+            let column = set_up_column(i, clock, &mut available_cards);
+            vector::push_back(&mut columns, column);
+            i = i + 1;
+        };
 
         let game = Game {
             id: object::new(ctx),
@@ -336,28 +348,54 @@ module solitaire::solitaire {
     /// Internal function that sets up the 7 columns of cards.
     /// Each column has the top card revealed and the a number of hidden cards that is equal to the
     /// index of the column, starting from 0.
-    fun set_up_columns(clock: &Clock, available_cards: &mut vector<u64>): vector<Column> {
-        let columns = vector::empty<Column>();
-        let i = 0;
-        while(i < COLUMN_COUNT) {
-            let card = reveal_card(clock, available_cards);
-            let column = Column {
-                hidden_cards: i,
-                cards: vector::singleton<u64>(card),
-            };
-            vector::push_back(&mut columns, column);
-            i = i + 1;
+    fun set_up_column(column_num: u64, clock: &Clock, available_cards: &mut vector<u64>): Column {
+        let card = reveal_card(clock, available_cards);
+        let column = Column {
+            hidden_cards: column_num,
+            cards: vector::singleton<u64>(card)
         };
-        columns
+        column
     }
 
     fun reveal_card (clock: &Clock, available_cards: &mut vector<u64>): u64 {
         // The randomness will be retrieved from the timestamp of the current block.
-        let timestamp = clock::timestamp_ms(clock);
+        let timestamp =
+            clock::timestamp_ms(clock) +
+            pseudo_random(clock::timestamp_ms(clock) + vector::length(available_cards));
+
         let length = vector::length(available_cards);
         // A card is removed from the stack of the available cards based on the modulo of the timestamp.
         // Module length will ensure that we cannot get out of bounds.
         vector::remove(available_cards, timestamp % length)
+    }
+
+    fun pseudo_random(seed: u64): u64 {
+        // Generated using `for _ in echo {1..400}; do echo -n $(shuf -i 1-52 -n 1),; done`
+        let random_order_numbers: vector<u64> = vector<u64>[
+            19,33,19,24,50,21,13,23,44,23,45,21,13,13,37,36,1,
+            19,6,34,37,4,28,49,6,26,3,44,46,28,23,31,8,23,34,
+            38,6,50,20,31,29,15,22,18,9,14,47,6,40,19,39,46,46,
+            42,31,41,2,37,11,32,16,22,36,40,41,44,47,32,3,14,15,
+            3,23,47,23,51,50,40,45,22,37,43,4,39,28,23,45,47,11,
+            37,22,6,38,4,6,14,48,44,50,5,1,17,36,9,51,45,51,7,2,
+            13,9,43,34,14,20,7,7,20,6,49,19,28,38,23,18,49,40,16,
+            44,49,48,15,51,33,7,38,14,8,8,46,29,8,37,23,6,49,28,2,
+            17,46,46,10,20,20,34,3,25,28,33,45,8,2,36,19,22,45,15,
+            23,2,16,35,48,22,1,42,36,19,3,19,48,8,15,4,14,38,20,27,
+            18,9,20,14,44,22,13,51,45,23,35,31,10,16,44,47,51,36,20,
+            6,45,20,8,45,30,7,19,46,45,47,28,3,40,42,32,15,49,45,34,
+            40,40,20,1,18,44,36,47,2,45,43,14,32,19,46,39,13,11,40,
+            52,39,11,44,8,47,31,43,37,18,47,20,39,37,49,26,9,33,32,15,
+            50,42,42,20,4,20,6,47,4,48,45,49,42,47,38,34,11,2,41,13,30,
+            26,20,4,30,39,44,14,8,30,33,33,18,6,8,42,7,41,15,41,37,45,
+            32,31,20,18,49,13,31,18,45,1,4,23,43,20,40,43,40,1,7,27,19,
+            37,6,39,31,24,19,19,14,47,15,11,52,13,17,11,43,3,21,32,50,
+            45,23,15,48,50,48,32,15,2,41,7,25,50,38,7,19,37,30,15,2,7,
+            6,5,47,31,7,6,25,7,18,33,50,50,13,13,19,14,50,15,51,34,9,
+            45,6,20,41,28,9,39,7,47,18,15
+        ];
+        let length = vector::length(&random_order_numbers);
+        *vector::borrow(&random_order_numbers, seed % length)
     }
 
     #[test_only]
@@ -375,7 +413,14 @@ module solitaire::solitaire {
         };
         available_cards
     }
-    
+
+    #[test_only]
+    public fun get_top_card_of_deck(game: &Game): u64 {
+        let length = vector::length(&game.deck.cards);
+        let card = vector::borrow(&game.deck.cards, length - 1);
+        *card
+    }
+
     // We consider the following mapping between Move Contract and Application:
     //
     // index= 0,  suit: "Clubs", name-on-card: "A", 
