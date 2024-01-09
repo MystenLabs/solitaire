@@ -5,8 +5,6 @@ module solitaire::solitaire {
     use sui::transfer::{Self};
     use std::vector;
     use std::string::{String, utf8};
-    #[test_only]
-    use sui::test_scenario::num_user_events;
 
     // =================== Error Codes ===================
     const ENoMoreHiddenCards: u64 = 0;

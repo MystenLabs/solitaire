@@ -282,30 +282,84 @@ module solitaire::test_solitaire {
     #[test]
     #[expected_failure(abort_code = ENotAceCard)]
     public fun test_from_deck_to_pile_invalid_order_diamonds_7_on_empty() {
-        // TODO
-        assert!(false, 1)
+        let scenario_val = init_normal_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            // Cheat to get 7 of diamonds on top of the deck
+            solitaire::cheat_open_card_to_deck(&mut game, 45);
+            // Use the 7 of diamonds to place it on the empty pile
+            solitaire::from_deck_to_pile(
+                &mut game, 45, 0, test_scenario::ctx(scenario)
+            );
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
     }
 
 
     #[test]
     #[expected_failure(abort_code = EInvalidPlacement)]
     public fun test_from_deck_to_pile_invalid_order_hearts_3_on_hearts_A() {
-        // TODO
-        assert!(false, 1)
+        let scenario_val = init_easy_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            // Cheat to get 3 of hearts on top of the deck
+            solitaire::cheat_open_card_to_deck(&mut game, 28);
+            // Use the 3 of hearts to place it on the hearts pile
+            solitaire::from_deck_to_pile(
+                &mut game, 28, 2, test_scenario::ctx(scenario)
+            );
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
     }
 
     #[test]
     #[expected_failure(abort_code = EInvalidPlacement)]
     public fun test_from_deck_to_pile_invalid_class_clubs_2_on_hearts_A() {
-        // TODO
-        assert!(false, 1)
+        let scenario_val = init_easy_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            // Cheat to get 3 of hearts on top of the deck
+            solitaire::cheat_open_card_to_deck(&mut game, 1);
+            // Use the 3 of hearts to place it on the hearts pile
+            solitaire::from_deck_to_pile(
+                &mut game, 1, 2, test_scenario::ctx(scenario)
+            );
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
     }
 
     #[test]
     #[expected_failure(abort_code = ECardNotOnTopOFDeck)]
     public fun test_from_deck_to_pile_invalid_card_not_on_top_of_deck() {
-        // TODO
-        assert!(false, 1)
+        let scenario_val = init_easy_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+
+            // Add 2 cards to the deck
+            solitaire::cheat_open_card_to_deck(&mut game, 1);
+            solitaire::cheat_open_card_to_deck(&mut game, 10);
+
+            clock::destroy_for_testing(clock);
+
+            // Try to pick the second card from the deck, which is not the top card
+            solitaire::from_deck_to_pile(
+                &mut game, 1, 0, test_scenario::ctx(scenario)
+            );
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
     }
 
     #[test]
