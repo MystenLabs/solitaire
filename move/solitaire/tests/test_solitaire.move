@@ -96,6 +96,26 @@ module solitaire::test_solitaire {
     }
 
     #[test]
+    #[expected_failure(abort_code = ENoMoreHiddenCards)]
+    public fun test_open_deck_card_invalid_out_of_cards() {
+        let scenario_val = init_normal_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+            // Open all the cards in the deck
+            let i = 0;
+            while (i <= 25) {
+                solitaire::open_deck_card(&mut game, &clock, test_scenario::ctx(scenario));
+            };
+            clock::destroy_for_testing(clock);
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
+    }
+
+    #[test]
     public fun test_from_deck_to_column_valid_spades_8_on_hearts_9(){
         let scenario_val = init_normal_game_scenario_helper();
         let scenario = &mut scenario_val;
