@@ -26,8 +26,8 @@ dist/
 build/
 
 # Move
-move/poc/Move.lock
-move/poc/build
+move/solitaire/Move.lock
+move/solitaire/build
 
 # env files under the setup directory
 setup/*.env
