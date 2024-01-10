@@ -1,19 +1,13 @@
 #[test_only]
 #[allow(unused_use)]
 module solitaire::test_solitaire {
-    use std::debug; // TODO - remove this
     use std::vector;
     use sui::test_scenario::{Self, Scenario};
-    // use sui::sui::SUI;
-    // use sui::object::{ID};
     use sui::clock;
 
     use solitaire::solitaire::{
         Self,
         Game,
-        Deck,
-        Column,
-        Pile,
         ENoMoreHiddenCards,
         ECardNotOnTopOFDeck,
         ENotKingCard,
@@ -25,6 +19,8 @@ module solitaire::test_solitaire {
         ECardNotInColumn,
         EInvalidColumnIndex,
         EInvalidPileIndex,
+        EGameNotFinished,
+        EGameHasFinished,
     };
 
     // Test error codes
@@ -527,6 +523,26 @@ module solitaire::test_solitaire {
     }
 
     #[test]
+    #[expected_failure(abort_code = EColumnIsEmpty)]
+    public fun test_from_column_to_pile_column_is_empty() {
+        let scenario_val = init_easy_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+
+            solitaire::remove_all_from_column(&mut game, 5);
+            solitaire::from_column_to_pile(&mut game, 5, 3, &clock, test_scenario::ctx(scenario));
+
+            // Teardown
+            clock::destroy_for_testing(clock);
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
+    }
+
+    #[test]
     public fun test_from_column_to_column_valid_hearts_J_on_clubs_Q() {
         let scenario_val = init_normal_game_scenario_helper();
         let scenario = &mut scenario_val;
@@ -753,9 +769,95 @@ module solitaire::test_solitaire {
         test_scenario::end(scenario_val);
     }
 
-    // public fun test_from_pile_to_column_valid_spades_8_on_hearts_9() {
-    //     // TODO
-    //     assert!(false, 1)
-    // }
+    #[test]
+    #[expected_failure(abort_code = EInvalidPileIndex)]
+    public fun test_from_pile_to_column_invalid_pile_index() {
+        let scenario_val = init_easy_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
 
+            solitaire::remove_all_from_column(&mut game, 4);
+
+            solitaire::from_pile_to_column(
+                &mut game, 4, 4, test_scenario::ctx(scenario)
+            );
+
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
+    }
+
+    #[test]
+    #[expected_failure(abort_code = EInvalidColumnIndex)]
+    public fun test_from_pile_to_column_invalid_column_index() {
+        let scenario_val = init_easy_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+
+            solitaire::remove_all_from_column(&mut game, 4);
+
+            solitaire::from_pile_to_column(
+                &mut game, 0, 7, test_scenario::ctx(scenario)
+            );
+
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
+    }
+
+    #[test]
+    public fun test_from_pile_to_column_valid_clubs_2_on_diamonds_3() {
+        let scenario_val = init_normal_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+
+            solitaire::cheat_place_card_to_pile(&mut game, 41, 1);
+            solitaire::cheat_place_card_to_column(&mut game, 3, 4);
+
+            solitaire::from_pile_to_column(
+                &mut game, 1, 4, test_scenario::ctx(scenario)
+            );
+
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
+    }
+
+    #[test]
+    #[expected_failure(abort_code = ECannotPlaceOnAce)]
+    public fun test_from_pile_to_column_invalid_spades_K_on_hearts_A(){
+        let scenario_val = init_easy_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            // Setup
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            solitaire::cheat_place_card_to_column(&mut game, 26, 4);
+            solitaire::cheat_place_card_to_pile(&mut game, 25, 3);
+
+            solitaire::from_pile_to_column(
+                &mut game, 3, 4, test_scenario::ctx(scenario)
+            );
+
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
+    }
+
+    // #[test]
+    // public fun test_finish_game_valid_finished() {
+    //     // TODO
+    // }
+    //
+    // #[test]
+    // #[expected_failure(abort_code = EGameNotFinished)]
+    // public fun test_finish_game_invalid_not_finished() {
+    //     // TODO
+    // }
 }

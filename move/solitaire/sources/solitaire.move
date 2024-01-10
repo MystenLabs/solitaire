@@ -322,10 +322,10 @@ module solitaire::solitaire {
             assert!(*column_card % 13 != 0, ECannotPlaceOnAce);
             let pile_card_mod = pile_card % 13;
             if (pile_card >= HEARTS_INDEX) {
-                assert!((pile_card_mod == *column_card - SPADES_INDEX - 1) || (pile_card_mod == *column_card - CLUBS_INDEX - 1), EInvalidPlacement);
+                assert!((pile_card_mod == *column_card - CLUBS_INDEX - 1) || (*column_card >= SPADES_INDEX && pile_card_mod  == *column_card - SPADES_INDEX - 1), EInvalidPlacement);
                 vector::push_back(&mut column.cards, pile_card);
             } else {
-                assert!((pile_card_mod == *column_card - HEARTS_INDEX - 1) || (pile_card_mod == *column_card - DIAMONDS_INDEX - 1), EInvalidPlacement);
+                assert!((pile_card_mod == *column_card - HEARTS_INDEX - 1) || (*column_card >= DIAMONDS_INDEX && pile_card_mod == *column_card - DIAMONDS_INDEX - 1), EInvalidPlacement);
                 vector::push_back(&mut column.cards, pile_card);
             };
         };
@@ -455,6 +455,14 @@ module solitaire::solitaire {
     public fun cheat_place_card_to_column(game: &mut Game, card: u64, column_index: u64) {
         let column = vector::borrow_mut(&mut game.columns, column_index);
         vector::push_back(&mut column.cards, card);
+        let (_, index) = vector::index_of(&game.available_cards, &card);
+        vector::remove(&mut game.available_cards, index);
+    }
+
+    #[test_only]
+    public fun cheat_place_card_to_pile(game: &mut Game, card: u64, pile_index: u64) {
+        let pile = vector::borrow_mut(&mut game.piles, pile_index);
+        vector::push_back(&mut pile.cards, card);
         let (_, index) = vector::index_of(&game.available_cards, &card);
         vector::remove(&mut game.available_cards, index);
     }
