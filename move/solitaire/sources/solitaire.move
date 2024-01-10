@@ -248,6 +248,11 @@ module solitaire::solitaire {
     public fun from_column_to_column(game: &mut Game, src_column_index: u64, card: u64, dest_column_index: u64, clock: &Clock, _ctx: &mut TxContext) {
         assert!(src_column_index < COLUMN_COUNT, EInvalidColumnIndex);
         assert!(dest_column_index < COLUMN_COUNT, EInvalidColumnIndex);
+        if (src_column_index == dest_column_index) {
+            // If the source and destination columns are the same,
+            // we do not need to do anything.
+            return
+        };
         // One column needs to be removed because it is not allowed to take 2 mutable references to the same vector.
         let dest_column = vector::remove(&mut game.columns, dest_column_index);
         let src_column = vector::borrow_mut(&mut game.columns, src_column_index);
@@ -257,7 +262,7 @@ module solitaire::solitaire {
             assert!(card % 13 == 12, ENotKingCard);
             // Because more than one card can be moved at once, we need to iterate over the vector with starting point
             // the index of the card to move.
-            while (vector::length(&src_column.cards) >= index) {
+            while (vector::length(&src_column.cards) > index) {
                 let card_to_move = vector::remove(&mut src_column.cards, index);
                 vector::push_back(&mut dest_column.cards, card_to_move);
             };
@@ -441,6 +446,12 @@ module solitaire::solitaire {
     }
 
     #[test_only]
+    public fun get_num_cards_in_column(game: &Game, column_index: u64): u64 {
+        let column = vector::borrow(&game.columns, column_index);
+        vector::length(&column.cards)
+    }
+
+    #[test_only]
     public fun cheat_place_card_to_column(game: &mut Game, card: u64, column_index: u64) {
         let column = vector::borrow_mut(&mut game.columns, column_index);
         vector::push_back(&mut column.cards, card);
@@ -457,7 +468,7 @@ module solitaire::solitaire {
     // index= 4,  suit: "Clubs", name-on-card: "5",  
     // index= 5,  suit: "Clubs", name-on-card: "6",  
     // index= 6,  suit: "Clubs", name-on-card: "7",  
-    // index= 7,  suit: "Clubs", name-on-card: "8",  
+    // index= 7,  suit: "Clubs", name-on-card: "8",
     // index= 8,  suit: "Clubs", name-on-card: "9",  
     // index= 9,  suit: "Clubs", name-on-card: "10", 
     // index= 10, suit: "Clubs", name-on-card: "J",  

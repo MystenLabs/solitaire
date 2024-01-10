@@ -27,6 +27,11 @@ module solitaire::test_solitaire {
         EInvalidPileIndex,
     };
 
+    // Test error codes
+    const ETestColumnNotEmpty: u64 = 901;
+    const ETestIncorrectNumberOfCardsInColumnAfterMove: u64 = 902;
+
+
     const PLAYER: address = @0xCAFE;
 
     // ----------------- Helper functions -----------------
@@ -615,30 +620,142 @@ module solitaire::test_solitaire {
         test_scenario::end(scenario_val);
     }
 
-    // #[test]
-    // #[expected_failure(abort_code = ECardNotInColumn)]
-    // public fun test_from_column_to_column_invalid_card_not_in_column() {
-    //     // TODO
-    //     assert!(false, 1)
-    // }
-    //
-    // #[test]
-    // #[expected_failure(abort_code = ENotKingCard)]
-    // public fun test_from_column_to_column_invalid_clubs_3_on_empty() {
-    //     // TODO
-    //     assert!(false, 1)
-    // }
-    //
-    // #[test]
-    // public fun test_from_column_to_column_valid_clubs_K_on_empty() {
-    //     // TODO
-    //     assert!(false, 1)
-    // }
-    //
+    #[test]
+    public fun test_from_column_to_column_valid_multiple_cards() {
+        let scenario_val = init_normal_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+
+            // Put 2 cards on column 0. It's ok to cheat here, just don't tell anyone.
+            solitaire::cheat_place_card_to_column(&mut game, 38, 0);
+            solitaire::cheat_place_card_to_column(&mut game, 37, 0);
+            // Remove the card from column 1 so that we can move anything to it
+            solitaire::remove_all_from_column(&mut game, 1);
+
+            // Both cheat-placed cards should be moved to column 1.
+            solitaire::from_column_to_column(
+                &mut game, 0, 38, 1, &clock, test_scenario::ctx(scenario)
+            );
+            assert!(
+                solitaire::get_num_cards_in_column(&game, 0) == 1,
+                ETestColumnNotEmpty
+            );
+            assert!(
+                solitaire::get_num_cards_in_column(&game, 1) == 2,
+                ETestIncorrectNumberOfCardsInColumnAfterMove
+            );
+
+            // Teardown
+            clock::destroy_for_testing(clock);
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
+    }
+
+    #[test]
+    public fun test_from_column_to_column_valid_to_same_column() {
+        let scenario_val = init_normal_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+
+            solitaire::remove_all_from_column(&mut game, 0);
+
+            // Put 2 cards on column 0. It's ok to cheat here, just don't tell anyone.
+            solitaire::cheat_place_card_to_column(&mut game, 38, 0);
+            solitaire::cheat_place_card_to_column(&mut game, 37, 0);
+
+            // Both cheat-placed cards should be moved to column 1.
+            solitaire::from_column_to_column(
+                &mut game, 0, 38, 0, &clock, test_scenario::ctx(scenario)
+            );
+
+            assert!(
+                solitaire::get_num_cards_in_column(&game, 0) == 2,
+                ETestIncorrectNumberOfCardsInColumnAfterMove
+            );
+
+            // Teardown
+            clock::destroy_for_testing(clock);
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
+    }
+
+    #[test]
+    #[expected_failure(abort_code = ECardNotInColumn)]
+    public fun test_from_column_to_column_invalid_card_not_in_column() {
+        let scenario_val = init_normal_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+
+            solitaire::from_column_to_column(
+                &mut game, 0, 70, 1, &clock, test_scenario::ctx(scenario)
+            );
+
+            // Teardown
+            clock::destroy_for_testing(clock);
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
+    }
+
+    #[test]
+    #[expected_failure(abort_code = ENotKingCard)]
+    public fun test_from_column_to_column_invalid_clubs_3_on_empty() {
+        let scenario_val = init_normal_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+            solitaire::cheat_place_card_to_column(&mut game, 4, 0);
+            solitaire::remove_all_from_column(&mut game, 1);
+            solitaire::from_column_to_column(
+                &mut game, 0, 4, 1, &clock, test_scenario::ctx(scenario)
+            );
+
+            // Teardown
+            clock::destroy_for_testing(clock);
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
+    }
+
+    #[test]
+    public fun test_from_column_to_column_valid_clubs_K_on_empty() {
+        let scenario_val = init_normal_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+            solitaire::cheat_place_card_to_column(&mut game, 12, 0);
+
+            solitaire::remove_all_from_column(&mut game, 1);
+
+            solitaire::from_column_to_column(
+                &mut game, 0, 12, 1, &clock, test_scenario::ctx(scenario)
+            );
+
+            // Teardown
+            clock::destroy_for_testing(clock);
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
+    }
+
     // public fun test_from_pile_to_column_valid_spades_8_on_hearts_9() {
     //     // TODO
     //     assert!(false, 1)
     // }
 
-    // TODO test that by moving a column card to another column, the cards on top of it should follow.
 }
