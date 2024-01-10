@@ -365,13 +365,10 @@ module solitaire::test_solitaire {
         test_scenario::next_tx(scenario, PLAYER);
         {
             let game = test_scenario::take_from_sender<Game>(scenario);
-            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
 
             // Add 2 cards to the deck
             solitaire::cheat_open_card_to_deck(&mut game, 1);
             solitaire::cheat_open_card_to_deck(&mut game, 10);
-
-            clock::destroy_for_testing(clock);
 
             // Try to pick the second card from the deck, which is not the top card
             solitaire::from_deck_to_pile(
@@ -384,43 +381,144 @@ module solitaire::test_solitaire {
 
     #[test]
     public fun test_from_column_to_pile_valid_hearts_A_on_empty() {
-        // TODO
-        assert!(false, 1)
+        let scenario_val = init_normal_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+            // Place ace of hearts to the first column
+            solitaire::cheat_place_card_to_column(&mut game, 26, 0);
+
+            // Move ace of hearts to an empty pile (e.g. pile 0)
+            solitaire::from_column_to_pile(&mut game, 0, 0, &clock, test_scenario::ctx(scenario));
+
+            // Teardown
+            clock::destroy_for_testing(clock);
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
     }
 
     #[test]
     public fun test_from_column_to_pile_valid_hearts_2_on_hearts_A() {
-        // TODO
-        assert!(false, 1)
+        let scenario_val = init_easy_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+            // Place ace of hearts 2 to the first column
+            solitaire::cheat_place_card_to_column(&mut game, 27, 0);
+
+            // Move ace of hearts to the hearts pile that already contains an ace due to
+            // an easy game start
+            solitaire::from_column_to_pile(&mut game, 0, 2, &clock, test_scenario::ctx(scenario));
+
+            // Teardown
+            clock::destroy_for_testing(clock);
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
     }
 
     #[test]
     #[expected_failure(abort_code = ENotAceCard)]
     public fun test_from_column_to_pile_invalid_order_diamonds_7_on_empty() {
-        // TODO
-        assert!(false, 1)
+        let scenario_val = init_normal_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+            solitaire::cheat_place_card_to_column(&mut game, 45, 0);
+
+            solitaire::from_column_to_pile(&mut game, 0, 2, &clock, test_scenario::ctx(scenario));
+
+            // Teardown
+            clock::destroy_for_testing(clock);
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
     }
 
 
     #[test]
     #[expected_failure(abort_code = EInvalidPlacement)]
     public fun test_from_column_to_pile_invalid_order_hearts_3_on_hearts_A() {
-        // TODO
-        assert!(false, 1)
+        let scenario_val = init_easy_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+            solitaire::cheat_place_card_to_column(&mut game, 41, 0);
+
+            solitaire::from_column_to_pile(&mut game, 0, 2, &clock, test_scenario::ctx(scenario));
+
+            // Teardown
+            clock::destroy_for_testing(clock);
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
     }
 
     #[test]
     #[expected_failure(abort_code = EInvalidPlacement)]
     public fun test_from_column_to_pile_invalid_class_clubs_2_on_hearts_A() {
-        // TODO
-        assert!(false, 1)
+        let scenario_val = init_easy_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+            solitaire::cheat_place_card_to_column(&mut game, 1, 0);
+
+            solitaire::from_column_to_pile(&mut game, 0, 2, &clock, test_scenario::ctx(scenario));
+
+            // Teardown
+            clock::destroy_for_testing(clock);
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
     }
 
     #[test]
-    #[expected_failure(abort_code = ECardNotOnTopOFDeck)]
-    public fun test_from_column_to_pile_invalid_card_not_on_top_of_deck() {
-        // TODO
-        assert!(false, 1)
+    #[expected_failure(abort_code = EInvalidColumnIndex)]
+    public fun test_from_column_to_pile_invalid_column_index() {
+        let scenario_val = init_easy_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+
+            solitaire::from_column_to_pile(&mut game, 7, 2, &clock, test_scenario::ctx(scenario));
+
+            // Teardown
+            clock::destroy_for_testing(clock);
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
+    }
+
+    #[test]
+    #[expected_failure(abort_code = EInvalidPileIndex)]
+    public fun test_from_column_to_pile_invalid_pile_index() {
+        let scenario_val = init_easy_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+
+            solitaire::from_column_to_pile(&mut game, 1, 4, &clock, test_scenario::ctx(scenario));
+
+            // Teardown
+            clock::destroy_for_testing(clock);
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
     }
 
     #[test]
@@ -447,4 +545,6 @@ module solitaire::test_solitaire {
         // TODO
         assert!(false, 1)
     }
+
+    // TODO test that by moving a column card to another column, the cards on top of it should follow.
 }

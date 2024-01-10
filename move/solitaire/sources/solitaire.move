@@ -440,6 +440,14 @@ module solitaire::solitaire {
         };
     }
 
+    #[test_only]
+    public fun cheat_place_card_to_column(game: &mut Game, card: u64, column_index: u64) {
+        let column = vector::borrow_mut(&mut game.columns, column_index);
+        vector::push_back(&mut column.cards, card);
+        let (_, index) = vector::index_of(&game.available_cards, &card);
+        vector::remove(&mut game.available_cards, index);
+    }
+
     // We consider the following mapping between Move Contract and Application:
     //
     // index= 0,  suit: "Clubs", name-on-card: "A", 
