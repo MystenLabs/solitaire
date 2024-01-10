@@ -251,7 +251,7 @@ module solitaire::solitaire {
         // One column needs to be removed because it is not allowed to take 2 mutable references to the same vector.
         let dest_column = vector::remove(&mut game.columns, dest_column_index);
         let src_column = vector::borrow_mut(&mut game.columns, src_column_index);
-        let (exist, index) = vector::index_of(&game.deck.cards, &card);
+        let (exist, index) = vector::index_of(&src_column.cards, &card);
         assert!(exist, ECardNotInColumn);
         if (vector::is_empty(&dest_column.cards)) {
             assert!(card % 13 == 12, ENotKingCard);
@@ -272,8 +272,8 @@ module solitaire::solitaire {
             assert!(*dest_column_card % 13 != 0, ECannotPlaceOnAce);
             let card_mod = card % 13;
             if (card >= HEARTS_INDEX) {
-                assert!((card_mod == *dest_column_card - SPADES_INDEX - 1) || (card_mod == *dest_column_card - CLUBS_INDEX - 1), EInvalidPlacement);
-                while (vector::length(&src_column.cards) >= index) {
+                assert!((card_mod == *dest_column_card - CLUBS_INDEX - 1) || (*dest_column_card >= SPADES_INDEX && card_mod == *dest_column_card - SPADES_INDEX - 1), EInvalidPlacement);
+                while (vector::length(&src_column.cards) > index) {
                     let card_to_move = vector::remove(&mut src_column.cards, index);
                     vector::push_back(&mut dest_column.cards, card_to_move);
                 };
@@ -283,8 +283,8 @@ module solitaire::solitaire {
                     vector::push_back(&mut src_column.cards, card);
                 };
             } else {
-                assert!((card_mod == *dest_column_card - HEARTS_INDEX - 1) || (card_mod == *dest_column_card - DIAMONDS_INDEX - 1), EInvalidPlacement);
-                while (vector::length(&src_column.cards) >= index) {
+                assert!((card_mod == *dest_column_card - HEARTS_INDEX - 1) || (*dest_column_card >= DIAMONDS_INDEX && card_mod == *dest_column_card - DIAMONDS_INDEX - 1), EInvalidPlacement);
+                while (vector::length(&src_column.cards) > index) {
                     let card_to_move = vector::remove(&mut src_column.cards, index);
                     vector::push_back(&mut dest_column.cards, card_to_move);
                 };

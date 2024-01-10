@@ -522,29 +522,123 @@ module solitaire::test_solitaire {
     }
 
     #[test]
-    public fun test_from_column_to_column_valid_spades_8_on_hearts_9() {
-        // TODO
-        assert!(false, 1)
+    public fun test_from_column_to_column_valid_hearts_J_on_clubs_Q() {
+        let scenario_val = init_normal_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+
+            solitaire::cheat_place_card_to_column(
+                &mut game, 36, 0
+            ); // J of hearts
+            solitaire::cheat_place_card_to_column(
+                &mut game, 11, 1
+            ); // Q of clubs
+
+            solitaire::from_column_to_column(
+                &mut game, 0, 36, 1, &clock, test_scenario::ctx(scenario)
+            );
+
+            // Teardown
+            clock::destroy_for_testing(clock);
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
+    }
+
+    #[test]
+    #[expected_failure(abort_code = EInvalidPlacement)]
+    public fun test_from_column_to_column_invalid_order_spades_8_on_hearts_10() {
+        let scenario_val = init_normal_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+
+            // Setup -- place 8 of spades on column 0 and 9 of hearts on column 1
+            solitaire::cheat_place_card_to_column(&mut game, 20, 0); // 8 of spades
+            solitaire::cheat_place_card_to_column(&mut game, 35, 1); // 9 of hearts
+
+            solitaire::from_column_to_column(
+                &mut game, 0, 20, 1, &clock, test_scenario::ctx(scenario)
+            );
+
+            // Teardown
+            clock::destroy_for_testing(clock);
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
     }
 
     #[test]
     #[expected_failure(abort_code = EInvalidColumnIndex)]
-    public fun test_from_column_to_column_invalid_column_index() {
-        // TODO
-        assert!(false, 1)
+    public fun test_from_column_to_column_invalid_src_column_index() {
+        let scenario_val = init_normal_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+
+            solitaire::from_column_to_column(
+                &mut game, 7, 20, 1, &clock, test_scenario::ctx(scenario)
+            );
+
+            // Teardown
+            clock::destroy_for_testing(clock);
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
     }
 
     #[test]
-    #[expected_failure(abort_code = EInvalidPileIndex)]
-    public fun test_from_column_to_column_invalid_pile_index() {
-        // TODO
-        assert!(false, 1)
+    #[expected_failure(abort_code = EInvalidColumnIndex)]
+    public fun test_from_column_to_column_invalid_dest_column_index() {
+        let scenario_val = init_normal_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+
+            solitaire::from_column_to_column(
+                &mut game, 0, 20, 7, &clock, test_scenario::ctx(scenario)
+            );
+
+            // Teardown
+            clock::destroy_for_testing(clock);
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
     }
 
-    public fun test_from_pile_to_column_valid_spades_8_on_hearts_9() {
-        // TODO
-        assert!(false, 1)
-    }
+    // #[test]
+    // #[expected_failure(abort_code = ECardNotInColumn)]
+    // public fun test_from_column_to_column_invalid_card_not_in_column() {
+    //     // TODO
+    //     assert!(false, 1)
+    // }
+    //
+    // #[test]
+    // #[expected_failure(abort_code = ENotKingCard)]
+    // public fun test_from_column_to_column_invalid_clubs_3_on_empty() {
+    //     // TODO
+    //     assert!(false, 1)
+    // }
+    //
+    // #[test]
+    // public fun test_from_column_to_column_valid_clubs_K_on_empty() {
+    //     // TODO
+    //     assert!(false, 1)
+    // }
+    //
+    // public fun test_from_pile_to_column_valid_spades_8_on_hearts_9() {
+    //     // TODO
+    //     assert!(false, 1)
+    // }
 
     // TODO test that by moving a column card to another column, the cards on top of it should follow.
 }
