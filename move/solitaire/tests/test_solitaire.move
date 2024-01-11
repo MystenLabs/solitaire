@@ -543,6 +543,37 @@ module solitaire::test_solitaire {
     }
 
     #[test]
+    #[expected_failure(abort_code = ECannotPlaceOnKing)]
+    public fun test_from_column_to_pile_invalid_place_on_king() {
+        let scenario_val = init_normal_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+
+            let ace_of_hearts = 26;
+            solitaire::cheat_place_card_to_column(
+                &mut game,
+                ace_of_hearts,
+                0);
+
+            let king_of_spades = 25;
+            solitaire::cheat_place_card_to_pile(
+                &mut game,
+                king_of_spades,
+                3);
+
+            solitaire::from_column_to_pile(&mut game, 0, 3, &clock, test_scenario::ctx(scenario));
+
+            // Teardown
+            clock::destroy_for_testing(clock);
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
+    }
+
+    #[test]
     public fun test_from_column_to_column_valid_hearts_J_on_clubs_Q() {
         let scenario_val = init_normal_game_scenario_helper();
         let scenario = &mut scenario_val;
@@ -854,7 +885,7 @@ module solitaire::test_solitaire {
     // public fun test_finish_game_valid_finished() {
     //     // TODO
     // }
-    //
+
     // #[test]
     // #[expected_failure(abort_code = EGameNotFinished)]
     // public fun test_finish_game_invalid_not_finished() {
