@@ -87,13 +87,7 @@ module solitaire::solitaire {
         vector::push_back(&mut piles, Pile {cards: vector::empty()});
         vector::push_back(&mut piles, Pile {cards: vector::empty()});
 
-        let columns = vector::empty<Column>();
-        let i: u64 = 0;
-        while(i < COLUMN_COUNT) {
-            let column = set_up_column(i, clock, &mut available_cards);
-            vector::push_back(&mut columns, column);
-            i = i + 1;
-        };
+        let columns = set_up_columns(clock, &mut available_cards);
 
         let game = Game {
             id: object::new(ctx),
@@ -134,13 +128,7 @@ module solitaire::solitaire {
         vector::push_back(&mut piles, Pile {
             cards: vector::singleton(vector::remove(&mut available_cards, DIAMONDS_INDEX-3))});
 
-        let columns = vector::empty<Column>();
-        let i: u64 = 0;
-        while(i < COLUMN_COUNT) {
-            let column = set_up_column(i, clock, &mut available_cards);
-            vector::push_back(&mut columns, column);
-            i = i + 1;
-        };
+        let columns = set_up_columns(clock, &mut available_cards);
 
         let game = Game {
             id: object::new(ctx),
@@ -354,13 +342,19 @@ module solitaire::solitaire {
     /// Internal function that sets up the 7 columns of cards.
     /// Each column has the top card revealed and the a number of hidden cards that is equal to the
     /// index of the column, starting from 0.
-    fun set_up_column(column_num: u64, clock: &Clock, available_cards: &mut vector<u64>): Column {
-        let card = reveal_card(clock, available_cards);
-        let column = Column {
-            hidden_cards: column_num,
-            cards: vector::singleton<u64>(card)
+    fun set_up_columns(clock: &Clock, available_cards: &mut vector<u64>): vector<Column> {
+        let columns = vector::empty<Column>();
+        let i: u64 = 0;
+        while(i < COLUMN_COUNT) {
+            let card = reveal_card(clock, available_cards);
+            let column = Column {
+                hidden_cards: i,
+                cards: vector::singleton<u64>(card)
+            };
+            vector::push_back(&mut columns, column);
+            i = i + 1;
         };
-        column
+        columns
     }
 
     fun reveal_card (clock: &Clock, available_cards: &mut vector<u64>): u64 {
