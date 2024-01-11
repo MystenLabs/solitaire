@@ -26,7 +26,7 @@ module solitaire::test_solitaire {
     // Test error codes
     const ETestColumnNotEmpty: u64 = 901;
     const ETestIncorrectNumberOfCardsInColumnAfterMove: u64 = 902;
-
+    const ETestTimeEndNotGreaterThanTimeStart : u64 = 903;
 
     const PLAYER: address = @0xCAFE;
 
@@ -881,14 +881,64 @@ module solitaire::test_solitaire {
         test_scenario::end(scenario_val);
     }
 
-    // #[test]
-    // public fun test_finish_game_valid_finished() {
-    //     // TODO
-    // }
+    #[test]
+    #[expected_failure(abort_code = EGameHasFinished)]
+    public fun test_pile_to_column_invalid_has_finished() {
+        let scenario_val = init_normal_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            // Setup
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
 
-    // #[test]
-    // #[expected_failure(abort_code = EGameNotFinished)]
-    // public fun test_finish_game_invalid_not_finished() {
-    //     // TODO
-    // }
+            // Run test
+            solitaire::cheat_fill_all_piles(&mut game);
+            clock::set_for_testing(&mut clock, 2008);
+            solitaire::finish_game(&mut game, &clock, test_scenario::ctx(scenario));
+            solitaire::from_pile_to_column(&mut game, 0, 1, test_scenario::ctx(scenario));
+
+            // Teardown
+            clock::destroy_for_testing(clock);
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
+    }
+
+    #[test]
+    public fun test_finish_game_valid_finished() {
+        let scenario_val = init_normal_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+            solitaire::cheat_fill_all_piles(&mut game);
+            clock::set_for_testing(&mut clock, 2009);
+            solitaire::finish_game(&mut game, &clock, test_scenario::ctx(scenario));
+            assert!(
+                solitaire::check_time_end_greater_than_time_start(&game),
+                ETestTimeEndNotGreaterThanTimeStart
+            );
+            clock::destroy_for_testing(clock);
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
+    }
+
+    #[test]
+    #[expected_failure(abort_code = EGameNotFinished)]
+    public fun test_finish_game_invalid_not_finished() {
+        let scenario_val = init_easy_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+            solitaire::finish_game(&mut game, &clock, test_scenario::ctx(scenario));
+            clock::destroy_for_testing(clock);
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
+    }
 }

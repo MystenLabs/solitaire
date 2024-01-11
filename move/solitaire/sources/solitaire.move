@@ -343,11 +343,10 @@ module solitaire::solitaire {
     /// This funtion needs to be called when the player has finished the game.
     public fun finish_game(game: &mut Game, clock: &Clock, _ctx: &mut TxContext) {
         let i = 0;
-        let pile = vector::borrow(&game.piles, i);
         while (i < PILE_COUNT) {
+            let pile = vector::borrow(&game.piles, i);
             assert!(vector::length(&pile.cards) == 13, EGameNotFinished);
             i = i + 1;
-            pile = vector::borrow(&game.piles, i);
         };
         game.end_time = clock::timestamp_ms(clock);
     }
@@ -465,6 +464,31 @@ module solitaire::solitaire {
         vector::push_back(&mut pile.cards, card);
         let (_, index) = vector::index_of(&game.available_cards, &card);
         vector::remove(&mut game.available_cards, index);
+    }
+
+    #[test_only]
+    public fun cheat_fill_all_piles(game: &mut Game) {
+        let i: u64 = 0;
+        let indexes = vector<u64>[
+            CLUBS_INDEX,
+            SPADES_INDEX,
+            HEARTS_INDEX,
+            DIAMONDS_INDEX
+        ];
+        while (i < PILE_COUNT) {
+            let pile = vector::borrow_mut(&mut game.piles, i);
+            while (vector::length(&pile.cards) < 13) {
+                let card_index = vector::borrow(&indexes, i);
+                let card: u64 = *card_index + vector::length(&pile.cards);
+                vector::push_back(&mut pile.cards, card);
+            };
+            i = i + 1;
+        };
+    }
+
+    #[test_only]
+    public fun check_time_end_greater_than_time_start(game: &Game): bool {
+        game.end_time > game.start_time
     }
 
     // We consider the following mapping between Move Contract and Application:
