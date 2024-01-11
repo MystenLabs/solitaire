@@ -31,6 +31,15 @@ module solitaire::test_solitaire {
     const PLAYER: address = @0xCAFE;
 
     // ----------------- Helper functions -----------------
+    fun generate_cards(num_cards: u64): vector<u64>{
+        let i: u64 = 0;
+        let available_cards = vector::empty<u64>();
+        while (i < num_cards) {
+            vector::push_back(&mut available_cards, i);
+            i = i + 1;
+        };
+        available_cards
+    }
 
     fun init_normal_game_scenario_helper(): Scenario {
         let scenario_val = test_scenario::begin(PLAYER);
@@ -61,7 +70,7 @@ module solitaire::test_solitaire {
         let scenario = &mut scenario_val;
         {
             let clock = clock::create_for_testing(test_scenario::ctx(scenario));
-            let available_cards = solitaire::generate_cards(num_cards);
+            let available_cards = generate_cards(num_cards);
             solitaire::reveal_card_test(&clock, &mut available_cards);
             clock::destroy_for_testing(clock);
         };

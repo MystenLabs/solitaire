@@ -404,17 +404,6 @@ module solitaire::solitaire {
     }
 
     #[test_only]
-    public fun generate_cards(num_cards: u64): vector<u64>{
-        let i: u64 = 0;
-        let available_cards = vector::empty<u64>();
-        while (i < num_cards) {
-            vector::push_back(&mut available_cards, i);
-            i = i + 1;
-        };
-        available_cards
-    }
-
-    #[test_only]
     public fun get_top_card_of_deck(game: &Game): u64 {
         let length = vector::length(&game.deck.cards);
         let card = vector::borrow(&game.deck.cards, length - 1);
