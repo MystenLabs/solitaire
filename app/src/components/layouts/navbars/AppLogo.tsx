@@ -1,4 +1,3 @@
-import { USER_ROLES } from "@/constants/USER_ROLES";
 import { useAuthentication } from "@/contexts/Authentication";
 import Image from "next/image";
 import Link from "next/link";
@@ -11,7 +10,7 @@ export const AppLogo = ({ className = "" }: AppLogoProps) => {
   const { user } = useAuthentication();
   return (
     <Link
-      href={`/${user.role === USER_ROLES.ROLE_4 ? "/" : user.role}`}
+      href={`/${user.role === 'anonymous' ? "/" : user.role}`}
       className={`min-w-[175px] flex space-x-3 text-2xl font-bold text-contrast items-center ${className}`}
     >
       <Image

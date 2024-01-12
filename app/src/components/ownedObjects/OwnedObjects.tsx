@@ -9,7 +9,6 @@ import { OwnedObjectsAccordion } from "./OwnedObjectsAccordion";
 import { OwnedObjectsTable } from "./OwnedObjectsTable";
 import { Spinner } from "../general/Spinner";
 import { useAuthentication } from "@/contexts/Authentication";
-import { USER_ROLES } from "@/constants/USER_ROLES";
 
 type Display = "carousel" | "table" | "accordion";
 
@@ -23,7 +22,7 @@ export const OwnedObjects = () => {
     setDisplay(value as Display);
   };
 
-  if (user?.role === USER_ROLES.ROLE_4 && !isAuthLoading) {
+  if (user?.role === 'anonymous' && !isAuthLoading) {
     return (
       <div className="text-center">
         <div className="font-bold text-lg">Not logged in</div>

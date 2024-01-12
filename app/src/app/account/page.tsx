@@ -4,12 +4,11 @@ import { Paper } from "@/components/general/Paper";
 import { useAuthentication } from "@/contexts/Authentication";
 import { UserAvatar } from "@/components/general/UserAvatar";
 import { UserProfileMenu } from "@/components/general/UserProfileMenu";
-import { USER_ROLES } from "@/constants/USER_ROLES";
 
 export default function Account() {
   const { user, isLoading } = useAuthentication();
 
-  if (!isLoading && user.role === USER_ROLES.ROLE_4) {
+  if (!isLoading && user.role === 'anonymous') {
     return <Paper className="text-center">Not logged in</Paper>;
   }
 

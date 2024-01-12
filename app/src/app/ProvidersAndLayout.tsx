@@ -1,7 +1,7 @@
 "use client";
 
-import { LargeScreenLayout } from "@/components/layouts/LargeScreenLayout";
-import { MobileLayout } from "@/components/layouts/MobileLayout";
+// import { LargeScreenLayout } from "@/components/layouts/LargeScreenLayout";
+// import { MobileLayout } from "@/components/layouts/MobileLayout";
 import { AuthenticationProvider } from "@/contexts/Authentication";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useRegisterServiceWorker } from "@/hooks/useRegisterServiceWorker";
@@ -16,8 +16,9 @@ export const ProvidersAndLayout = ({ children }: ChildrenProps) => {
   return (
     <AuthenticationProvider>
       <main className={`min-h-screen w-screen bg-gray-100`}>
-        {!!isMobile && <MobileLayout>{children}</MobileLayout>}
-        {!isMobile && <LargeScreenLayout>{children}</LargeScreenLayout>}
+        {/* {!!isMobile && <MobileLayout>{children}</MobileLayout>}
+        {!isMobile && <LargeScreenLayout>{children}</LargeScreenLayout>} */}
+        {children}
         <Toaster
           position="bottom-center"
           toastOptions={{
