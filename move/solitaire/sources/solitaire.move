@@ -322,8 +322,9 @@ module solitaire::solitaire {
         vector::push_back(&mut game.deck.cards, card);
     }
 
-    /// This function is used to get the next deck card, when all deck cards are revealed.
-    public fun turn_deck_card(game: &mut Game, _ctx: &mut TxContext) {
+    /// This function is used to cycle through the open deck cards and rotate their order, one at a time. 
+    /// The top card is placed at the bottom which makes the next card in the deck `top card`
+    public fun rotate_open_deck_cards(game: &mut Game, _ctx: &mut TxContext) {
         assert!(game.deck.hidden_cards == 0, EInvalidTurnDeckCard);
         assert!(vector::length(&game.deck.cards) > 0, ENoAvailableDeckCard);
         let card = vector::pop_back(&mut game.deck.cards);
