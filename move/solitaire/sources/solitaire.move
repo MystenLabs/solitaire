@@ -8,7 +8,7 @@ module solitaire::solitaire {
 
     // =================== Error Codes ===================
     const ENoMoreHiddenCards: u64 = 0;
-    const ECardNotOnTopOFDeck: u64 = 1;
+    const ENoAvailableDeckCard: u64 = 1;
     const ENotKingCard: u64 = 2;
     const EInvalidPlacement: u64 = 3;
     const ECannotPlaceOnAce: u64 = 4;
@@ -20,6 +20,7 @@ module solitaire::solitaire {
     const EInvalidPileIndex: u64 = 10;
     const EGameNotFinished: u64 = 11;
     const EGameHasFinished: u64 = 12;
+    const EInvalidTurnDeckCard: u64 = 13;
 
 // =================== Constants ===================
     const CARD_COUNT: u64 = 52;
@@ -146,17 +147,15 @@ module solitaire::solitaire {
         transfer::transfer(game, tx_context::sender(ctx));
     }
 
-    public fun from_deck_to_column(game: &mut Game, deck_card: u64, column_index: u64, _ctx: &mut TxContext) {
+    public fun from_deck_to_column(game: &mut Game, column_index: u64, _ctx: &mut TxContext) {
         assert!(column_index < COLUMN_COUNT, EInvalidColumnIndex);
-        let top_card_index = vector::length(&game.deck.cards) - 1;
-        let (_, index) = vector::index_of(&game.deck.cards, &deck_card);
-        assert!(index == top_card_index, ECardNotOnTopOFDeck);
+        assert!(vector::length(&game.deck.cards) > 0, ENoAvailableDeckCard);
         let column = vector::borrow_mut(&mut game.columns, column_index);
+        let deck_card = vector::pop_back(&mut game.deck.cards);
         // if the column is empty, the card must be a king
         if (vector::is_empty(&column.cards)) {
             assert!(deck_card % 13 == 12, ENotKingCard);
-            let card_to_place = vector::remove(&mut game.deck.cards, index);
-            vector::push_back(&mut column.cards, card_to_place);
+            vector::push_back(&mut column.cards, deck_card);
         } else {
             // Get the card at the top of the column
             let last_card_index = vector::length(&column.cards) - 1;
@@ -166,28 +165,24 @@ module solitaire::solitaire {
             let card_mod = deck_card % 13;
             if (deck_card >= HEARTS_INDEX) { // check if card deck card is red
                 assert!((*column_card >= SPADES_INDEX && card_mod == *column_card - SPADES_INDEX - 1) || (card_mod == *column_card - CLUBS_INDEX - 1), EInvalidPlacement);
-                let card_to_place = vector::remove(&mut game.deck.cards, index);
-                vector::push_back(&mut column.cards, card_to_place);
+                vector::push_back(&mut column.cards, deck_card);
             } else { // else, if it is black
                 assert!((card_mod == *column_card - HEARTS_INDEX - 1) || (*column_card >= DIAMONDS_INDEX && card_mod == *column_card - DIAMONDS_INDEX - 1), EInvalidPlacement);
-                let card_to_place = vector::remove(&mut game.deck.cards, index);
-                vector::push_back(&mut column.cards, card_to_place);
+                vector::push_back(&mut column.cards, deck_card);
             };
         };
         game.player_moves = game.player_moves + 1;
     }
 
-    public fun from_deck_to_pile(game: &mut Game, deck_card: u64, pile_index: u64, _ctx: &mut TxContext) {
+    public fun from_deck_to_pile(game: &mut Game, pile_index: u64, _ctx: &mut TxContext) {
         assert!(pile_index < PILE_COUNT, EInvalidPileIndex);
-        let top_card_index = vector::length(&game.deck.cards) - 1;
-        let (_, index) = vector::index_of(&game.deck.cards, &deck_card);
-        assert!(index == top_card_index, ECardNotOnTopOFDeck);
+        assert!(vector::length(&game.deck.cards) > 0, ENoAvailableDeckCard);
+        let deck_card = vector::pop_back(&mut game.deck.cards);
         let pile = vector::borrow_mut(&mut game.piles, pile_index);
         // if the pile is empty, only Ace is allowed to be placed
         if (vector::is_empty(&pile.cards)) {
             assert!(deck_card % 13 == 0, ENotAceCard);
-            let card_to_place = vector::remove(&mut game.deck.cards, index);
-            vector::push_back(&mut pile.cards, card_to_place);
+            vector::push_back(&mut pile.cards, deck_card);
         } else {
             let last_card_index = vector::length(&pile.cards) - 1;
             let pile_card = vector::borrow(&pile.cards, last_card_index);
@@ -195,8 +190,7 @@ module solitaire::solitaire {
             assert!(*pile_card % 13 != 12, ECannotPlaceOnKing);
             // the card to place must be the next card in the pile and of the same suit
             assert!(deck_card == *pile_card + 1, EInvalidPlacement);
-            let card_to_place = vector::remove(&mut game.deck.cards, index);
-            vector::push_back(&mut pile.cards, card_to_place);
+            vector::push_back(&mut pile.cards, deck_card);
         };
         game.player_moves = game.player_moves + 1;
     }
@@ -328,6 +322,16 @@ module solitaire::solitaire {
         vector::push_back(&mut game.deck.cards, card);
     }
 
+    /// This function is used to cycle through the open deck cards and rotate their order, one at a time. 
+    /// The top card is placed at the bottom which makes the next card in the deck `top card`
+    public fun rotate_open_deck_cards(game: &mut Game, _ctx: &mut TxContext) {
+        assert!(game.deck.hidden_cards == 0, EInvalidTurnDeckCard);
+        assert!(vector::length(&game.deck.cards) > 0, ENoAvailableDeckCard);
+        let card = vector::pop_back(&mut game.deck.cards);
+        vector::insert(&mut game.deck.cards, card, 0);
+        game.player_moves = game.player_moves + 1;
+    }
+
     /// This funtion needs to be called when the player has finished the game.
     public fun finish_game(game: &mut Game, clock: &Clock, _ctx: &mut TxContext) {
         let i = 0;
@@ -416,6 +420,13 @@ module solitaire::solitaire {
         vector::push_back(&mut game.deck.cards, card);
         let (_, index) = vector::index_of(&game.available_cards, &card);
         vector::remove(&mut game.available_cards, index);
+    }
+
+    #[test_only]
+    public fun remove_all_from_deck(game: &mut Game) {
+        while (!vector::is_empty(&game.deck.cards)) {
+            vector::pop_back(&mut game.deck.cards);
+        };
     }
 
     #[test_only]

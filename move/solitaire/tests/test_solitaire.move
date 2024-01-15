@@ -9,7 +9,7 @@ module solitaire::test_solitaire {
         Self,
         Game,
         ENoMoreHiddenCards,
-        ECardNotOnTopOFDeck,
+        ENoAvailableDeckCard,
         ENotKingCard,
         EInvalidPlacement,
         ECannotPlaceOnAce,
@@ -21,6 +21,7 @@ module solitaire::test_solitaire {
         EInvalidPileIndex,
         EGameNotFinished,
         EGameHasFinished,
+        EInvalidTurnDeckCard,
     };
 
     // Test error codes
@@ -118,6 +119,7 @@ module solitaire::test_solitaire {
             let i = 0;
             while (i <= 25) {
                 solitaire::open_deck_card(&mut game, &clock, test_scenario::ctx(scenario));
+                i = i + 1;
             };
             clock::destroy_for_testing(clock);
             test_scenario::return_to_sender(scenario, game);
@@ -137,12 +139,9 @@ module solitaire::test_solitaire {
             solitaire::open_deck_card(&mut game, &clock, test_scenario::ctx(scenario));
             clock::destroy_for_testing(clock);
 
-            // Top card should be {index= 20, suit: "Spades", name-on-card: "8"}
-            let top_card_of_dock = solitaire::get_top_card_of_deck(&game);
-
             // Placing {index= 20, suit: "Spades", name-on-card: "8"} on {index= 34, suit: "Hearts", name-on-card:"9"}
             solitaire::from_deck_to_column(
-                &mut game, top_card_of_dock, 0, test_scenario::ctx(scenario)
+                &mut game, 0, test_scenario::ctx(scenario)
             );
             test_scenario::return_to_sender(scenario, game);
         };
@@ -164,12 +163,9 @@ module solitaire::test_solitaire {
             solitaire::open_deck_card(&mut game, &clock, test_scenario::ctx(scenario));
             clock::destroy_for_testing(clock);
 
-            // Top card should be {index= 20, suit: "Spades", name-on-card: "8"}
-            let top_card_of_dock = solitaire::get_top_card_of_deck(&game);
-
             // Placing {index= 20, suit: "Spades", name-on-card: "8"} on {index= 30, suit: "Hearts", name-on-card:"5"}
             solitaire::from_deck_to_column(
-                &mut game, top_card_of_dock, 4, test_scenario::ctx(scenario)
+                &mut game, 4, test_scenario::ctx(scenario)
             );
             test_scenario::return_to_sender(scenario, game);
         };
@@ -178,8 +174,33 @@ module solitaire::test_solitaire {
     }
 
     #[test]
+    #[expected_failure(abort_code = ENoAvailableDeckCard)]
+    public fun test_from_deck_to_column_no_available_card() {
+        let scenario_val = init_normal_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+            // Open all the cards in the deck
+            let i = 0;
+            while (i < 24) {
+                solitaire::open_deck_card(&mut game, &clock, test_scenario::ctx(scenario));
+                i = i + 1;
+            };
+            solitaire::remove_all_from_deck(&mut game);
+            solitaire::from_deck_to_column(
+                &mut game, 0, test_scenario::ctx(scenario)
+            );
+            clock::destroy_for_testing(clock);
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
+    }
+
+    #[test]
     #[expected_failure(abort_code = EInvalidPlacement)]
-    public fun test_from_deck_to_column_invalid_color_hearts_4_on_hearts_5(){
+    public fun test_from_deck_to_column_invalid_color_hearts_4_on_hearts_5() {
         let scenario_val = init_normal_game_scenario_helper();
         let scenario = &mut scenario_val;
         test_scenario::next_tx(scenario, PLAYER);
@@ -190,39 +211,9 @@ module solitaire::test_solitaire {
             solitaire::cheat_open_card_to_deck(&mut game, 29);
             clock::destroy_for_testing(clock);
 
-            // Top card should be {index= 20, suit: "Spades", name-on-card: "8"}
-            let top_card_of_dock = solitaire::get_top_card_of_deck(&game);
-
             // Placing {index= 20, suit: "Spades", name-on-card: "8"} on {index= 30, suit: "Hearts", name-on-card:"5"}
             solitaire::from_deck_to_column(
-                &mut game, top_card_of_dock, 4, test_scenario::ctx(scenario)
-            );
-            test_scenario::return_to_sender(scenario, game);
-        };
-
-        test_scenario::end(scenario_val);
-    }
-
-    #[test]
-    #[expected_failure(abort_code = ECardNotOnTopOFDeck)]
-    // Player should only be able to move only the top card of the deck
-    public fun test_from_deck_to_column_invalid_card_not_on_top_of_deck() {
-        let scenario_val = init_normal_game_scenario_helper();
-        let scenario = &mut scenario_val;
-        test_scenario::next_tx(scenario, PLAYER);
-        {
-            let game = test_scenario::take_from_sender<Game>(scenario);
-            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
-
-            // Add 2 cards to the deck
-            solitaire::cheat_open_card_to_deck(&mut game, 29);
-            solitaire::cheat_open_card_to_deck(&mut game, 2);
-
-            clock::destroy_for_testing(clock);
-
-            // Try to pick the second card from the deck, which is not the top card
-            solitaire::from_deck_to_column(
-                &mut game, 29, 4, test_scenario::ctx(scenario)
+                &mut game, 4, test_scenario::ctx(scenario)
             );
             test_scenario::return_to_sender(scenario, game);
         };
@@ -243,7 +234,7 @@ module solitaire::test_solitaire {
             solitaire::cheat_open_card_to_deck(&mut game, 51);
             // Use the king of diamonds to place it on the empty column
             solitaire::from_deck_to_column(
-                &mut game, 51, 0, test_scenario::ctx(scenario)
+                &mut game, 0, test_scenario::ctx(scenario)
             );
             test_scenario::return_to_sender(scenario, game);
         };
@@ -264,7 +255,7 @@ module solitaire::test_solitaire {
             solitaire::cheat_open_card_to_deck(&mut game, 50);
             // Use the queen of diamonds to try to place it on the empty column
             solitaire::from_deck_to_column(
-                &mut game, 50, 0, test_scenario::ctx(scenario)
+                &mut game, 0, test_scenario::ctx(scenario)
             );
             test_scenario::return_to_sender(scenario, game);
         };
@@ -282,7 +273,7 @@ module solitaire::test_solitaire {
             solitaire::cheat_open_card_to_deck(&mut game, 26);
             // Use the ace of hearts to place it on the empty pile
             solitaire::from_deck_to_pile(
-                &mut game, 26, 0, test_scenario::ctx(scenario)
+                &mut game, 0, test_scenario::ctx(scenario)
             );
             test_scenario::return_to_sender(scenario, game);
         };
@@ -302,8 +293,27 @@ module solitaire::test_solitaire {
 
             // Use the 2 of hearts to place it on the hearts pile
             solitaire::from_deck_to_pile(
-                &mut game, 27, 2, test_scenario::ctx(scenario)
+                &mut game, 2, test_scenario::ctx(scenario)
             );
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
+    }
+
+    #[test]
+    #[expected_failure(abort_code = ENoAvailableDeckCard)]
+    public fun test_from_deck_to_pile_no_available_card() {
+        let scenario_val = init_normal_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+
+            solitaire::from_deck_to_pile(
+                &mut game, 0, test_scenario::ctx(scenario)
+            );
+            clock::destroy_for_testing(clock);
             test_scenario::return_to_sender(scenario, game);
         };
         test_scenario::end(scenario_val);
@@ -321,7 +331,7 @@ module solitaire::test_solitaire {
             solitaire::cheat_open_card_to_deck(&mut game, 45);
             // Use the 7 of diamonds to place it on the empty pile
             solitaire::from_deck_to_pile(
-                &mut game, 45, 0, test_scenario::ctx(scenario)
+                &mut game, 0, test_scenario::ctx(scenario)
             );
             test_scenario::return_to_sender(scenario, game);
         };
@@ -341,7 +351,7 @@ module solitaire::test_solitaire {
             solitaire::cheat_open_card_to_deck(&mut game, 28);
             // Use the 3 of hearts to place it on the hearts pile
             solitaire::from_deck_to_pile(
-                &mut game, 28, 2, test_scenario::ctx(scenario)
+                &mut game, 2, test_scenario::ctx(scenario)
             );
             test_scenario::return_to_sender(scenario, game);
         };
@@ -360,29 +370,7 @@ module solitaire::test_solitaire {
             solitaire::cheat_open_card_to_deck(&mut game, 1);
             // Use the 3 of hearts to place it on the hearts pile
             solitaire::from_deck_to_pile(
-                &mut game, 1, 2, test_scenario::ctx(scenario)
-            );
-            test_scenario::return_to_sender(scenario, game);
-        };
-        test_scenario::end(scenario_val);
-    }
-
-    #[test]
-    #[expected_failure(abort_code = ECardNotOnTopOFDeck)]
-    public fun test_from_deck_to_pile_invalid_card_not_on_top_of_deck() {
-        let scenario_val = init_easy_game_scenario_helper();
-        let scenario = &mut scenario_val;
-        test_scenario::next_tx(scenario, PLAYER);
-        {
-            let game = test_scenario::take_from_sender<Game>(scenario);
-
-            // Add 2 cards to the deck
-            solitaire::cheat_open_card_to_deck(&mut game, 1);
-            solitaire::cheat_open_card_to_deck(&mut game, 10);
-
-            // Try to pick the second card from the deck, which is not the top card
-            solitaire::from_deck_to_pile(
-                &mut game, 1, 0, test_scenario::ctx(scenario)
+                &mut game, 2, test_scenario::ctx(scenario)
             );
             test_scenario::return_to_sender(scenario, game);
         };
@@ -912,6 +900,51 @@ module solitaire::test_solitaire {
             test_scenario::return_to_sender(scenario, game);
         };
         test_scenario::end(scenario_val);
+    }
+
+    #[test]
+    public fun test_turn_deck_card_valid_reveal_all_and_iterate_2_times() {
+        let scenario_val = init_normal_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+            // Open all the cards in the deck
+            let i = 0;
+            while (i < 24) {
+                solitaire::open_deck_card(&mut game, &clock, test_scenario::ctx(scenario));
+                i = i + 1;
+            };
+            // iterate the whole deck 2 times
+            i = 0;
+            while (i < 48) {
+                solitaire::turn_deck_card(&mut game, test_scenario::ctx(scenario));
+                i = i + 1;
+            };
+            clock::destroy_for_testing(clock);
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);
+    }
+
+    #[test]
+    #[expected_failure(abort_code = EInvalidTurnDeckCard)]
+    public fun test_invalid_turn_deck_card() {
+        let scenario_val = init_normal_game_scenario_helper();
+        let scenario = &mut scenario_val;
+        test_scenario::next_tx(scenario, PLAYER);
+        {
+            let game = test_scenario::take_from_sender<Game>(scenario);
+            let clock = clock::create_for_testing(test_scenario::ctx(scenario));
+
+            solitaire::open_deck_card(&mut game, &clock, test_scenario::ctx(scenario));
+            solitaire::turn_deck_card(&mut game, test_scenario::ctx(scenario));
+
+            clock::destroy_for_testing(clock);
+            test_scenario::return_to_sender(scenario, game);
+        };
+        test_scenario::end(scenario_val);    
     }
 
     #[test]
