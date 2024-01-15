@@ -903,7 +903,7 @@ module solitaire::test_solitaire {
     }
 
     #[test]
-    public fun test_turn_deck_card() {
+    public fun test_turn_deck_card_valid_reveal_all_and_iterate_2_times() {
         let scenario_val = init_normal_game_scenario_helper();
         let scenario = &mut scenario_val;
         test_scenario::next_tx(scenario, PLAYER);
