@@ -6,8 +6,8 @@ import Image from "next/image";
 import logo from "../../public/SymbolRed 1.svg";
 
 export const metadata: Metadata = {
-  title: "PoC Template",
-  description: "A NextJS app to bootstrap PoCs faster",
+  title: "Solitaire | Mysten Labs",
+  description: "Play klondike style solitaire on the web3!",
 };
 
 export default function Home() {
@@ -25,7 +25,7 @@ export default function Home() {
         </h3>
         <p className="max-w-[300px] text-xs text-center font-normal">
           Dive into the world of strategic moves and captivating gameplay in
-          this Klondike style Solitaire game. Whether you're here to beat your
+          this Klondike style Solitaire game. Whether you are here to beat your
           high score or just starting, your next game awaits. Log in and let the
           cards fall where they may!
         </p>
