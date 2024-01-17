@@ -1,0 +1,9 @@
+.title {
+    color: black;
+    font-size: 25px;
+    font-family: Inter, system-ui;
+    font-weight: 700;
+    line-height: 29px;
+    word-wrap: break-word
+}
+
