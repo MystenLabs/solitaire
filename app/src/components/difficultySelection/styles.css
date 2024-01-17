@@ -1,9 +1,30 @@
+.outside-container {
+    padding: 60px;
+    background: white;
+    border-radius: 24px;
+    backdrop-filter: blur(40px);
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.modes-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+
 .title {
     color: black;
+    text-align: center;
     font-size: 25px;
     font-family: Inter, system-ui;
     font-weight: 700;
     line-height: 29px;
-    word-wrap: break-word
+    word-wrap: break-word;
+    margin-bottom: 60px;
 }
-
