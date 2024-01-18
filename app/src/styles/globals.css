@@ -117,7 +117,3 @@
     @apply bg-background text-foreground;
   }
 }
-
-body {
-    cursor: url("../../public/assets/cursor/pointing.svg"), auto;
-}
