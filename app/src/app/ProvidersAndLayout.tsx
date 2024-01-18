@@ -8,6 +8,7 @@ import { useRegisterServiceWorker } from "@/hooks/useRegisterServiceWorker";
 import { ChildrenProps } from "@/types/ChildrenProps";
 import React from "react";
 import { Toaster } from "react-hot-toast";
+import table from "../../public/Table.svg";
 
 export const ProvidersAndLayout = ({ children }: ChildrenProps) => {
   const _ = useRegisterServiceWorker();
@@ -15,7 +16,15 @@ export const ProvidersAndLayout = ({ children }: ChildrenProps) => {
 
   return (
     <AuthenticationProvider>
-      <main className={`min-h-screen w-screen bg-gray-100`}>
+      <main
+        className={`min-h-screen w-screen`}
+        style={{
+          backgroundImage: `url(${table.src})`, // Set the table image as background
+          backgroundSize: "cover", 
+          backgroundPosition: "bottom", 
+          backgroundRepeat: "no-repeat",
+        }}
+      >
         {/* {!!isMobile && <MobileLayout>{children}</MobileLayout>}
         {!isMobile && <LargeScreenLayout>{children}</LargeScreenLayout>} */}
         {children}

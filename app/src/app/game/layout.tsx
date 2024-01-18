@@ -11,7 +11,7 @@ export default function MemberRootLayout({ children }: ChildrenProps) {
     return <Spinner />;
   }
 
-  if (user?.role !== "member") {
+  if (user?.role === "anonymous") {
     return "Not allowed";
   }
 
