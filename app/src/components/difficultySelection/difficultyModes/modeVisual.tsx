@@ -1,18 +1,19 @@
 import Image from "next/image";
-import easy_mode_visual from "../../../../public/assets/difficultyModesVisuals/easy_mode_visual.svg";
 import React from "react";
 import './styles.css'
+import {StaticImport} from "next/dist/shared/lib/get-img-props";
 
 interface ModeModalProps {
     level: string;
     description: string;
+    mode: string | StaticImport;
 }
-export const EasyModeVisual = ({ level, description }: ModeModalProps ) => {
+export const ModeVisual = ({ level, description, mode }: ModeModalProps ) => {
     return (
         <div className={'outer'}>
             <div className={"mode-visual"}>
-                <Image src={easy_mode_visual}
-                       alt={"Easy mode visual"}
+                <Image src={mode}
+                       alt={"Mode visual"}
                        style={{
                            display: "block",
                            marginLeft: "auto",
