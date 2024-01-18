@@ -1,7 +1,11 @@
 .outer {
     border-radius: 10px;
-    border: 1px solid #BDBDBD;
+    border: 2px solid #BDBDBD;
     background: #FFF;
+}
+
+.outer:hover {
+    border: 2px solid #000;
 }
 
 .mode-visual {
