@@ -5,6 +5,7 @@ import { Metadata } from "next";
 import React from "react";
 import {DifficultySelection} from "@/components/difficultySelection/DifficultySelection";
 
+
 export const metadata: Metadata = {
   title: "PoC Template for Members",
 };
