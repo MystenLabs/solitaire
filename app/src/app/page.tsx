@@ -6,8 +6,8 @@ import logo from "../../public/SymbolRed 1.svg";
 import cardGray from "../../public/card-gray.svg";
 
 export const metadata: Metadata = {
-  title: "PoC Template",
-  description: "A NextJS app to bootstrap PoCs faster",
+  title: "Solitaire | Mysten Labs",
+  description: "Play klondike style solitaire on the web3!",
 };
 
 export default function Home() {
