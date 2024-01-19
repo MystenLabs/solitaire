@@ -5,17 +5,22 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "setup": "env-cmd -f .env ts-node src/setup"
+    "setup": "env-cmd -f .env ts-node src/setup",
+    "test:e2e": "vitest run e2e"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@mysten/sui.js": "^0.41.2",
     "dotenv": "^16.0.3",
+    "tmp": "^0.2.1",
+    "ts-retry-promise": "^0.8.0",
     "typescript": "^5.0.4"
   },
   "devDependencies": {
     "env-cmd": "^10.1.0",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "vite": "^5.0.11",
+    "vitest": "^1.2.1"
   }
 }
