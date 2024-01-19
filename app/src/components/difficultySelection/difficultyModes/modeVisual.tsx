@@ -1,6 +1,5 @@
 import Image from "next/image";
 import React from "react";
-import './styles.css'
 import {StaticImport} from "next/dist/shared/lib/get-img-props";
 
 interface ModeModalProps {
@@ -10,8 +9,8 @@ interface ModeModalProps {
 }
 export const ModeVisual = ({ level, description, mode }: ModeModalProps ) => {
     return (
-        <div className={'outer'}>
-            <div className={"mode-visual"}>
+        <div className="rounded-2xl border-2 border-gray-300 bg-white hover:border-black cursor-pointer" >
+            <div className="mode-visual m-5 bg-white">
                 <Image src={mode}
                        alt={"Mode visual"}
                        style={{
@@ -20,8 +19,8 @@ export const ModeVisual = ({ level, description, mode }: ModeModalProps ) => {
                            marginRight: "auto"
                        }}/>
             </div>
-            <p className={'mode-title'}>{level}</p>
-            <p className={'mode-subtitle'}>{description}</p>
+            <p className="mode-title text-black text-center text-xl font-bold mb-2">{level}</p>
+            <p className="mode-subtitle text-gray-700 text-center text-lg font-normal mb-4 mx-5">{description}</p>
         </div>
     )
 }
