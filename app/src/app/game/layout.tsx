@@ -3,6 +3,9 @@
 import { ChildrenProps } from "@/types/ChildrenProps";
 import { useAuthentication } from "@/contexts/Authentication";
 import { Spinner } from "@/components/general/Spinner";
+import google from "../../../../app/public/assets/logos/google_email.svg";
+import Image from "next/image";
+import React from "react";
 
 export default function MemberRootLayout({ children }: ChildrenProps) {
   const { user, isLoading } = useAuthentication();
@@ -13,7 +16,11 @@ export default function MemberRootLayout({ children }: ChildrenProps) {
               <div className="logo text-white text-[28px] font-bold font-['Mysten Walter Alte']">
                   Mysten Solitaire
               </div>
-              <div className="email pl-2 pr-3.5 py-3 left-0 top-0 rounded-[36px] border border-white border-opacity-40 items-center max-h-12">
+              <div className="flex gap-2 email pl-2 pr-3.5 py-3 left-0 top-0 rounded-[36px] border border-white border-opacity-40 items-center max-h-12">
+                  <div>
+                      <Image src={google}
+                             alt={"Logo of google"}/>
+                  </div>
                   <div className="text-center text-white text-base font-normal font-['Mysten Walter Alte'] leading-tight">
                         {user?.email}
                   </div>
