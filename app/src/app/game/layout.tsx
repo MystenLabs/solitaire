@@ -11,7 +11,7 @@ export default function MemberRootLayout({ children }: ChildrenProps) {
   const { user, isLoading } = useAuthentication();
 
   return (
-      <div className="h-screen">
+      <div className="h-full">
           <div className={"flex align-bottom pt-10 px-20 justify-between"}>
               <div className="logo text-white text-[28px] font-bold font-['Mysten Walter Alte']">
                   Mysten Solitaire
