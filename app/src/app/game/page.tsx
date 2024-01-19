@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 const GamePage = () => {
   console.log("Game Page is on server:", !!process.env.IS_SERVER_SIDE);
   return (
-      <div className="flex flex-col justify-center items-center min-h-screen space-y-20">
+      <div className="flex flex-col justify-center items-center mt-32">
         <DifficultySelection />
       </div>
   )
