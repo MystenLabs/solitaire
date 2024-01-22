@@ -89,12 +89,13 @@ export function fromPileToColumn(game: string, pileIndex: number, columnIndex: n
     return tx;
 }
 
-export function openDeckCard(game: string) {
+export function openDeckCard(game: string, clock: string) {
     const tx = new TransactionBlock();
     tx.moveCall({
         target: `${PACKAGE_ADDRESS}::solitaire::open_deck_card`,
         arguments: [
-            tx.object(game)
+            tx.object(game),
+            tx.object(clock)
         ],
     });
     return tx;

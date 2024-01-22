@@ -327,8 +327,8 @@ module solitaire::solitaire {
     public fun rotate_open_deck_cards(game: &mut Game, _ctx: &mut TxContext) {
         assert!(game.deck.hidden_cards == 0, EInvalidTurnDeckCard);
         assert!(vector::length(&game.deck.cards) > 0, ENoAvailableDeckCard);
-        let card = vector::pop_back(&mut game.deck.cards);
-        vector::insert(&mut game.deck.cards, card, 0);
+        let card = vector::remove(&mut game.deck.cards, 0);
+        vector::push_back(&mut game.deck.cards, card);
         game.player_moves = game.player_moves + 1;
     }
 

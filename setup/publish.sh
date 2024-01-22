@@ -8,9 +8,9 @@ for i in jq curl sui; do
   fi
 done
 
-NETWORK=http://localhost:9000
-BACKEND_API=http://localhost:3000
-FAUCET=https://localhost:9000/gas
+NETWORK=http://127.0.0.1:9000
+BACKEND_API=http://127.0.0.1:3000
+FAUCET=http://127.0.0.1:9000/gas
 
 MOVE_PACKAGE_PATH=../move/solitaire
 
