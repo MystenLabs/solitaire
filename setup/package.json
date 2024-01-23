@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "setup": "env-cmd -f .env ts-node src/setup"
+    "setup": "env-cmd -f .env ts-node src/setup",
+    "test": "vitest run e2e"
   },
   "author": "",
   "license": "ISC",
@@ -16,6 +16,8 @@
   },
   "devDependencies": {
     "env-cmd": "^10.1.0",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "vite": "^5.0.11",
+    "vitest": "^1.2.1"
   }
 }

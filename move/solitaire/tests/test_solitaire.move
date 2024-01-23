@@ -919,7 +919,7 @@ module solitaire::test_solitaire {
             // iterate the whole deck 2 times
             i = 0;
             while (i < 48) {
-                solitaire::turn_deck_card(&mut game, test_scenario::ctx(scenario));
+                solitaire::rotate_open_deck_cards(&mut game, test_scenario::ctx(scenario));
                 i = i + 1;
             };
             clock::destroy_for_testing(clock);
@@ -939,7 +939,7 @@ module solitaire::test_solitaire {
             let clock = clock::create_for_testing(test_scenario::ctx(scenario));
 
             solitaire::open_deck_card(&mut game, &clock, test_scenario::ctx(scenario));
-            solitaire::turn_deck_card(&mut game, test_scenario::ctx(scenario));
+            solitaire::rotate_open_deck_cards(&mut game, test_scenario::ctx(scenario));
 
             clock::destroy_for_testing(clock);
             test_scenario::return_to_sender(scenario, game);
