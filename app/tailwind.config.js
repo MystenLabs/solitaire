@@ -68,6 +68,7 @@ module.exports = {
           DEFAULT: "hsl(var(--warning))",
           foreground: "hsl(var(--warning-foreground))",
         },
+        MystenRed: '#F50032',
       },
       borderRadius: {
         lg: "var(--radius)",
