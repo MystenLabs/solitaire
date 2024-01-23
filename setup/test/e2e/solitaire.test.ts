@@ -113,8 +113,8 @@ describe("Interacting with the Smart Contract", () => {
   });
 
   it("Test open deck cards and rotate them", async () => {
-	let hiddenDeckCards = 24;
 	let firstCard: any;
+	// Open and save the first card
 	let tx = openDeckCard(normalGame.id.id, CLOCK);
 	await executeTransactionBlock(toolbox, tx);
 	const obj = await toolbox.client
@@ -126,8 +126,9 @@ describe("Interacting with the Smart Contract", () => {
 	if (obj.data?.content?.dataType === 'moveObject') {
 		firstCard = (obj.data?.content?.fields as unknown as GameObject).deck.fields.cards[0];
 	}
-	console.log(firstCard);
-	hiddenDeckCards--;
+
+	let hiddenDeckCards = 23;
+	// Open all the deck cards
 	while (hiddenDeckCards > 0) {
 		let tx = openDeckCard(normalGame.id.id, CLOCK);
 		const result = await executeTransactionBlock(toolbox, tx);
@@ -144,7 +145,7 @@ describe("Interacting with the Smart Contract", () => {
 		  }
         });
 
-	// rotate the deck cards
+	// After opening all the cards, rotate them to get the first card back
 	tx = rotateOpenDeckCards(normalGame.id.id);
 	await executeTransactionBlock(toolbox, tx);
 	toolbox.client
