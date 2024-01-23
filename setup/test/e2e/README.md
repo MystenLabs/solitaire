@@ -1,7 +1,7 @@
 # Test e2e
 ### Steps
 1. Run `sui start` from the terminal to spin up a local network
-2. Run the `publish.sh` script to publish the smart contract and create the .env file.
+2. From inside the `setup/` directory, run `sui client switch --env localnet && publish.sh` to publish the smart contract and create the `.env` file. Some environment variables will be automatically parsed by `.publish.res.json`, but you will have to fill in the missing ones by yourself.
 3. Add your private key in the .env file with the name ADMIN_SECRET_KEY. 
 The private key can be retrieved from the sui.keystore file under the sui_config folder. 
 The .env file should look like that:
