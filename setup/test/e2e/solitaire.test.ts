@@ -2,12 +2,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { executeTransactionBlock, setupSuiClient, TestToolbox } from "./setup";
 import { PACKAGE_ADDRESS } from "../../src/config";
-import { initEasyGame, initNormalGame, openDeckCard, rotateOpenDeckCards } from "../../src/calls";
+import { initEasyGame, initNormalGame, openDeckCard, rotateOpenDeckCards } from "../../../app/src/helpers/moveCalls";
 import { ObjectOwner } from "@mysten/sui.js/client";
-import { TransactionBlock } from "@mysten/sui.js/transactions";
-
-const CLOCK =
-  "0x0000000000000000000000000000000000000000000000000000000000000006";
 
 interface ObjectCreated {
   digest: string;
@@ -64,7 +60,7 @@ describe("Interacting with the Smart Contract", () => {
   });
 
   it("Test init normal game", async () => {
-    const tx = initNormalGame(CLOCK);
+    const tx = initNormalGame();
     const result = await executeTransactionBlock(toolbox, tx);
     const game = result.objectChanges?.filter(
       (object) =>
@@ -88,7 +84,7 @@ describe("Interacting with the Smart Contract", () => {
   });
 
   it("Test init easy game", async () => {
-    const tx = initEasyGame(CLOCK);
+    const tx = initEasyGame();
     const result = await executeTransactionBlock(toolbox, tx);
     const game = result.objectChanges?.filter(
       (object) =>
@@ -115,7 +111,7 @@ describe("Interacting with the Smart Contract", () => {
   it("Test open deck cards and rotate them", async () => {
 	let firstCard: any;
 	// Open and save the first card
-	let tx = openDeckCard(normalGame.id.id, CLOCK);
+	let tx = openDeckCard(normalGame.id.id);
 	await executeTransactionBlock(toolbox, tx);
 	const obj = await toolbox.client
 	.getObject({
@@ -130,7 +126,7 @@ describe("Interacting with the Smart Contract", () => {
 	let hiddenDeckCards = 23;
 	// Open all the deck cards
 	while (hiddenDeckCards > 0) {
-		let tx = openDeckCard(normalGame.id.id, CLOCK);
+		let tx = openDeckCard(normalGame.id.id);
 		const result = await executeTransactionBlock(toolbox, tx);
 		hiddenDeckCards--;
 	}
