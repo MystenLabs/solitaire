@@ -2,9 +2,9 @@ import { EnokiFlow } from "@mysten/enoki";
 // bad practice but not exported from @mysten/enoki
 import { ZkLoginSession } from "@mysten/enoki/dist/cjs/EnokiFlow";
 
-export type UserRole = "admin" | "moderator" | "member" | "anonymous";
+export type UserRole = "admin" | "moderator" | "member" | "anonymous" | "player";
 
-export interface UserProps {
+export interface UserProps { 
   firstName: string;
   lastName: string;
   email: string;

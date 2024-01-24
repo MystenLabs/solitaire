@@ -29,11 +29,10 @@ const AuthPage = () => {
           .toSuiAddress();
         const jwt = session?.jwt;
         const decodedJwt: any = jwtDecode(jwt!);
-        const userRole = res as UserRole;
         handleLoginAs({
           firstName: decodedJwt["given_name"],
           lastName: decodedJwt["family_name"],
-          role: userRole,
+          role: "player",
           email: decodedJwt["email"],
           picture: decodedJwt["picture"],
           address,
