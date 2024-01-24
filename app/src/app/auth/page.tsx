@@ -7,9 +7,8 @@ import { useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 
 // bad practice but is not exported from @mysten/enoki
-import { ZkLoginSession } from "@mysten/enoki/dist/cjs/EnokiFlow";
+import { ZkLoginSession } from "@mysten/enoki/dist/cjs/EnokiFlow"
 import { Spinner } from "@/components/general/Spinner";
-import { UserRole } from "@/types/Authentication";
 
 const AuthPage = () => {
   const { enokiFlow, handleLoginAs, setIsLoading } = useAuthentication();
@@ -19,7 +18,7 @@ const AuthPage = () => {
     const hash = window.location.hash;
     enokiFlow
       .handleAuthCallback(hash)
-      .then(async (res) => {
+      .then(async (res: any) => {
         console.log({ res });
         const session = await enokiFlow.getSession();
         const keypair = session?.ephemeralKeyPair!;
@@ -40,7 +39,7 @@ const AuthPage = () => {
         });
         setIsLoading(false);
       })
-      .catch((err) => {
+      .catch((err: any) => {
         console.log({ err });
         setIsLoading(false);
       });
