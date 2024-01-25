@@ -9,7 +9,6 @@ import { jwtDecode } from "jwt-decode";
 // bad practice but is not exported from @mysten/enoki
 import { ZkLoginSession } from "@mysten/enoki/dist/cjs/EnokiFlow";
 import { Spinner } from "@/components/general/Spinner";
-import { UserRole } from "@/types/Authentication";
 
 const AuthPage = () => {
   const { enokiFlow, handleLoginAs, setIsLoading } = useAuthentication();
@@ -19,7 +18,7 @@ const AuthPage = () => {
     const hash = window.location.hash;
     enokiFlow
       .handleAuthCallback(hash)
-      .then(async (res) => {
+      .then(async (res: any) => {
         console.log({ res });
         const session = await enokiFlow.getSession();
         const keypair = session?.ephemeralKeyPair!;
@@ -29,11 +28,10 @@ const AuthPage = () => {
           .toSuiAddress();
         const jwt = session?.jwt;
         const decodedJwt: any = jwtDecode(jwt!);
-        const userRole = res as UserRole;
         handleLoginAs({
           firstName: decodedJwt["given_name"],
           lastName: decodedJwt["family_name"],
-          role: userRole,
+          role: "player",
           email: decodedJwt["email"],
           picture: decodedJwt["picture"],
           address,
@@ -41,7 +39,7 @@ const AuthPage = () => {
         });
         setIsLoading(false);
       })
-      .catch((err) => {
+      .catch((err: any) => {
         console.log({ err });
         setIsLoading(false);
       });

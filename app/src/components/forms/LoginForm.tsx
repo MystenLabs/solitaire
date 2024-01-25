@@ -35,7 +35,7 @@ export const LoginForm = () => {
   };
 
   useEffect(() => {
-    if (user.role !== 'anonymous' && !isAuthLoading) {
+    if (user.role == "player" && !isAuthLoading) {
       router.push(`/game`);
     }
   }, [user, isAuthLoading]);

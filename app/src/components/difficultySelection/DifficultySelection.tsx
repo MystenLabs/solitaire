@@ -6,7 +6,7 @@ import normal_mode_visual from "../../../public/assets/difficultyModesVisuals/no
 
 export const DifficultySelection = () => {
     return (
-        <div className="outside-container px-10 bg-white rounded-3xl backdrop-blur-2xl inline-flex flex-col justify-center items-center">
+        <div className="px-10 bg-white rounded-3xl backdrop-blur-2xl flex flex-col justify-center items-center">
             <p className={"title text-black pt-14 text-center text-2xl font-bold font-inter mb-10"}>
                 Choose Your Difficulty
             </p>
