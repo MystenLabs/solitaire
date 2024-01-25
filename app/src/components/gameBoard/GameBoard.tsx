@@ -25,13 +25,13 @@ export default function GameBoard({ gameId }: Props) {
   });
   const [piles, setPiles] = useState<number[][]>([[14], [], [33], [41]]);
   const [columns, setColumns] = useState<CardObject[]>([
-    { hiddenCards: 0, cards: [2, 3] },
-    { hiddenCards: 2, cards: [1, 2, 3, 4, 5, 6, 7] },
-    { hiddenCards: 3, cards: [1, 2, 3, 4, 5, 6, 7] },
-    { hiddenCards: 4, cards: [1, 2, 3, 4, 5, 6, 7] },
-    { hiddenCards: 5, cards: [1, 2, 3, 4, 5, 6, 7] },
-    { hiddenCards: 6, cards: [1, 2, 3, 4, 5, 6, 7] },
-    { hiddenCards: 7, cards: [1, 2, 3, 4, 5, 6, 7, 8, 9] },
+    { hiddenCards: 0, cards: [1] },
+    { hiddenCards: 1, cards: [2] },
+    { hiddenCards: 2, cards: [3,] },
+    { hiddenCards: 3, cards: [4,] },
+    { hiddenCards: 4, cards: [5,] },
+    { hiddenCards: 5, cards: [6,] },
+    { hiddenCards: 6, cards: [7,] },
   ]);
   const {
     handleFromDeckToPile,
