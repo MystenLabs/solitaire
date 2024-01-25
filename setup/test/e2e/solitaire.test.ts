@@ -4,7 +4,6 @@ import { executeTransactionBlock, setupSuiClient, TestToolbox } from "./setup";
 import { PACKAGE_ADDRESS } from "../../src/config";
 import { initEasyGame, initNormalGame, openDeckCard, rotateOpenDeckCards } from "../../../app/src/helpers/moveCalls";
 import { ObjectOwner } from "@mysten/sui.js/client";
-import { MoveCallsExecutorService } from "../../../app/src/helpers/moveCallsExecutorService";
 
 interface ObjectCreated {
   digest: string;
@@ -155,11 +154,5 @@ describe("Interacting with the Smart Contract", () => {
 		expect((result.data?.content?.fields as unknown as GameObject).deck.fields.cards[23]).toEqual(firstCard);
 	  }
 	});
-  });
-
-  it("Tests executor service", async () => {
-	  let executor = await MoveCallsExecutorService.initialize("localnet");
-	  let res = await executor.executeInitEasyGame(toolbox.keypair);
-	  res
   });
 });

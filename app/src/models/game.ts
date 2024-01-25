@@ -4,14 +4,14 @@ import { Deck } from './deck';
 import { Pile } from './pile';
 
 export class Game {
-    availableCards: String[];
+    id: string;
     columns: Column[];
     deck: Deck;
     piles: Pile[];
 
     constructor(gameContentsResp: SuiTransactionBlockResponse) {
         let contents = gameContentsResp.data.content.fields;
-        this.availableCards = contents.available_cards; // Maybe we don't need to track this
+        this.id = contents.id.id;
         this.columns = contents.columns.map(
             (column: any) => new Column(column.fields.cards, column.fields.hidden_cards)
         );

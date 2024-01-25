@@ -3,14 +3,13 @@ import React from "react";
 import {ModeVisual} from "@/components/difficultySelection/difficultyModes/modeVisual";
 import easy_mode_visual from "../../../public/assets/difficultyModesVisuals/easy_mode_visual.svg";
 import normal_mode_visual from "../../../public/assets/difficultyModesVisuals/normal_mode_visual.svg";
-import { getFullnodeUrl, SuiClient } from "@mysten/sui.js/client";
 import { MoveCallsExecutorService } from "@/helpers/moveCallsExecutorService";
+import { useAuthentication } from "@/contexts/Authentication";
+import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519"
+import { fromB64 } from "@mysten/sui.js/utils";
 
-export const DifficultySelection = async () => {
-    // TODO: Where should the executor reside? How will the game object be used?
-    let executor = await MoveCallsExecutorService.initialize(
-        process.env.SUI_NETWORK!,
-    );
+export const DifficultySelection = () => {
+    const { user } = useAuthentication();
     return (
         <div className="px-10 bg-white rounded-3xl backdrop-blur-2xl flex flex-col justify-center items-center">
             <p className={"title text-black pt-14 text-center text-2xl font-bold font-inter mb-10"}>
@@ -19,9 +18,11 @@ export const DifficultySelection = async () => {
             <div className={"modes-container grid grid-cols-2 pb-14 gap-5"}>
                 <div onClick={
                     async () => {
-                        let game = await executor.executeInitEasyGame(
-                            // TODO: get the signed-in user's ed25519 keypair
-                        );
+                        let executorService = await new MoveCallsExecutorService('localnet'); // TODO parse from env
+                        const keypair = user.zkLoginSession?.ephemeralKeyPair;
+                        let privateKeyArray = Uint8Array.from(Array.from(fromB64(keypair!)));
+                        const signer = Ed25519Keypair.fromSecretKey(privateKeyArray)
+                        // let game = await executorService.executeInitEasyGame(enokiFlow); // FIXME
                         // TODO: redirect to game board + start timer
                     }
                 }>
@@ -31,9 +32,13 @@ export const DifficultySelection = async () => {
                 </div>
                 <div onClick={
                     async () => {
-                        let game = await executor.executeInitNormalGame(
-                            // TODO: get the signed-in user's ed25519 keypair
-                        );
+                        let executorService = new MoveCallsExecutorService('localnet'); // TODO parse from env
+                        const keypair = user.zkLoginSession?.ephemeralKeyPair;
+                        let privateKeyArray = Uint8Array.from(Array.from(fromB64(keypair!)));
+                        const signerKeypair = Ed25519Keypair.fromSecretKey(privateKeyArray)
+                        console.log(signerKeypair.toSuiAddress());
+                        let game = await executorService.executeInitNormalGame(signerKeypair);
+                        console.log(game);
                         // TODO: redirect to game board + start timer
                     }
                 }>

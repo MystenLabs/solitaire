@@ -1,33 +1,20 @@
-import {SuiTransactionBlockResponse} from "@mysten/sui.js";
-import {SuiClient} from "@mysten/sui.js/client";
-import {Ed25519Keypair} from "@mysten/sui.js/keypairs/ed25519";
+import {SuiTransactionBlockResponse} from "@mysten/sui.js/client";
+import {SuiClient, getFullnodeUrl} from "@mysten/sui.js/client";
 import {TransactionBlock} from "@mysten/sui.js/transactions";
 import {initEasyGame, initNormalGame} from "./moveCalls";
 import {Game} from "../models/game";
+import {Ed25519Keypair} from "@mysten/sui.js/keypairs/ed25519";
 
-// Singleton class to execute move calls
 export class MoveCallsExecutorService {
-    private static executor: MoveCallsExecutorService | undefined = undefined
-    private client: SuiClient | undefined;
-
-    static async initialize(clientUrl: string) {
-        if (MoveCallsExecutorService.executor === undefined) {
-            MoveCallsExecutorService.executor = new MoveCallsExecutorService(
-                clientUrl,
-            );
-            return MoveCallsExecutorService.executor
-        }
-    }
-
-    private constructor(clientUrl: string) {
+    private client: SuiClient;
+    constructor(network: 'mainnet' | 'testnet' | 'localnet') {
         this.client = new SuiClient({
-            url: clientUrl,
+            url: getFullnodeUrl(network),
         });
     }
 
     private async execute(transactionBlock: TransactionBlock, keypair: Ed25519Keypair) {
-        const res = MoveCallsExecutorService
-            .executor?.client?.signAndExecuteTransactionBlock({
+        const res = this.client?.signAndExecuteTransactionBlock({
                 signer: keypair,
                 transactionBlock,
                 options: {
@@ -43,20 +30,19 @@ export class MoveCallsExecutorService {
         const transactionBlock = initNormalGame();
         let res=  await this.execute(transactionBlock, keypair);
         let gameObjectRes = await this.getGameObjectDetails(res);
-
         return new Game(gameObjectRes!);
     }
 
     async executeInitEasyGame(keypair: Ed25519Keypair) {
         const transactionBlock = initEasyGame();
-        let res=  await this.execute(transactionBlock, keypair);
+        let res = await this.execute(transactionBlock, keypair);
         let gameObjectRes = await this.getGameObjectDetails(res);
 
         return new Game(gameObjectRes!);
     }
 
     private async getGameObjectDetails(initGameRes: SuiTransactionBlockResponse) {
-        let res = await MoveCallsExecutorService.executor?.client?.getObject(
+        let res = await this.client.getObject(
             {
                 id: initGameRes.effects!.created![0].reference.objectId,
                 options: {showContent: true},
