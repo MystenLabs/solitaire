@@ -1,6 +1,5 @@
 "use client";
 
-import { Metadata } from "next";
 import React, { useState } from "react";
 import { DifficultySelection } from "@/components/difficultySelection/DifficultySelection";
 import google from "../../../../app/public/assets/logos/google_email.svg";
@@ -8,10 +7,6 @@ import Image from "next/image";
 import { useAuthentication } from "@/contexts/Authentication";
 import { Spinner } from "@/components/general/Spinner";
 import GameBoard from "@/components/gameBoard/GameBoard";
-
-export const metadata: Metadata = {
-  title: "PoC Template for Members",
-};
 
 const GamePage = () => {
   const { user, isLoading } = useAuthentication();

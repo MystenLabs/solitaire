@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 
 // bad practice but is not exported from @mysten/enoki
-import { ZkLoginSession } from "@mysten/enoki/dist/cjs/EnokiFlow"
+import { ZkLoginSession } from "@mysten/enoki/dist/cjs/EnokiFlow";
 import { Spinner } from "@/components/general/Spinner";
 
 const AuthPage = () => {
