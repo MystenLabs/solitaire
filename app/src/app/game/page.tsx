@@ -7,18 +7,26 @@ import { useAuthentication } from "@/contexts/Authentication";
 import { Spinner } from "@/components/general/Spinner";
 import GameBoard from "@/components/gameBoard/GameBoard";
 import {Game} from "@/models/game";
+import {UserProps} from "@/types/Authentication";
+import {MoveCallsExecutorService} from "@/helpers/moveCallsExecutorService";
+import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519"
+import { fromB64 } from "@mysten/sui.js/utils";
+
 
 const GamePage = () => {
+  const [spinning, setSpinning] = useState<boolean>(false);
   const { user, isLoading } = useAuthentication();
   const [game, setGame] = useState<Game | null>(null);
   const [moves, setMoves] = useState<number>(0);
 
-  if (isLoading) {
+  if (isLoading || spinning) {
     return <Spinner />;
   }
 
-  const onGameCreation = (game: Game) => {
-    console.log(game);
+  const onGameCreation = async (mode: 'easy' | 'normal') => {
+    setSpinning(true);
+    let game = await createGame(user, mode);
+    setSpinning(false);
     setGame(game);
   }
 
@@ -56,3 +64,22 @@ const GamePage = () => {
 };
 
 export default GamePage;
+
+async function createGame(user: UserProps, mode: 'easy' | 'normal' ): Promise<Game> {
+  let executorService = new MoveCallsExecutorService(); // TODO parse from env
+  const keypair = user.zkLoginSession?.ephemeralKeyPair;
+  let privateKeyArray = Uint8Array.from(Array.from(fromB64(keypair!)));
+  const signerKeypair = Ed25519Keypair.fromSecretKey(privateKeyArray)
+  let game = undefined;
+  if (mode === 'easy') {
+    game = await executorService.executeInitEasyGame(signerKeypair);
+  } else if (mode === 'normal') {
+    game = await executorService.executeInitNormalGame(signerKeypair);
+  } else {
+    throw new Error('Invalid difficulty mode');
+  }
+  if (!game) {
+    throw new Error('Failed to initialize game');
+  }
+  return game;
+}

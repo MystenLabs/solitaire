@@ -1,6 +1,3 @@
-export class Pile {
+export interface Pile {
     cards: String[];
-    constructor(cards: String[]) {
-        this.cards = cards;
-    }
 }

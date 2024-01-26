@@ -13,11 +13,18 @@ export class Game {
         let contents = gameContentsResp.data.content.fields;
         this.id = contents.id.id;
         this.columns = contents.columns.map(
-            (column: any) => new Column(column.fields.cards, column.fields.hidden_cards)
+            (column: any) => {
+                column.fields.cards, column.fields.hidden_cards
+            }
         );
-        this.deck = new Deck(contents.deck.fields.cards, contents.deck.fields.hidden_cards);
+        const deckCards: String[] = contents.deck.fields.cards;
+        const deckHiddenCards: number = contents.deck.fields.hidden_cards
+        this.deck = {
+            cards: deckCards,
+            hidden_cards: deckHiddenCards,
+        };
         this.piles = contents.piles.map(
-            (pile: any) => new Pile(pile.fields.cards)
+            (pile: any) => {pile.fields.cards}
         );
     }
 }
