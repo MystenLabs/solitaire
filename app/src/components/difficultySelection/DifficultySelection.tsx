@@ -12,7 +12,7 @@ export const DifficultySelection = (
                 Choose Your Difficulty
             </p>
             <div className={"modes-container grid grid-cols-2 pb-14 gap-5"}>
-                <div onClick={
+                <button onClick={
                     async () => {
                         onGameCreation('easy');
                     }
@@ -20,8 +20,8 @@ export const DifficultySelection = (
                 <ModeVisual level={"Easy"}
                             description={"Start with all aces placed"}
                             mode={easy_mode_visual}/>
-                </div>
-                <div onClick={
+                </button>
+                <button onClick={
                     async () => {
                         onGameCreation('normal');
                     }
@@ -29,7 +29,7 @@ export const DifficultySelection = (
                 <ModeVisual level={"Normal"}
                             description={"Start with aces in deck"}
                             mode={normal_mode_visual}/>
-                </div>
+                </button>
             </div>
         </div>
     )
