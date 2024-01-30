@@ -5,7 +5,6 @@ import { Pile } from "../../models/pile";
 
 
 export default function Pile({ pile }: { pile: Pile }) {
-  console.log(pile);
   return (
     <div className="h-[166px] w-[120px] rounded-lg border border-black bg-black bg-opacity-20 relative">
       {pile.cards.map((card: any, index: any) => (
