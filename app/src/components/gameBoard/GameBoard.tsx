@@ -3,36 +3,30 @@
 import { use, useEffect, useState } from "react";
 import cardBack from "../../../../app/public/assets/cards/card_back.svg";
 import Image from "next/image";
-import Pile from "./Pile";
-import Column from "./Column";
+import {Pile as PileProps} from "../../models/pile" ;
+import {Column as ColumnProps} from "../../models/column";
+import {Deck as DeckProps} from "../../models/deck";
 import { Card } from "../cards/Card";
 import { useSolitaireActions } from "@/hooks/useSolitaireActions";
 import toast from "react-hot-toast";
+import {DndContext} from "@dnd-kit/core";
+import Pile from "./Pile";
+import Column from "./Column";
 
-interface CardObject {
-  hiddenCards: number;
-  cards: number[];
+interface GameProps {
+  id: string;
+  columns: ColumnProps[];
+  deck: DeckProps;
+  piles: PileProps[];
 }
 
-interface Props {
-  gameId: string;
-}
+export default function GameBoard({ game }: {game: GameProps}) {
+  const [deck, setDeck] = useState<DeckProps>(game.deck);
+  const [piles, setPiles] = useState<PileProps[]>(game.piles);
+  const [columns, setColumns] = useState<ColumnProps[]>(
+      game.columns
+  );
 
-export default function GameBoard({ gameId }: Props) {
-  const [deck, setDeck] = useState<CardObject>({
-    hiddenCards: 10,
-    cards: [13, 26],
-  });
-  const [piles, setPiles] = useState<number[][]>([[14], [], [33], [41]]);
-  const [columns, setColumns] = useState<CardObject[]>([
-    { hiddenCards: 0, cards: [1] },
-    { hiddenCards: 1, cards: [2] },
-    { hiddenCards: 2, cards: [3,] },
-    { hiddenCards: 3, cards: [4,] },
-    { hiddenCards: 4, cards: [5,] },
-    { hiddenCards: 5, cards: [6,] },
-    { hiddenCards: 6, cards: [7,] },
-  ]);
   const {
     handleFromDeckToPile,
     handleFromDeckToColumn,
@@ -43,8 +37,45 @@ export default function GameBoard({ gameId }: Props) {
     handleRotateOpenDeckCards,
   } = useSolitaireActions();
 
+  function handleDragEnd(event: any) {
+    const {active, over} = event;
+    if (!over || !active) {
+      return;
+    }
+
+    // Get from-column index
+    const columnIndexOfActive = columns.findIndex(
+        (column) => column.cards.includes(String(active.id))
+    );
+
+    // Get to-column index
+    const columnIndexOfOver = columns.findIndex(
+        (column) => column.cards.includes(String(over.id))
+    );
+
+    /* Update the values of the columns */
+    let newColumns = [...columns];
+    const objectsToMove = newColumns[columnIndexOfActive].cards.slice(
+        newColumns[columnIndexOfActive].cards.indexOf(String(active.id))
+    );
+
+    // TODO: Check if the move is legal! If not, return early.
+
+    // Remove the item from the old column
+    newColumns[columnIndexOfActive].cards = newColumns[columnIndexOfActive].cards.slice(0, newColumns[columnIndexOfActive].cards.indexOf(String(active.id)));
+
+    // Move the item to the new column
+    newColumns[columnIndexOfOver].cards.push(...objectsToMove);
+
+    // If the move is valid, update the state of the game
+    // TODO - setDeck if changed
+    // TODO - setPiles if changed
+    // TODO - Open column card if revealed
+    setColumns(over ? newColumns : columns);
+  }
+
   const clickDeck = async () => {
-    if (deck.hiddenCards !== 0) {
+    if (deck.hidden_cards !== 0) {
       try {
         const game = await handleOpenDeckCard(gameId);
         // setDeck(game.deck);
@@ -120,34 +151,43 @@ export default function GameBoard({ gameId }: Props) {
   };
 
   return (
-    <div className="px-60 h-full w-full flex flex-col items-center space-y-7 pt-14">
-      <ul className="w-full flex justify-between items-center">
-        <li key={"cardDeck"} onClick={clickDeck}>
-          <Image
-            src={cardBack}
-            alt={"Card Back"}
-            className="min-w-[120px] h-[166px]"
-          />
-        </li>
-        <li className="min-w-[120px] h-[166px]" key={"openCard"}>
-          {!!deck.cards.length && (
-            <Card id={deck.cards[deck.cards.length - 1]} />
-          )}
-        </li>
-        <li className="w-[120px] h-[166px]"></li>
-        {piles.map((pile, index) => (
-          <li key={index}>
-            <Pile pile={pile} />
-          </li>
-        ))}
-      </ul>
-      <ul className="w-full flex justify-between items-center ">
-        {columns.map((column, index) => (
-          <li key={index}>
-            <Column column={column} />
-          </li>
-        ))}
-      </ul>
-    </div>
+      <DndContext onDragEnd={handleDragEnd}>
+        <div className="px-60 h-full w-full flex flex-col items-center space-y-7 pt-14 gap-y-36">
+
+          <ul className="w-full flex justify-between items-center">
+            {/* Set up card deck */}
+            <li key={"cardDeck"} onClick={clickDeck}>
+              <Card id={-1}></Card>
+            </li>
+
+            {/* Place where the open deck cards are being displayed */}
+            <li className="min-w-[120px] h-[166px]" key={"openCard"}>
+              {!!deck.cards.length && (
+                <Card id={Number(deck.cards[deck.cards.length - 1])} />
+              )}
+            </li>
+
+            {/* Empty placeholder */}
+            <li className="w-[120px] h-[166px]"></li>
+
+            {/* Set up piles */}
+            {piles.map((pile, index) => (
+              <li key={index}>
+                <Pile pile={pile} />
+              </li>
+            ))}
+          </ul>
+          <ul className="w-full flex justify-between items-center ">
+            {
+              columns.map((column, index) => {
+                if (column.cards.length == 0) {
+                  return (<li className="w-[120px] h-[166px]"></li>)
+                }
+                return ( <li key={index}> <Column column={column} /> </li>)
+              })
+            }
+          </ul>
+        </div>
+      </DndContext>
   );
 }

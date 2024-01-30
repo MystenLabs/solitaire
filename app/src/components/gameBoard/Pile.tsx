@@ -1,17 +1,16 @@
-"use clinet";
+"use client";
 
 import { Card } from "../cards/Card";
+import { Pile } from "../../models/pile";
 
-interface Props {
-  pile: number[];
-}
 
-export default function Pile({ pile }: Props) {
+export default function Pile({ pile }: { pile: Pile }) {
+  console.log(pile);
   return (
     <div className="h-[166px] w-[120px] rounded-lg border border-black bg-black bg-opacity-20 relative">
-      {pile.map((card, index) => (
+      {pile.cards.map((card: any, index: any) => (
         <div className="absolute" key={index} style={{ top: 0 }}>
-          <Card id={card} />
+          <Card id={Number(card)} />
         </div>
       ))}
     </div>

@@ -53,7 +53,7 @@ const GamePage = () => {
           <div className="flex justify-center items-center gap-x-4 pl-4 pr-1 bg-black bg-opacity-10 rounded-[40px] border border-black border-opacity-10">
               <div className="text-stone-100 text-base font-normal">Moves: {moves}</div>
               <div className="text-stone-100 text-base font-normal">Time: 00:00</div>
-              <button className="text-white text-base font-bold font-normal bg-black rounded-[40px] p-2">End game</button>
+              <button className="text-white text-base font-bold bg-black rounded-[40px] p-2">End game</button>
           </div>
         )}
         <div className="flex gap-2 email pl-2 pr-3.5 py-3 left-0 top-0 rounded-[36px] border border-white border-opacity-40 items-center max-h-12">
@@ -70,7 +70,7 @@ const GamePage = () => {
           <DifficultySelection onGameCreation={onGameCreation} />
         </div>
       ) : (
-        <GameBoard gameId={game.id} />
+        <GameBoard game={game.elements} />
       )}
     </div>
   );

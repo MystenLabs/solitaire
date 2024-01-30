@@ -1,37 +1,26 @@
 "use client";
 
 import { Card } from "../cards/Card";
-import cardBack from "../../../../app/public/assets/cards/card_back.svg";
-import Image from "next/image";
+import { Column } from "@/models/column";
+import {ReactNode} from "react";
 
-interface Props {
-  column: {
-    hiddenCards: number;
-    cards: number[];
-  };
-}
+export default function Column({ column }: { column: Column }) {
+    // Create an array containing all the cards in the column, both hidden and open cards.
+    // `Undefined` represent hidden cards.
+    const allCards: (ReactNode | undefined)[] = Array.from(
+        {length: column.hidden_cards}
+    );
+    allCards.push(...column.cards);
 
-export default function Column({ column }: Props) {
-  return (
-    <div className="h-[166px] w-[120px] rounded-lg border border-black bg-black bg-opacity-20 relative">
-      {Array.from({ length: column.hiddenCards }).map((_, index) => (
-        <div key={index} className="absolute" style={{ top: index * 10 }}>
-          <Image
-            src={cardBack}
-            alt={"Card Back"}
-            className="min-w-[120px] h-[166px]"
-          />
-        </div>
-      ))}
-      {column.cards.map((card, index) => (
-        <div
-          key={index + column.hiddenCards}
-          className="absolute"
-          style={{ top: column.hiddenCards * 10 + index * 22 }}
-        >
-          <Card id={card} />
-        </div>
-      ))}
-    </div>
-  );
+    // Generate stack the of cards:
+    return (
+          allCards.reduceRight(
+            (accumulator, id) => {
+              return (
+                <Card id={id ? Number(id) : -1} marginTop={'-110%'}>
+                  {accumulator}
+                </Card>)
+            }, <></>
+          )
+    )
 }
