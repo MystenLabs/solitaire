@@ -112,7 +112,32 @@ export default function GameBoard({game}: { game: GameProps }) {
         // Move the item to the new column
         let newPiles = [...piles];
         newPiles[pileIndexOfOver].cards.push(...objectsToMove);
-        console.log(newPiles, newColumns)
+
+        setColumns(over ? newColumns : columns);
+        setPiles(over ? newPiles : piles);
+    }
+
+    function updatePileToColumnMove(active: any, over: any) {
+        // TODO: Check if the move is legal! If not, return early.
+        const pileIndexOfActive = piles.findIndex(
+            (pile) => pile.cards.includes(String(active.id))
+        );
+
+        // Get to-column index
+        const columnIndexOfOver = columns.findIndex(
+            (column) => column.cards.includes(String(over.id))
+        );
+
+        /* Update the values of the columns */
+        let newPiles = [...piles];
+        const objectsToMove = newPiles[pileIndexOfActive].cards.pop();
+
+        // Move the item to the new column
+        let newColumns = [...columns];
+        newColumns[columnIndexOfOver].cards.push(objectsToMove);
+
+        console.log(newPiles, newColumns);
+
         setColumns(over ? newColumns : columns);
         setPiles(over ? newPiles : piles);
     }
@@ -134,6 +159,8 @@ export default function GameBoard({game}: { game: GameProps }) {
             updateColumnToColumnMove(active, over);
         } else if (cardOriginType === "column" && cardDestinationType === "pile") {
             updateColumnToPileMove(active, over)
+        } else if (cardOriginType === "pile" && cardDestinationType === "column") {
+            updatePileToColumnMove(active, over)
         }
     }
 
