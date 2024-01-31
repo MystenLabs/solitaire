@@ -11,6 +11,7 @@ import {DndContext, useDroppable} from "@dnd-kit/core";
 import Pile from "./Pile";
 import Column from "./Column";
 import {EmptyDroppable} from "./EmptyDroppable";
+import {CardDetails} from "@/helpers/cardDetails";
 
 
 interface GameProps {
@@ -57,8 +58,6 @@ export default function GameBoard({game}: { game: GameProps }) {
     }
 
     function updateColumnToColumnMove(active: any, over: any) {
-        // TODO: Check if the move is legal! If not, return early.
-
         // Get from-column index
         const columnIndexOfActive = columns.findIndex(
             (column) => column.cards.includes(String(active.id))
@@ -67,10 +66,8 @@ export default function GameBoard({game}: { game: GameProps }) {
         // Get to-column index
         let columnIndexOfOver: number;
         if (over.id.includes('empty-column-droppable')) {
-            console.log("empty over id", over.id)
             columnIndexOfOver = Number(over.id.split('-').pop());
         } else {
-            console.log("over id", over.id)
             columnIndexOfOver = columns.findIndex(
                 (column) => column.cards.includes(String(over.id))
             );
@@ -87,7 +84,26 @@ export default function GameBoard({game}: { game: GameProps }) {
             newColumns[columnIndexOfActive].cards.indexOf(String(active.id))
         );
 
-        // TODO: Check if the move is legal! If not, return early.
+        // Check if the move is legal! If not, return early.
+        const bottomCardOfObjectToMove = new CardDetails(objectsToMove[0]);
+        if (over.id.includes('empty-column-droppable')) {
+            const isNotKing = bottomCardOfObjectToMove.rank !== 12;
+            const columnIsNotEmpty = columns[columnIndexOfOver].cards.length !== 0;
+            if (isNotKing || columnIsNotEmpty) {
+                console.error("Illegal move")
+                return;
+            }
+        } else {
+            const topCardOfDestination = new CardDetails(columns[columnIndexOfOver].cards[columns[columnIndexOfOver].cards.length - 1]);
+            const sameColor = bottomCardOfObjectToMove.color === topCardOfDestination.color;
+            const destinationRankDifference = topCardOfDestination.rank - bottomCardOfObjectToMove.rank == 1;
+            if (sameColor || !destinationRankDifference) {
+                console.error("Illegal move")
+                return;
+            }
+        }
+
+
 
         // Remove the item from the old column
         newColumns[columnIndexOfActive].cards = newColumns[columnIndexOfActive].cards.slice(0, newColumns[columnIndexOfActive].cards.indexOf(String(active.id)));
@@ -176,11 +192,6 @@ export default function GameBoard({game}: { game: GameProps }) {
         if (!over || !active) {
             return;
         }
-
-        //TODO find out what kind of move is this:
-        // deck to pile, deck to column, column to pile, column to column, pile to column
-        // First check where the active card is coming from
-
         const cardOriginType = findCardOriginType(active.id);
         const cardDestinationType = findCardOriginType(over.id);
         if (cardOriginType === "column" && cardDestinationType === "column") {
@@ -190,6 +201,8 @@ export default function GameBoard({game}: { game: GameProps }) {
         } else if (cardOriginType === "pile" && cardDestinationType === "column") {
             updatePileToColumnMove(active, over)
         }
+        // TODO - deck to column
+        // TODO - deck to pile
     }
 
     const clickDeck = async () => {
