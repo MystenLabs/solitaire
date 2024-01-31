@@ -24,14 +24,7 @@ interface GameProps {
 type CardStackType =  "pile" | "column" | "deck";
 
 export default function GameBoard({game}: { game: GameProps }) {
-    const [deck, setDeck] = useState<DeckProps>(
-        {
-            cards: [
-                "27",
-            ],
-            hidden_cards: game.deck.hidden_cards
-        }
-    );
+    const [deck, setDeck] = useState<DeckProps>(game.deck);
     const [piles, setPiles] = useState<PileProps[]>(game.piles);
     const [columns, setColumns] = useState<ColumnProps[]>(
         game.columns
