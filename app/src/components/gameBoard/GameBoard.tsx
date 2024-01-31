@@ -335,12 +335,21 @@ export default function GameBoard({game}: { game: GameProps }) {
                   {/* Place where the open deck cards are being displayed */}
                   <li className="min-w-[120px] h-[166px]" key={"openCard"}>
                     {!!deck.cards.length && (
-                      <Card id={Number(deck.cards[deck.cards.length - 1])} />
+                        <div style={{position: 'relative'}}>
+                            <div style={{position: 'absolute', zIndex: 1}}><Card
+                                id={Number(deck.cards[deck.cards.length - 1])}/></div>
+                            {   // Show the following card if there is one after the top deck card
+                                deck.cards.length > 1 &&
+                                <div style={{position: 'absolute', zIndex: 2}}>
+                                    <Card id={Number(deck.cards[deck.cards.length - 2])}/>
+                                </div>
+                            }
+                        </div>
                     )}
                   </li>
 
-                  {/* Empty placeholder */}
-                  <li className="w-[120px] h-[166px]"></li>
+                    {/* Empty placeholder */}
+                    <li className="w-[120px] h-[166px]"></li>
 
                   {/* Set up piles */}
                   {piles.map((pile, index) => (
