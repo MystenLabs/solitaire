@@ -20,12 +20,12 @@ export const Card = ({ id, children, marginTop }: { id: number, children?: React
     });
 
     const style = {
-        transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+        transform: isDragging ? `translate3d(${transform?.x}px, ${transform?.y}px, 0)` : 'none',
         height: "166px",
         minWidth: "120px",
         marginTop: marginTop,
-        position: "relative",
-        zIndex: isDragging ? 100000 : 1, // Increase z-index when dragging
+        position: 'relative' as 'relative',
+        zIndex: isDragging ? 100 : 1, // Bring the card to the front when it's being dragged
     };
 
     const setNodeRef = (node: any) => {

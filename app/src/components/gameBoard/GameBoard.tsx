@@ -272,7 +272,7 @@ export default function GameBoard({game}: { game: GameProps }) {
         <DndContext onDragEnd={handleDragEnd}>
             <div className="px-60 h-full w-full flex flex-col items-center space-y-7 pt-14 gap-y-36">
 
-                <ul className="w-full flex justify-between items-center">
+                <ul className="w-full h-200 flex justify-between items-center">
                   {/* Set up card deck */}
                   <li key={"cardDeck"} onClick={clickDeck}>
                     <Card id={-1}></Card>
@@ -297,7 +297,7 @@ export default function GameBoard({game}: { game: GameProps }) {
                     </li>
                   ))}
                 </ul>
-                <ul className="w-full flex justify-between items-center ">
+                <ul className="w-full flex justify-between  ">
                     {columns.map((column, index) => (
                         <li key={index}>
                             <EmptyDroppable index={index} id={`empty-column-droppable-${index}`}>
