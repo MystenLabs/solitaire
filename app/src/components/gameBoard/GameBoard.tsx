@@ -24,7 +24,15 @@ interface GameProps {
 type CardStackType =  "pile" | "column" | "deck";
 
 export default function GameBoard({game}: { game: GameProps }) {
-    const [deck, setDeck] = useState<DeckProps>(game.deck);
+    const [deck, setDeck] = useState<DeckProps>(
+        {
+            cards: [
+                "1", "2",
+                // "3"
+            ],
+            hidden_cards: game.deck.hidden_cards
+        }
+    );
     const [piles, setPiles] = useState<PileProps[]>(game.piles);
     const [columns, setColumns] = useState<ColumnProps[]>(
         game.columns
@@ -228,9 +236,58 @@ export default function GameBoard({game}: { game: GameProps }) {
         setPiles(over ? newPiles : piles);
     }
 
+    function updateDeckToColumnMove(active: any, over: any) {
+        // Get to-column index
+        let columnIndexOfOver: number;
+        if (over.id.includes('empty-column-droppable')) {
+            columnIndexOfOver = Number(over.id.split('-').pop());
+        } else {
+            columnIndexOfOver = columns.findIndex(
+                (column) => column.cards.includes(String(over.id))
+            );
+        }
+
+        if (columnIndexOfOver === -1) {
+            console.error("Destination index not found")
+            return;
+        }
+
+        /* Update the values of the columns */
+        let newDeck = {...deck};
+        const objectToMove = newDeck.cards.pop()!;
+
+        /* Check if the move is legal! If not, return early. */
+        const bottomCardOfObjectToMove = new CardDetails(objectToMove);
+        if (over.id.includes('empty-column-droppable')) {
+            const isNotKing = bottomCardOfObjectToMove.rank !== 12;
+            const columnIsNotEmpty = columns[columnIndexOfOver].cards.length !== 0;
+            if (isNotKing || columnIsNotEmpty) {
+                console.error("Illegal move")
+                return;
+            }
+        } else {
+            const topCardOfDestination = new CardDetails(columns[columnIndexOfOver].cards[columns[columnIndexOfOver].cards.length - 1]);
+            const sameColor = bottomCardOfObjectToMove.color === topCardOfDestination.color;
+            const destinationRankDifference = topCardOfDestination.rank - bottomCardOfObjectToMove.rank == 1;
+            if (sameColor || !destinationRankDifference) {
+                console.error("Illegal move")
+                return;
+            }
+        }
+
+        // Move the item to the new column
+        let newColumns = [...columns];
+        newColumns[columnIndexOfOver].cards.push(objectToMove);
+
+        setColumns(over ? newColumns : columns);
+        setDeck(over ? newDeck : deck);
+    }
+
+    // TODO: function updateDeckToPileMove(active: any, over: any) {}
+
     function handleDragEnd(event: any) {
         const {active, over} = event;
-        if (!over || !active) {
+        if (!over || !active || active.id === over.id) {
             return;
         }
         const cardOriginType = findCardOriginType(active.id);
@@ -241,9 +298,11 @@ export default function GameBoard({game}: { game: GameProps }) {
             updateColumnToPileMove(active, over)
         } else if (cardOriginType === "pile" && cardDestinationType === "column") {
             updatePileToColumnMove(active, over)
+        } else if (cardOriginType === "deck" && cardDestinationType === "column") {
+            updateDeckToColumnMove(active, over)
+        } else if (cardOriginType === "deck" && cardDestinationType === "pile") {
+            // TODO - deck to pile
         }
-        // TODO - deck to column
-        // TODO - deck to pile
     }
 
     const clickDeck = async () => {
