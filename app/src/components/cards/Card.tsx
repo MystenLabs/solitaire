@@ -7,7 +7,7 @@ import {useId} from "react";
 export const Card = ({ id, children, marginTop }: { id: number, children?: ReactNode, marginTop?: any }) => {
     let idOfHiddenCard = useId();
     const isHiddenCard = id == -1;
-    let cardId = !isHiddenCard ? id : idOfHiddenCard;
+    let cardId = !isHiddenCard ? String(id) : idOfHiddenCard;
 
     const {attributes, listeners, setNodeRef: setDraggableNodeRef, transform, isDragging} = useDraggable({
         id: cardId,

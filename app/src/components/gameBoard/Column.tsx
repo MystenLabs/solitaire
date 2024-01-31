@@ -17,7 +17,7 @@ export default function Column({ column }: { column: Column }) {
           allCards.reduceRight(
             (accumulator, id) => {
               return (
-                <Card id={id ? Number(id) : -1} marginTop={'-110%'}>
+                <Card id={id !== undefined && id !== null ? Number(id) : -1} marginTop={'-110%'}>
                   {accumulator}
                 </Card>)
             }, <></>
