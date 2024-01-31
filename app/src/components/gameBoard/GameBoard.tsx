@@ -299,7 +299,15 @@ export default function GameBoard({game}: { game: GameProps }) {
         if (over.id.includes('empty-pile-droppable')) {
             const isNotAce = bottomCardOfObjectToMove.rank !== 0;
             const pileIsNotEmpty = piles[pileIndexOfOver].cards.length !== 0;
-            if (isNotAce || pileIsNotEmpty) {
+            if (pileIsNotEmpty) {
+                const topCardOfDestination = new CardDetails(piles[pileIndexOfOver].cards[piles[pileIndexOfOver].cards.length - 1]);
+                const notSameColor = bottomCardOfObjectToMove.color !== topCardOfDestination.color;
+                const destinationRankDifference = bottomCardOfObjectToMove.rank - topCardOfDestination.rank == 1;
+                if (notSameColor || !destinationRankDifference) {
+                    console.error("Illegal move")
+                    return;
+                }
+            } else if (isNotAce) {
                 console.error("Illegal move")
                 return;
             }
