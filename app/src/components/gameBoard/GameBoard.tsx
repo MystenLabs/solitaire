@@ -110,11 +110,11 @@ export default function GameBoard({game}: { game: GameProps }) {
         newColumns[columnIndexOfOver].cards.push(...objectsToMove);
 
         // TODO - Open column card if revealed
+
         setColumns(over ? newColumns : columns);
     }
 
     function updateColumnToPileMove(active: any, over: any) {
-        // TODO: Check if the move is legal! If not, return early.
         const columnIndexOfActive = columns.findIndex(
             (column) => column.cards.includes(String(active.id))
         );
@@ -140,6 +140,10 @@ export default function GameBoard({game}: { game: GameProps }) {
         );
 
         /* Check if the move is legal! If not, return early. */
+        if (objectsToMove.length > 1) {
+            console.error("Illegal move")
+            return;
+        }
         const bottomCardOfObjectToMove = new CardDetails(objectsToMove[0]);
         if (over.id.includes('empty-pile-droppable')) {
             const isNotAce = bottomCardOfObjectToMove.rank !== 0;
@@ -167,12 +171,13 @@ export default function GameBoard({game}: { game: GameProps }) {
         let newPiles = [...piles];
         newPiles[pileIndexOfOver].cards.push(...objectsToMove);
 
+        // TODO - Open column card if revealed
+
         setColumns(over ? newColumns : columns);
         setPiles(over ? newPiles : piles);
     }
 
     function updatePileToColumnMove(active: any, over: any) {
-        // TODO: Check if the move is legal! If not, return early.
         const pileIndexOfActive = piles.findIndex(
             (pile) => pile.cards.includes(String(active.id))
         );
@@ -194,11 +199,30 @@ export default function GameBoard({game}: { game: GameProps }) {
 
         /* Update the values of the columns */
         let newPiles = [...piles];
-        const objectsToMove = newPiles[pileIndexOfActive].cards.pop();
+        const objectToMove = newPiles[pileIndexOfActive].cards.pop()!;
+
+        /* Check if the move is legal! If not, return early. */
+        const bottomCardOfObjectToMove = new CardDetails(objectToMove);
+        if (over.id.includes('empty-column-droppable')) {
+            const isNotKing = bottomCardOfObjectToMove.rank !== 12;
+            const columnIsNotEmpty = columns[columnIndexOfOver].cards.length !== 0;
+            if (isNotKing || columnIsNotEmpty) {
+                console.error("Illegal move")
+                return;
+            }
+        } else {
+            const topCardOfDestination = new CardDetails(columns[columnIndexOfOver].cards[columns[columnIndexOfOver].cards.length - 1]);
+            const sameColor = bottomCardOfObjectToMove.color === topCardOfDestination.color;
+            const destinationRankDifference = topCardOfDestination.rank - bottomCardOfObjectToMove.rank == 1;
+            if (sameColor || !destinationRankDifference) {
+                console.error("Illegal move")
+                return;
+            }
+        }
 
         // Move the item to the new column
         let newColumns = [...columns];
-        newColumns[columnIndexOfOver].cards.push(objectsToMove!);
+        newColumns[columnIndexOfOver].cards.push(objectToMove);
 
         setColumns(over ? newColumns : columns);
         setPiles(over ? newPiles : piles);
