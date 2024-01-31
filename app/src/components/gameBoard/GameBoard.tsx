@@ -84,7 +84,7 @@ export default function GameBoard({game}: { game: GameProps }) {
             newColumns[columnIndexOfActive].cards.indexOf(String(active.id))
         );
 
-        // Check if the move is legal! If not, return early.
+        /* Check if the move is legal! If not, return early. */
         const bottomCardOfObjectToMove = new CardDetails(objectsToMove[0]);
         if (over.id.includes('empty-column-droppable')) {
             const isNotKing = bottomCardOfObjectToMove.rank !== 12;
@@ -102,8 +102,6 @@ export default function GameBoard({game}: { game: GameProps }) {
                 return;
             }
         }
-
-
 
         // Remove the item from the old column
         newColumns[columnIndexOfActive].cards = newColumns[columnIndexOfActive].cards.slice(0, newColumns[columnIndexOfActive].cards.indexOf(String(active.id)));
@@ -140,6 +138,25 @@ export default function GameBoard({game}: { game: GameProps }) {
         const objectsToMove = newColumns[columnIndexOfActive].cards.slice(
             newColumns[columnIndexOfActive].cards.indexOf(String(active.id))
         );
+
+        /* Check if the move is legal! If not, return early. */
+        const bottomCardOfObjectToMove = new CardDetails(objectsToMove[0]);
+        if (over.id.includes('empty-pile-droppable')) {
+            const isNotAce = bottomCardOfObjectToMove.rank !== 0;
+            const pileIsNotEmpty = piles[pileIndexOfOver].cards.length !== 0;
+            if (isNotAce || pileIsNotEmpty) {
+                console.error("Illegal move")
+                return;
+            }
+        } else {
+            const topCardOfDestination = new CardDetails(piles[pileIndexOfOver].cards[piles[pileIndexOfOver].cards.length - 1]);
+            const notSameColor = bottomCardOfObjectToMove.color !== topCardOfDestination.color;
+            const destinationRankDifference = bottomCardOfObjectToMove.rank - topCardOfDestination.rank == 1;
+            if (notSameColor || !destinationRankDifference) {
+                console.error("Illegal move")
+                return;
+            }
+        }
 
         // Remove the item from the old column
         newColumns[columnIndexOfActive].cards = newColumns[columnIndexOfActive].cards.slice(
