@@ -423,11 +423,12 @@ export default function GameBoard({game}: { game: GameProps }) {
 
                 <ul className="w-full h-200 flex justify-between items-center">
                   {/* Set up card deck */}
-                  <li key={"cardDeck"} onClick={clickDeck}>
-                    <Card id={-1}></Card>
-                  </li>
+                    <li key={"cardDeck"} onClick={clickDeck}>
+                        {!!deck.hidden_cards && (<Card id={-1}></Card>)}
+                        {!deck.hidden_cards && (<div className="w-[120px] h-[166px]"></div>)}
+                    </li>
 
-                  {/* Place where the open deck cards are being displayed */}
+                    {/* Place where the open deck cards are being displayed */}
                   <li className="min-w-[120px] h-[166px]" key={"openCard"}>
                     {!!deck.cards.length && (
                         <div style={{position: 'relative'}}>
