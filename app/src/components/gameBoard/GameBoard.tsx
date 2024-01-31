@@ -27,8 +27,7 @@ export default function GameBoard({game}: { game: GameProps }) {
     const [deck, setDeck] = useState<DeckProps>(
         {
             cards: [
-                "1", "2",
-                // "3"
+                "27",
             ],
             hidden_cards: game.deck.hidden_cards
         }
@@ -283,7 +282,51 @@ export default function GameBoard({game}: { game: GameProps }) {
         setDeck(over ? newDeck : deck);
     }
 
-    // TODO: function updateDeckToPileMove(active: any, over: any) {}
+    function updateDeckToPileMove(active: any, over: any) {
+        let pileIndexOfOver: number;
+        if (over.id.includes('empty-pile-droppable')) {
+            pileIndexOfOver = Number(over.id.split('-').pop());
+        } else {
+            pileIndexOfOver = piles.findIndex(
+                (pile) => pile.cards.includes(String(over.id))
+            );
+        }
+
+        if (pileIndexOfOver === -1) {
+            console.error("Destination index not found")
+            return;
+        }
+
+        /* Update the values of the columns */
+        const objectToMove = deck.cards.pop()!;
+        let newDeck = {...deck};
+
+        /* Check if the move is legal! If not, return early. */
+        const bottomCardOfObjectToMove = new CardDetails(objectToMove);
+        if (over.id.includes('empty-pile-droppable')) {
+            const isNotAce = bottomCardOfObjectToMove.rank !== 0;
+            const pileIsNotEmpty = piles[pileIndexOfOver].cards.length !== 0;
+            if (isNotAce || pileIsNotEmpty) {
+                console.error("Illegal move")
+                return;
+            }
+        } else {
+            const topCardOfDestination = new CardDetails(piles[pileIndexOfOver].cards[piles[pileIndexOfOver].cards.length - 1]);
+            const notSameColor = bottomCardOfObjectToMove.color !== topCardOfDestination.color;
+            const destinationRankDifference = bottomCardOfObjectToMove.rank - topCardOfDestination.rank == 1;
+            if (notSameColor || !destinationRankDifference) {
+                console.error("Illegal move")
+                return;
+            }
+        }
+
+        // Move the item to the new column
+        let newPiles = [...piles];
+        newPiles[pileIndexOfOver].cards.push(objectToMove);
+
+        setPiles(over ? newPiles : piles);
+        setDeck(over ? newDeck : deck);
+    }
 
     function handleDragEnd(event: any) {
         const {active, over} = event;
@@ -301,7 +344,7 @@ export default function GameBoard({game}: { game: GameProps }) {
         } else if (cardOriginType === "deck" && cardDestinationType === "column") {
             updateDeckToColumnMove(active, over)
         } else if (cardOriginType === "deck" && cardDestinationType === "pile") {
-            // TODO - deck to pile
+            updateDeckToPileMove(active, over)
         }
     }
 
@@ -395,11 +438,11 @@ export default function GameBoard({game}: { game: GameProps }) {
                   <li className="min-w-[120px] h-[166px]" key={"openCard"}>
                     {!!deck.cards.length && (
                         <div style={{position: 'relative'}}>
-                            <div style={{position: 'absolute', zIndex: 1}}><Card
+                            <div style={{position: 'absolute', zIndex: 2}}><Card
                                 id={Number(deck.cards[deck.cards.length - 1])}/></div>
                             {   // Show the following card if there is one after the top deck card
                                 deck.cards.length > 1 &&
-                                <div style={{position: 'absolute', zIndex: 2}}>
+                                <div style={{position: 'absolute', zIndex: 1}}>
                                     <Card id={Number(deck.cards[deck.cards.length - 2])}/>
                                 </div>
                             }
