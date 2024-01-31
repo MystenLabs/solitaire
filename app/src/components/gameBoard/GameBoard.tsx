@@ -1,17 +1,17 @@
 "use client";
 
 import {use, useEffect, useState} from "react";
-import cardBack from "../../../../app/public/assets/cards/card_back.svg";
-import Image from "next/image";
 import {Pile as PileProps} from "../../models/pile" ;
 import {Column as ColumnProps} from "../../models/column";
 import {Deck as DeckProps} from "../../models/deck";
 import {Card} from "../cards/Card";
 import {useSolitaireActions} from "@/hooks/useSolitaireActions";
 import toast from "react-hot-toast";
-import {DndContext} from "@dnd-kit/core";
+import {DndContext, useDroppable} from "@dnd-kit/core";
 import Pile from "./Pile";
 import Column from "./Column";
+import {EmptyDroppable} from "./EmptyDroppable";
+
 
 interface GameProps {
     id: string;
@@ -40,10 +40,10 @@ export default function GameBoard({game}: { game: GameProps }) {
     } = useSolitaireActions();
 
     /* Is the card on a pile, a column, or on the deck*/
-    function findCardOriginType(cardId: number): CardStackType | undefined {
-        const isInPile = piles.some((pile) => pile.cards.includes(String(cardId)));
-        const isInColumn = columns.some((column) => column.cards.includes(String(cardId)));
-        const isInDeck = deck.cards.includes(String(cardId));
+    function findCardOriginType(cardId: String): CardStackType | undefined {
+        const isInPile = cardId.includes('pile') || piles.some((pile) => pile.cards.includes(cardId));
+        const isInColumn = columns.some((column) => column.cards.includes(cardId));
+        const isInDeck = deck.cards.includes(cardId);
         switch (true) {
             case isInPile:
                 return "pile";
@@ -95,10 +95,14 @@ export default function GameBoard({game}: { game: GameProps }) {
             (column) => column.cards.includes(String(active.id))
         );
 
-        // Get to-column index
-        const pileIndexOfOver = piles.findIndex(
-            (pile) => pile.cards.includes(String(over.id))
-        );
+        let pileIndexOfOver: number;
+        if (over.id.includes('empty-pile-droppable')) {
+            pileIndexOfOver = Number(over.id.split('-').pop());
+        } else {
+            pileIndexOfOver = piles.findIndex(
+                (pile) => pile.cards.includes(String(over.id))
+            );
+        }
 
         /* Update the values of the columns */
         let newColumns = [...columns];
@@ -107,7 +111,9 @@ export default function GameBoard({game}: { game: GameProps }) {
         );
 
         // Remove the item from the old column
-        newColumns[columnIndexOfActive].cards = newColumns[columnIndexOfActive].cards.slice(0, newColumns[columnIndexOfActive].cards.indexOf(String(active.id)));
+        newColumns[columnIndexOfActive].cards = newColumns[columnIndexOfActive].cards.slice(
+            0, newColumns[columnIndexOfActive].cards.indexOf(String(active.id))
+        );
 
         // Move the item to the new column
         let newPiles = [...piles];
@@ -134,7 +140,7 @@ export default function GameBoard({game}: { game: GameProps }) {
 
         // Move the item to the new column
         let newColumns = [...columns];
-        newColumns[columnIndexOfOver].cards.push(objectsToMove);
+        newColumns[columnIndexOfOver].cards.push(objectsToMove!);
 
         console.log(newPiles, newColumns);
 
@@ -152,9 +158,8 @@ export default function GameBoard({game}: { game: GameProps }) {
         // deck to pile, deck to column, column to pile, column to column, pile to column
         // First check where the active card is coming from
 
-        const cardOriginType = findCardOriginType(Number(active.id));
-        const cardDestinationType = findCardOriginType(Number(over.id));
-
+        const cardOriginType = findCardOriginType(active.id);
+        const cardDestinationType = findCardOriginType(over.id);
         if (cardOriginType === "column" && cardDestinationType === "column") {
             updateColumnToColumnMove(active, over);
         } else if (cardOriginType === "column" && cardDestinationType === "pile") {
@@ -263,7 +268,9 @@ export default function GameBoard({game}: { game: GameProps }) {
                   {/* Set up piles */}
                   {piles.map((pile, index) => (
                     <li key={index}>
-                      <Pile pile={pile} />
+                        <EmptyDroppable id={`empty-pile-droppable-${index}`}>
+                            <Pile pile={pile} />
+                        </EmptyDroppable>
                     </li>
                   ))}
                 </ul>

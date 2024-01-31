@@ -15,3 +15,4 @@ export default function Pile({ pile }: { pile: Pile }) {
     </div>
   );
 }
+
