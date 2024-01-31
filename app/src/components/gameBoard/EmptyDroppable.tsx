@@ -6,7 +6,7 @@ export function EmptyDroppable(props: any) {
     });
 
     return (
-        <div ref={setNodeRef} key={'empty-pile-droppable'}>
+        <div ref={setNodeRef} key={'empty-pile-droppable'} className={"h-[166px] w-[120px]"}>
             {props.children}
         </div>
     );

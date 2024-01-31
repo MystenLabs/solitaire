@@ -42,7 +42,7 @@ export default function GameBoard({game}: { game: GameProps }) {
     /* Is the card on a pile, a column, or on the deck*/
     function findCardOriginType(cardId: String): CardStackType | undefined {
         const isInPile = cardId.includes('pile') || piles.some((pile) => pile.cards.includes(cardId));
-        const isInColumn = columns.some((column) => column.cards.includes(cardId));
+        const isInColumn = cardId.includes('column') || columns.some((column) => column.cards.includes(cardId));
         const isInDeck = deck.cards.includes(cardId);
         switch (true) {
             case isInPile:
@@ -59,17 +59,27 @@ export default function GameBoard({game}: { game: GameProps }) {
     function updateColumnToColumnMove(active: any, over: any) {
         // TODO: Check if the move is legal! If not, return early.
 
-        // TODO: columnToColumn(...)
-
         // Get from-column index
         const columnIndexOfActive = columns.findIndex(
             (column) => column.cards.includes(String(active.id))
         );
 
         // Get to-column index
-        const columnIndexOfOver = columns.findIndex(
-            (column) => column.cards.includes(String(over.id))
-        );
+        let columnIndexOfOver: number;
+        if (over.id.includes('empty-column-droppable')) {
+            console.log("empty over id", over.id)
+            columnIndexOfOver = Number(over.id.split('-').pop());
+        } else {
+            console.log("over id", over.id)
+            columnIndexOfOver = columns.findIndex(
+                (column) => column.cards.includes(String(over.id))
+            );
+        }
+
+        if (columnIndexOfOver === -1 || columnIndexOfActive === -1) {
+            console.error("Destination index not found", columnIndexOfActive, columnIndexOfOver)
+            return;
+        }
 
         /* Update the values of the columns */
         let newColumns = [...columns];
@@ -104,6 +114,11 @@ export default function GameBoard({game}: { game: GameProps }) {
             );
         }
 
+        if (pileIndexOfOver === -1 || columnIndexOfActive === -1) {
+            console.error("Destination index not found")
+            return;
+        }
+
         /* Update the values of the columns */
         let newColumns = [...columns];
         const objectsToMove = newColumns[columnIndexOfActive].cards.slice(
@@ -130,9 +145,19 @@ export default function GameBoard({game}: { game: GameProps }) {
         );
 
         // Get to-column index
-        const columnIndexOfOver = columns.findIndex(
-            (column) => column.cards.includes(String(over.id))
-        );
+        let columnIndexOfOver: number;
+        if (over.id.includes('empty-column-droppable')) {
+            columnIndexOfOver = Number(over.id.split('-').pop());
+        } else {
+            columnIndexOfOver = columns.findIndex(
+                (column) => column.cards.includes(String(over.id))
+            );
+        }
+
+        if (columnIndexOfOver === -1 || pileIndexOfActive === -1) {
+            console.error("Destination index not found")
+            return;
+        }
 
         /* Update the values of the columns */
         let newPiles = [...piles];
@@ -141,8 +166,6 @@ export default function GameBoard({game}: { game: GameProps }) {
         // Move the item to the new column
         let newColumns = [...columns];
         newColumns[columnIndexOfOver].cards.push(objectsToMove!);
-
-        console.log(newPiles, newColumns);
 
         setColumns(over ? newColumns : columns);
         setPiles(over ? newPiles : piles);
@@ -275,14 +298,13 @@ export default function GameBoard({game}: { game: GameProps }) {
                   ))}
                 </ul>
                 <ul className="w-full flex justify-between items-center ">
-                  {
-                    columns.map((column, index) => {
-                      if (column.cards.length == 0 && column.hidden_cards == 0) {
-                        return (<li key={index} className="w-[120px] h-[166px]"></li>)
-                      }
-                      return ( <li key={index}> <Column column={column} /> </li>)
-                    })
-                  }
+                    {columns.map((column, index) => (
+                        <li key={index}>
+                            <EmptyDroppable index={index} id={`empty-column-droppable-${index}`}>
+                                <Column column={column} index={index}/>
+                            </EmptyDroppable>
+                        </li>
+                    ))}
                 </ul>
             </div>
         </DndContext>
