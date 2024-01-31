@@ -1,5 +1,5 @@
 import React, {ReactNode} from 'react';
-import { cardIdToSvg } from "@/helpers/card_mappings";
+import { cardIdToSvg } from "@/helpers/cardMappings";
 import Image from "next/image";
 import {useDraggable, useDroppable} from '@dnd-kit/core';
 import {useId} from "react";
