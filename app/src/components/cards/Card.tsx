@@ -24,8 +24,6 @@ export const Card = ({ id, children, marginTop }: { id: number, children?: React
         height: "166px",
         minWidth: "120px",
         marginTop: marginTop,
-        position: 'relative' as 'relative',
-        zIndex: isDragging ? 100 : 1, // Bring the card to the front when it's being dragged
     };
 
     const setNodeRef = (node: any) => {

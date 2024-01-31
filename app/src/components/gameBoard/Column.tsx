@@ -14,7 +14,7 @@ export default function Column({ column, index }: { column: Column, index: numbe
 
     // Generate stack the of cards:
     return (
-        <div className="h-[166px] w-[120px] relative">
+        <div>
             {allCards.reduceRight(
                 (accumulator, id) => {
                     return (
