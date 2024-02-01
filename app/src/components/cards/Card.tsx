@@ -20,11 +20,13 @@ export const Card = ({ id, children, marginTop }: { id: number, children?: React
     });
 
     const style = {
-        transform: isDragging ? `translate3d(${transform?.x}px, ${transform?.y}px, 0)` : 'none',
+        transform: isDragging ? `translate3d(${transform?.x}px, ${transform?.y}px, 0) rotate(10deg)` : 'none',
         height: "166px",
         minWidth: "120px",
         marginTop: marginTop,
-    };
+        cursor: isDragging ? 'grabbing' : 'grab',
+
+};
 
     const setNodeRef = (node: any) => {
         setDraggableNodeRef(node);
