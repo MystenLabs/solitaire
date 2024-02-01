@@ -344,6 +344,7 @@ export default function GameBoard({game}: { game: GameProps }) {
         }
         const cardOriginType = findCardOriginType(active.id);
         const cardDestinationType = findCardOriginType(over.id);
+        console.log(cardOriginType, 'to', cardDestinationType)
         if (cardOriginType === "column" && cardDestinationType === "column") {
             updateColumnToColumnMove(active, over);
         } else if (cardOriginType === "column" && cardDestinationType === "pile") {
