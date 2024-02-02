@@ -361,15 +361,17 @@ export default function GameBoard({game}: { game: GameProps }) {
     const clickDeck = async () => {
         if (deck.hidden_cards !== 0) {
             try {
-                const game = await handleOpenDeckCard(gameId);
-                // setDeck(game.deck);
+                // const updatedGame = await handleOpenDeckCard(game.id);
+                // TODO: deserialize updatedGame using GameProps
+                // setDeck(updatedGame.deck);
             } catch (e) {
                 toast.error("Transaction Failed");
             }
         } else {
             try {
-                const game = await handleRotateOpenDeckCards(gameId);
-                // setDeck(game.deck);
+                // const updatedGame = await handleRotateOpenDeckCards(game.id);
+                // TODO: deserialize updatedGame using GameProps
+                // setDeck(updatedGame.deck);
             } catch (e) {
                 toast.error("Transaction Failed");
             }
@@ -378,9 +380,10 @@ export default function GameBoard({game}: { game: GameProps }) {
 
     const deckToPile = async (pileIndex: number) => {
         try {
-            const game = await handleFromDeckToPile(gameId, pileIndex);
-            // setDeck(game.deck);
-            // setPiles(game.piles);
+            const updatedGame = await handleFromDeckToPile(game.id, pileIndex);
+            // TODO deserialize updatedGame using GameProps
+            // setDeck(updatedGame.deck);
+            // setPiles(updatedGame.piles);
         } catch (e) {
             toast.error("Transaction Failed");
         }
@@ -388,9 +391,10 @@ export default function GameBoard({game}: { game: GameProps }) {
 
     const deckToColumn = async (columnIndex: number) => {
         try {
-            const game = await handleFromDeckToColumn(gameId, columnIndex);
-            // setDeck(game.deck);
-            // setColumns(game.columns);
+            const updatedGame = await handleFromDeckToColumn(game.id, columnIndex);
+            // TODO deserialize updatedGame using GameProps
+            // setDeck(updatedGame.deck);
+            // setColumn(updatedGame.columns);
         } catch (e) {
             toast.error("Transaction Failed");
         }
@@ -398,9 +402,10 @@ export default function GameBoard({game}: { game: GameProps }) {
 
     const columnToPile = async (columnIndex: number, pileIndex: number) => {
         try {
-            const game = await handleFromColumnToPile(gameId, columnIndex, pileIndex);
-            // setColumns(game.columns);
-            // setPiles(game.piles);
+            const updatedGame = await handleFromColumnToPile(game.id, columnIndex, pileIndex);
+            // TODO deserialize updatedGame using GameProps
+            // setColumns(updatedGame.columns);
+            // setPiles(updatedGame.piles);
         } catch (e) {
             toast.error("Transaction Failed");
         }
@@ -412,13 +417,14 @@ export default function GameBoard({game}: { game: GameProps }) {
         toColumnIndex: number
     ) => {
         try {
-            const game = await handleFromColumnToColumn(
-                gameId,
+            const updatedGame = await handleFromColumnToColumn(
+                game.id,
                 fromColumnIndex,
                 card,
                 toColumnIndex
             );
-            // setColumns(game.columns);
+            // TODO: deserialize updatedGame using GameProps
+            // setColumns(updatedGame.columns);
         } catch (e) {
             toast.error("Transaction Failed");
         }
@@ -426,9 +432,10 @@ export default function GameBoard({game}: { game: GameProps }) {
 
     const pileToColumn = async (pileIndex: number, columnIndex: number) => {
         try {
-            const game = await handleFromPileToColumn(gameId, pileIndex, columnIndex);
-            // setColumns(game.columns);
-            // setPiles(game.piles);
+            const updatedGame = await handleFromPileToColumn(game.id, pileIndex, columnIndex);
+            // TODO: deserialize updatedGame using GameProps
+            // setColumns(updatedGame.columns);
+            // setPiles(updatedGame.piles);
         } catch (e) {
             toast.error("Transaction Failed");
         }
