@@ -10,7 +10,7 @@ done
 
 NETWORK=http://127.0.0.1:9000
 BACKEND_API=http://127.0.0.1:3000
-FAUCET=http://127.0.0.1:9000/gas
+FAUCET=http://127.0.0.1:9123/gas
 
 MOVE_PACKAGE_PATH=../move/solitaire
 
@@ -27,13 +27,14 @@ if [ $# -ne 0 ]; then
   fi
 fi
 
+ADMIN_ADDRESS=$(sui client active-address)
 echo "- Admin Address is: ${ADMIN_ADDRESS}"
 
 import_address=$(sui keytool import "$ADMIN_PHRASE" ed25519)
 
 switch_res=$(sui client switch --address ${ADMIN_ADDRESS})
 
-#faucet_res=$(curl --location --request POST "$FAUCET" --header 'Content-Type: application/json' --data-raw '{"FixedAmountRequest": { "recipient": '$ADMIN_ADDRESS'}}')
+faucet_res=$(curl --location --request POST "$FAUCET" --header 'Content-Type: application/json' --data-raw '{"FixedAmountRequest": { "recipient": '$ADMIN_ADDRESS'}}')
 
 publish_res=$(sui client publish --skip-fetch-latest-git-deps --gas-budget 2000000000 --skip-dependency-verification --json ${MOVE_PACKAGE_PATH})
 
@@ -75,12 +76,13 @@ NEXT_PUBLIC_BACKEND_API=$BACKEND_API
 VITE_API_ENV
 
 # commented out as the POC template does not have an api directory
-
-# cat >../api/.env$suffix<<-BACKEND_API_ENV
-# SUI_NETWORK=$NETWORK
-# BACKEND_API=$BACKEND_API
-# PACKAGE_ADDRESS=$PACKAGE_ID
-# ADMIN_ADDRESS=$ADMIN_ADDRESS
-# BACKEND_API_ENV
+cat >../app/.env<<-BACKEND_API_ENV
+NEXT_PUBLIC_SUI_NETWORK=$NETWORK
+NEXT_PUBLIC_USE_TOP_NAVBAR_IN_LARGE_SCREEN=1
+IS_SERVER_SIDE=1
+NEXT_PUBLIC_ENOKI_API_KEY=enoki_apikey_2561b261b49126875f11a62d858c8009
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=46765980508-4iog648mir1nlg8drbqdsn1b75qtj6nv.apps.googleusercontent.com
+NEXT_PUBLIC_PACKAGE_ADDRESS=$PACKAGE_ID
+BACKEND_API_ENV
 
 echo "Contract Deployment finished!"
