@@ -21,14 +21,11 @@ const GamePage = () => {
 
   const onGameCreation = async (mode: 'easy' | 'normal') => {
     setSpinning(true);
-    const ephemeralKeyPair = user.zkLoginSession?.ephemeralKeyPair;
-    let privateKeyArray = Uint8Array.from(Array.from(fromB64(ephemeralKeyPair!)));
-    const signerKeypair = Ed25519Keypair.fromSecretKey(privateKeyArray)
     let game: Game | undefined = undefined;
     if (mode === 'easy') {
-      game = await handleExecuteInitEasyGame(signerKeypair);
+      game = await handleExecuteInitEasyGame();
     } else if (mode === 'normal') {
-      game = await handleExecuteInitNormalGame(signerKeypair);
+      game = await handleExecuteInitNormalGame();
     } else {
       throw new Error('Invalid difficulty mode');
     }
