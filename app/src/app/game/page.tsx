@@ -8,7 +8,7 @@ import GameBoard from "@/components/gameBoard/GameBoard";
 import {AccountDropdown} from "@/components/user/accountDropdown";
 
 const GamePage = () => {
-  const { user, isLoading } = useAuthentication();
+  const { user, isLoading, enokiFlow } = useAuthentication();
   const [gameId, setGameId] = useState<string | null>("123");
   const [moves, setMoves] = useState<number>(0);
 
@@ -29,7 +29,7 @@ const GamePage = () => {
               <button className="text-white text-base font-bold font-normal bg-black rounded-[40px] p-2">End game</button>
           </div>
         )}
-        <AccountDropdown user={user} />
+        <AccountDropdown user={user} enokiFlow={enokiFlow} />
       </div>
       {!gameId ? (
         <div className="flex flex-col justify-center items-center mt-32">

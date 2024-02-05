@@ -8,15 +8,22 @@ import {
     DropdownMenuItem,
     DropdownMenuContent,
 } from "@radix-ui/react-dropdown-menu";
-import { CaretDownIcon, ExitIcon } from "@radix-ui/react-icons";
+import { CaretDownIcon } from "@radix-ui/react-icons";
+import {EnokiFlow} from "@mysten/enoki";
 
-export const AccountDropdown = ({user}: { user: UserProps }) => {
+export const AccountDropdown = ({user, enokiFlow}: { user: UserProps, enokiFlow: EnokiFlow }) => {
+    const logout = async () => {
+        await enokiFlow.logout();
+        localStorage.clear();
+        window.location.replace("/");
+    };
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger>
                 <button>
                     <div
-                        className="flex gap-2 email pl-2 pr-3.5 py-3 left-0 top-0 rounded-[36px] border border-white border-opacity-40 items-center max-h-12 min-w-max">
+                        className="select-none flex gap-2 email pl-2 pr-3.5 py-3 left-0 top-0 rounded-[36px] border border-white border-opacity-40 items-center max-h-12 min-w-max">
                         <div className={"shrink-0"}>
                             <Image src={google} alt={"Logo of google"}/>
                         </div>
@@ -29,7 +36,7 @@ export const AccountDropdown = ({user}: { user: UserProps }) => {
                 </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-                <DropdownMenuItem className={"rounded-[36px] border border-white px-14 py-1 text-center text-white bg-white bg-opacity-10 text-base font-bold leading-tight "}>
+                <DropdownMenuItem onSelect={logout} className={"select-none rounded-[36px] border border-white px-14 py-1 text-center text-white bg-white bg-opacity-10 text-base font-bold leading-tight "}>
                     👋 Logout
                 </DropdownMenuItem>
             </DropdownMenuContent>
