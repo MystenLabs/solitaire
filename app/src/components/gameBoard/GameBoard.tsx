@@ -12,6 +12,7 @@ import Pile from "./Pile";
 import Column from "./Column";
 import {EmptyDroppable} from "./EmptyDroppable";
 import {CardDetails} from "@/helpers/cardDetails";
+import {useSolitaireGameMoves} from "@/hooks/useSolitaireGameMoves";
 
 
 interface GameProps {
@@ -24,7 +25,10 @@ interface GameProps {
 type CardStackType =  "pile" | "column" | "deck";
 
 export default function GameBoard({game}: { game: GameProps }) {
-    const [deck, setDeck] = useState<DeckProps>(game.deck);
+    const [deck, setDeck] = useState<DeckProps>({
+        hidden_cards: game.deck.hidden_cards,
+        cards: []
+    });
     const [piles, setPiles] = useState<PileProps[]>(game.piles);
     const [columns, setColumns] = useState<ColumnProps[]>(
         game.columns
@@ -57,285 +61,14 @@ export default function GameBoard({game}: { game: GameProps }) {
         }
     }
 
-    function updateColumnToColumnMove(active: any, over: any) {
-        // Get from-column index
-        const columnIndexOfActive = columns.findIndex(
-            (column) => column.cards.includes(String(active.id))
-        );
+    const {
+        updateColumnToColumnMove,
+        updateColumnToPileMove,
+        updatePileToColumnMove,
+        updateDeckToColumnMove,
+        updateDeckToPileMove,
+    } = useSolitaireGameMoves();
 
-        // Get to-column index
-        let columnIndexOfOver: number;
-        if (over.id.includes('empty-column-droppable')) {
-            columnIndexOfOver = Number(over.id.split('-').pop());
-        } else {
-            columnIndexOfOver = columns.findIndex(
-                (column) => column.cards.includes(String(over.id))
-            );
-        }
-
-        if (columnIndexOfOver === -1 || columnIndexOfActive === -1) {
-            console.error("Destination index not found", columnIndexOfActive, columnIndexOfOver)
-            return;
-        }
-
-        /* Update the values of the columns */
-        let newColumns = [...columns];
-        const objectsToMove = newColumns[columnIndexOfActive].cards.slice(
-            newColumns[columnIndexOfActive].cards.indexOf(String(active.id))
-        );
-
-        /* Check if the move is legal! If not, return early. */
-        const bottomCardOfObjectToMove = new CardDetails(objectsToMove[0]);
-        if (over.id.includes('empty-column-droppable')) {
-            const isNotKing = bottomCardOfObjectToMove.rank !== 12;
-            const columnIsNotEmpty = columns[columnIndexOfOver].cards.length !== 0;
-            if (isNotKing || columnIsNotEmpty) {
-                console.error("Illegal move")
-                return;
-            }
-        } else {
-            const topCardOfDestination = new CardDetails(columns[columnIndexOfOver].cards[columns[columnIndexOfOver].cards.length - 1]);
-            const sameColor = bottomCardOfObjectToMove.color === topCardOfDestination.color;
-            const destinationRankDifference = topCardOfDestination.rank - bottomCardOfObjectToMove.rank == 1;
-            if (sameColor || !destinationRankDifference) {
-                console.error("Illegal move")
-                return;
-            }
-        }
-
-        // Remove the item from the old column
-        newColumns[columnIndexOfActive].cards = newColumns[columnIndexOfActive].cards.slice(0, newColumns[columnIndexOfActive].cards.indexOf(String(active.id)));
-
-        // Move the item to the new column
-        newColumns[columnIndexOfOver].cards.push(...objectsToMove);
-
-        // TODO - Open column card if revealed
-
-        setColumns(over ? newColumns : columns);
-    }
-
-    function updateColumnToPileMove(active: any, over: any) {
-        const columnIndexOfActive = columns.findIndex(
-            (column) => column.cards.includes(String(active.id))
-        );
-
-        let pileIndexOfOver: number;
-        if (over.id.includes('empty-pile-droppable')) {
-            pileIndexOfOver = Number(over.id.split('-').pop());
-        } else {
-            pileIndexOfOver = piles.findIndex(
-                (pile) => pile.cards.includes(String(over.id))
-            );
-        }
-
-        if (pileIndexOfOver === -1 || columnIndexOfActive === -1) {
-            console.error("Destination index not found")
-            return;
-        }
-
-        /* Update the values of the columns */
-        let newColumns = [...columns];
-        const objectsToMove = newColumns[columnIndexOfActive].cards.slice(
-            newColumns[columnIndexOfActive].cards.indexOf(String(active.id))
-        );
-
-        /* Check if the move is legal! If not, return early. */
-        if (objectsToMove.length > 1) {
-            console.error("Illegal move")
-            return;
-        }
-        const bottomCardOfObjectToMove = new CardDetails(objectsToMove[0]);
-        if (over.id.includes('empty-pile-droppable')) {
-            const isNotAce = bottomCardOfObjectToMove.rank !== 0;
-            const pileIsNotEmpty = piles[pileIndexOfOver].cards.length !== 0;
-            if (pileIsNotEmpty) {
-                const topCardOfDestination = new CardDetails(piles[pileIndexOfOver].cards[piles[pileIndexOfOver].cards.length - 1]);
-                const notSameColor = bottomCardOfObjectToMove.color !== topCardOfDestination.color;
-                const destinationRankDifference = bottomCardOfObjectToMove.rank - topCardOfDestination.rank == 1;
-                if (notSameColor || !destinationRankDifference) {
-                    console.error("Illegal move")
-                    return;
-                }
-            } else if (isNotAce) {
-                console.error("Illegal move")
-                return;
-            }
-        } else {
-            const topCardOfDestination = new CardDetails(piles[pileIndexOfOver].cards[piles[pileIndexOfOver].cards.length - 1]);
-            const notSameColor = bottomCardOfObjectToMove.color !== topCardOfDestination.color;
-            const destinationRankDifference = bottomCardOfObjectToMove.rank - topCardOfDestination.rank == 1;
-            if (notSameColor || !destinationRankDifference) {
-                console.error("Illegal move")
-                return;
-            }
-        }
-
-        // Remove the item from the old column
-        newColumns[columnIndexOfActive].cards = newColumns[columnIndexOfActive].cards.slice(
-            0, newColumns[columnIndexOfActive].cards.indexOf(String(active.id))
-        );
-
-        // Move the item to the new column
-        let newPiles = [...piles];
-        newPiles[pileIndexOfOver].cards.push(...objectsToMove);
-
-        // TODO - Open column card if revealed
-
-        setColumns(over ? newColumns : columns);
-        setPiles(over ? newPiles : piles);
-    }
-
-    function updatePileToColumnMove(active: any, over: any) {
-        const pileIndexOfActive = piles.findIndex(
-            (pile) => pile.cards.includes(String(active.id))
-        );
-
-        // Get to-column index
-        let columnIndexOfOver: number;
-        if (over.id.includes('empty-column-droppable')) {
-            columnIndexOfOver = Number(over.id.split('-').pop());
-        } else {
-            columnIndexOfOver = columns.findIndex(
-                (column) => column.cards.includes(String(over.id))
-            );
-        }
-
-        if (columnIndexOfOver === -1 || pileIndexOfActive === -1) {
-            console.error("Destination index not found")
-            return;
-        }
-
-        /* Update the values of the columns */
-        let newPiles = [...piles];
-        const objectToMove = newPiles[pileIndexOfActive].cards.pop()!;
-
-        /* Check if the move is legal! If not, return early. */
-        const bottomCardOfObjectToMove = new CardDetails(objectToMove);
-        if (over.id.includes('empty-column-droppable')) {
-            const isNotKing = bottomCardOfObjectToMove.rank !== 12;
-            const columnIsNotEmpty = columns[columnIndexOfOver].cards.length !== 0;
-            if (isNotKing || columnIsNotEmpty) {
-                console.error("Illegal move")
-                return;
-            }
-        } else {
-            const topCardOfDestination = new CardDetails(columns[columnIndexOfOver].cards[columns[columnIndexOfOver].cards.length - 1]);
-            const sameColor = bottomCardOfObjectToMove.color === topCardOfDestination.color;
-            const destinationRankDifference = topCardOfDestination.rank - bottomCardOfObjectToMove.rank == 1;
-            if (sameColor || !destinationRankDifference) {
-                console.error("Illegal move")
-                return;
-            }
-        }
-
-        // Move the item to the new column
-        let newColumns = [...columns];
-        newColumns[columnIndexOfOver].cards.push(objectToMove);
-
-        setColumns(over ? newColumns : columns);
-        setPiles(over ? newPiles : piles);
-    }
-
-    function updateDeckToColumnMove(active: any, over: any) {
-        // Get to-column index
-        let columnIndexOfOver: number;
-        if (over.id.includes('empty-column-droppable')) {
-            columnIndexOfOver = Number(over.id.split('-').pop());
-        } else {
-            columnIndexOfOver = columns.findIndex(
-                (column) => column.cards.includes(String(over.id))
-            );
-        }
-
-        if (columnIndexOfOver === -1) {
-            console.error("Destination index not found")
-            return;
-        }
-
-        /* Update the values of the columns */
-        let newDeck = {...deck};
-        const objectToMove = newDeck.cards.pop()!;
-
-        /* Check if the move is legal! If not, return early. */
-        const bottomCardOfObjectToMove = new CardDetails(objectToMove);
-        if (over.id.includes('empty-column-droppable')) {
-            const isNotKing = bottomCardOfObjectToMove.rank !== 12;
-            const columnIsNotEmpty = columns[columnIndexOfOver].cards.length !== 0;
-            if (isNotKing || columnIsNotEmpty) {
-                console.error("Illegal move")
-                return;
-            }
-        } else {
-            const topCardOfDestination = new CardDetails(columns[columnIndexOfOver].cards[columns[columnIndexOfOver].cards.length - 1]);
-            const sameColor = bottomCardOfObjectToMove.color === topCardOfDestination.color;
-            const destinationRankDifference = topCardOfDestination.rank - bottomCardOfObjectToMove.rank == 1;
-            if (sameColor || !destinationRankDifference) {
-                console.error("Illegal move")
-                return;
-            }
-        }
-
-        // Move the item to the new column
-        let newColumns = [...columns];
-        newColumns[columnIndexOfOver].cards.push(objectToMove);
-
-        setColumns(over ? newColumns : columns);
-        setDeck(over ? newDeck : deck);
-    }
-
-    function updateDeckToPileMove(active: any, over: any) {
-        let pileIndexOfOver: number;
-        if (over.id.includes('empty-pile-droppable')) {
-            pileIndexOfOver = Number(over.id.split('-').pop());
-        } else {
-            pileIndexOfOver = piles.findIndex(
-                (pile) => pile.cards.includes(String(over.id))
-            );
-        }
-
-        if (pileIndexOfOver === -1) {
-            console.error("Destination index not found")
-            return;
-        }
-
-        /* Update the values of the columns */
-        const objectToMove = deck.cards.pop()!;
-        let newDeck = {...deck};
-
-        /* Check if the move is legal! If not, return early. */
-        const bottomCardOfObjectToMove = new CardDetails(objectToMove);
-        if (over.id.includes('empty-pile-droppable')) {
-            const isNotAce = bottomCardOfObjectToMove.rank !== 0;
-            const pileIsNotEmpty = piles[pileIndexOfOver].cards.length !== 0;
-            if (pileIsNotEmpty) {
-                const topCardOfDestination = new CardDetails(piles[pileIndexOfOver].cards[piles[pileIndexOfOver].cards.length - 1]);
-                const notSameColor = bottomCardOfObjectToMove.color !== topCardOfDestination.color;
-                const destinationRankDifference = bottomCardOfObjectToMove.rank - topCardOfDestination.rank == 1;
-                if (notSameColor || !destinationRankDifference) {
-                    console.error("Illegal move")
-                    return;
-                }
-            } else if (isNotAce) {
-                console.error("Illegal move")
-                return;
-            }
-        } else {
-            const topCardOfDestination = new CardDetails(piles[pileIndexOfOver].cards[piles[pileIndexOfOver].cards.length - 1]);
-            const notSameColor = bottomCardOfObjectToMove.color !== topCardOfDestination.color;
-            const destinationRankDifference = bottomCardOfObjectToMove.rank - topCardOfDestination.rank == 1;
-            if (notSameColor || !destinationRankDifference) {
-                console.error("Illegal move")
-                return;
-            }
-        }
-
-        // Move the item to the new column
-        let newPiles = [...piles];
-        newPiles[pileIndexOfOver].cards.push(objectToMove);
-
-        setPiles(over ? newPiles : piles);
-        setDeck(over ? newDeck : deck);
-    }
 
     function handleDragEnd(event: any) {
         const {active, over} = event;
@@ -346,15 +79,15 @@ export default function GameBoard({game}: { game: GameProps }) {
         const cardDestinationType = findCardOriginType(over.id);
         console.log(cardOriginType, 'to', cardDestinationType)
         if (cardOriginType === "column" && cardDestinationType === "column") {
-            updateColumnToColumnMove(active, over);
+            updateColumnToColumnMove(active, over, columns, setColumns);
         } else if (cardOriginType === "column" && cardDestinationType === "pile") {
-            updateColumnToPileMove(active, over)
+            updateColumnToPileMove(active, over, columns, setColumns, piles, setPiles)
         } else if (cardOriginType === "pile" && cardDestinationType === "column") {
-            updatePileToColumnMove(active, over)
+            updatePileToColumnMove(active, over, piles, setPiles, columns, setColumns)
         } else if (cardOriginType === "deck" && cardDestinationType === "column") {
-            updateDeckToColumnMove(active, over)
+            updateDeckToColumnMove(active, over, deck, setDeck, columns, setColumns)
         } else if (cardOriginType === "deck" && cardDestinationType === "pile") {
-            updateDeckToPileMove(active, over)
+            updateDeckToPileMove(active, over, deck, setDeck, piles, setPiles)
         }
     }
 
