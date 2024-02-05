@@ -2,11 +2,10 @@
 
 import React, { useState } from "react";
 import { DifficultySelection } from "@/components/difficultySelection/DifficultySelection";
-import google from "../../../../app/public/assets/logos/google_email.svg";
-import Image from "next/image";
 import { useAuthentication } from "@/contexts/Authentication";
 import { Spinner } from "@/components/general/Spinner";
 import GameBoard from "@/components/gameBoard/GameBoard";
+import {AccountDropdown} from "@/components/user/accountDropdown";
 
 const GamePage = () => {
   const { user, isLoading } = useAuthentication();
@@ -30,14 +29,7 @@ const GamePage = () => {
               <button className="text-white text-base font-bold font-normal bg-black rounded-[40px] p-2">End game</button>
           </div>
         )}
-        <div className="flex gap-2 email pl-2 pr-3.5 py-3 left-0 top-0 rounded-[36px] border border-white border-opacity-40 items-center max-h-12 min-w-max">
-          <div className={"shrink-0"}>
-            <Image src={google} alt={"Logo of google"} />
-          </div>
-          <div className="text-center text-white text-base font-normal font-['Mysten Walter Alte'] leading-tight">
-            {user?.email}
-          </div>
-        </div>
+        <AccountDropdown user={user} />
       </div>
       {!gameId ? (
         <div className="flex flex-col justify-center items-center mt-32">
