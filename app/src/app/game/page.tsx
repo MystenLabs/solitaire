@@ -30,8 +30,8 @@ const GamePage = () => {
               <button className="text-white text-base font-bold font-normal bg-black rounded-[40px] p-2">End game</button>
           </div>
         )}
-        <div className="flex gap-2 email pl-2 pr-3.5 py-3 left-0 top-0 rounded-[36px] border border-white border-opacity-40 items-center max-h-12">
-          <div>
+        <div className="flex gap-2 email pl-2 pr-3.5 py-3 left-0 top-0 rounded-[36px] border border-white border-opacity-40 items-center max-h-12 min-w-max">
+          <div className={"shrink-0"}>
             <Image src={google} alt={"Logo of google"} />
           </div>
           <div className="text-center text-white text-base font-normal font-['Mysten Walter Alte'] leading-tight">
