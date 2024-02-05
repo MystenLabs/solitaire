@@ -13,6 +13,8 @@ import {Game} from "@/models/game";
 import {Ed25519Keypair} from "@mysten/sui.js/keypairs/ed25519";
 import {SuiTransactionBlockResponse} from "@mysten/sui.js/client";
 import {TransactionBlock} from "@mysten/sui.js/transactions";
+import {EnokiKeypair} from "@mysten/enoki";
+import {bytes} from "@noble/hashes/_assert";
 
 export const useSolitaireActions = () => {
     const {suiClient} = useSui();
@@ -209,7 +211,7 @@ export const useSolitaireActions = () => {
             });
     };
 
-    async function execute(transactionBlock: TransactionBlock, keypair: Ed25519Keypair) {
+    async function execute(transactionBlock: TransactionBlock, keypair: EnokiKeypair) {
         const res = await suiClient.signAndExecuteTransactionBlock({
             signer: keypair,
             transactionBlock,
@@ -232,15 +234,17 @@ export const useSolitaireActions = () => {
         return res;
     }
 
-    const handleExecuteInitNormalGame = async (keypair: Ed25519Keypair) => {
+    const handleExecuteInitNormalGame = async () => {
         const transactionBlock = initNormalGame();
+        const keypair = await enokiFlow.getKeypair();
         let res = await execute(transactionBlock, keypair);
         let gameObjectRes = await getGameObjectDetails(res);
         return new Game(gameObjectRes!);
     }
 
-    const handleExecuteInitEasyGame = async (keypair: Ed25519Keypair) => {
+    const handleExecuteInitEasyGame = async () => {
         const transactionBlock = initEasyGame();
+        const keypair = await enokiFlow.getKeypair();
         let res = await execute(transactionBlock, keypair);
         let gameObjectRes = await getGameObjectDetails(res);
         return new Game(gameObjectRes!);
