@@ -11,8 +11,8 @@ import {DndContext, useDroppable} from "@dnd-kit/core";
 import Pile from "./Pile";
 import Column from "./Column";
 import {EmptyDroppable} from "./EmptyDroppable";
-import {CardDetails} from "@/helpers/cardDetails";
 import {useSolitaireGameMoves} from "@/hooks/useSolitaireGameMoves";
+import {findCardOriginType} from "@/helpers/cardOrigin";
 
 
 interface GameProps {
@@ -22,7 +22,6 @@ interface GameProps {
     piles: PileProps[];
 }
 
-type CardStackType =  "pile" | "column" | "deck";
 
 export default function GameBoard({game}: { game: GameProps }) {
     const [deck, setDeck] = useState<DeckProps>({
@@ -44,23 +43,6 @@ export default function GameBoard({game}: { game: GameProps }) {
         handleRotateOpenDeckCards,
     } = useSolitaireActions();
 
-    /* Is the card on a pile, a column, or on the deck*/
-    function findCardOriginType(cardId: String): CardStackType | undefined {
-        const isInPile = cardId.includes('pile') || piles.some((pile) => pile.cards.includes(cardId));
-        const isInColumn = cardId.includes('column') || columns.some((column) => column.cards.includes(cardId));
-        const isInDeck = deck.cards.includes(cardId);
-        switch (true) {
-            case isInPile:
-                return "pile";
-            case isInColumn:
-                return "column";
-            case isInDeck:
-                return "deck";
-            default:
-                return undefined; // Maybe throw an error?
-        }
-    }
-
     const {
         updateColumnToColumnMove,
         updateColumnToPileMove,
@@ -75,8 +57,8 @@ export default function GameBoard({game}: { game: GameProps }) {
         if (!over || !active || active.id === over.id) {
             return;
         }
-        const cardOriginType = findCardOriginType(active.id);
-        const cardDestinationType = findCardOriginType(over.id);
+        const cardOriginType = findCardOriginType(active.id, piles, columns, deck);
+        const cardDestinationType = findCardOriginType(over.id, piles, columns, deck);
         console.log(cardOriginType, 'to', cardDestinationType)
         if (cardOriginType === "column" && cardDestinationType === "column") {
             updateColumnToColumnMove(active, over, columns, setColumns);

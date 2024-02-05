@@ -1,7 +1,7 @@
 import {CardDetails} from "@/helpers/cardDetails";
 import {Column as ColumnProps} from "../models/column";
-import {Pile as PileProps} from "../../models/pile" ;
-import {Deck as DeckProps} from "../../models/deck";
+import {Pile as PileProps} from "../models/pile" ;
+import {Deck as DeckProps} from "../models/deck";
 import {Dispatch, SetStateAction} from "react";
 
 export function useSolitaireGameMoves() {
