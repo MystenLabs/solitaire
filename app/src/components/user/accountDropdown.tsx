@@ -36,7 +36,7 @@ export const AccountDropdown = ({user, enokiFlow}: { user: UserProps, enokiFlow:
                 </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-                <DropdownMenuItem onSelect={logout} className={"select-none rounded-[36px] border border-white px-14 py-1 text-center text-white bg-white bg-opacity-10 text-base font-bold leading-tight "}>
+                <DropdownMenuItem onSelect={logout} className={"select-none rounded-[36px] border border-white px-14 py-1 text-center text-white bg-white bg-opacity-10 text-base leading-tight "}>
                     👋 Logout
                 </DropdownMenuItem>
             </DropdownMenuContent>
