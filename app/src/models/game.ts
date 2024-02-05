@@ -1,3 +1,4 @@
+// @ts-ignore
 import { SuiTransactionBlockResponse } from "@mysten/sui.js";
 import { Column } from './column';
 import { Deck } from './deck';
@@ -34,5 +35,14 @@ export class Game {
                 }
             }
         );
+    }
+
+    get elements(): any {
+        return {
+            id: this.id,
+            columns: this.columns,
+            deck: this.deck,
+            piles: this.piles
+        }
     }
 }
