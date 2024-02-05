@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState } from "react";
 import { DifficultySelection } from "@/components/difficultySelection/DifficultySelection";
 import google from "../../../../app/public/assets/logos/google_email.svg";
@@ -7,13 +6,37 @@ import Image from "next/image";
 import { useAuthentication } from "@/contexts/Authentication";
 import { Spinner } from "@/components/general/Spinner";
 import GameBoard from "@/components/gameBoard/GameBoard";
+import {Game} from "@/models/game";
+import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519"
+import { fromB64 } from "@mysten/sui.js/utils";
+import {useSolitaireActions} from "@/hooks/useSolitaireActions";
+
 
 const GamePage = () => {
+  const [spinning, setSpinning] = useState<boolean>(false);
   const { user, isLoading } = useAuthentication();
-  const [gameId, setGameId] = useState<string | null>("123");
+  const [game, setGame] = useState<Game | null>(null);
   const [moves, setMoves] = useState<number>(0);
+  const { handleExecuteInitEasyGame, handleExecuteInitNormalGame} = useSolitaireActions();
 
-  if (isLoading) {
+  const onGameCreation = async (mode: 'easy' | 'normal') => {
+    setSpinning(true);
+    let game: Game | undefined = undefined;
+    if (mode === 'easy') {
+      game = await handleExecuteInitEasyGame();
+    } else if (mode === 'normal') {
+      game = await handleExecuteInitNormalGame();
+    } else {
+      throw new Error('Invalid difficulty mode');
+    }
+    if (!game) {
+      throw new Error('Failed to initialize game');
+    }
+    setSpinning(false);
+    setGame(game);
+  }
+
+  if (isLoading || spinning) {
     return <Spinner />;
   }
 
@@ -23,7 +46,7 @@ const GamePage = () => {
         <div className="logo text-white text-[28px] font-bold font-['Mysten Walter Alte']">
           Mysten Solitaire
         </div>
-        {gameId && (
+        {game && (
           <div className="flex justify-center items-center gap-x-4 pl-4 pr-1 bg-black bg-opacity-10 rounded-[40px] border border-black border-opacity-10">
               <div className="text-stone-100 text-base font-normal">Moves: {moves}</div>
               <div className="text-stone-100 text-base font-normal">Time: 00:00</div>
@@ -39,12 +62,12 @@ const GamePage = () => {
           </div>
         </div>
       </div>
-      {!gameId ? (
+      {!game ? (
         <div className="flex flex-col justify-center items-center mt-32">
-          <DifficultySelection />
+          <DifficultySelection onGameCreation={onGameCreation} />
         </div>
       ) : (
-        <GameBoard gameId={gameId} />
+        <GameBoard gameId={game.id} />
       )}
     </div>
   );
