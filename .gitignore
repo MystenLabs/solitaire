@@ -33,6 +33,8 @@ move/solitaire/build
 setup/*.env
 .publish.res.json
 .vercel
+./app/.env
+./app/.env.local
 
 docs/.structurizr
 app/.env
