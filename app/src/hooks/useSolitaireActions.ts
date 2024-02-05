@@ -14,7 +14,6 @@ import {Ed25519Keypair} from "@mysten/sui.js/keypairs/ed25519";
 import {SuiTransactionBlockResponse} from "@mysten/sui.js/client";
 import {TransactionBlock} from "@mysten/sui.js/transactions";
 import {EnokiKeypair} from "@mysten/enoki";
-import {bytes} from "@noble/hashes/_assert";
 
 export const useSolitaireActions = () => {
     const {suiClient} = useSui();
