@@ -5,6 +5,7 @@ module solitaire::solitaire {
     use sui::transfer::{Self};
     use std::vector;
     use std::string::{String, utf8};
+    use sui::event;
 
     // =================== Error Codes ===================
     const ENoMoreHiddenCards: u64 = 0;
@@ -66,6 +67,15 @@ module solitaire::solitaire {
         hidden_cards: u64,
         cards: vector<u64>
     }
+
+// =================== Events ===================
+
+    /// This event is emitted when a new card is revealed from the deck or column.
+    struct CardRevealed has copy, drop {
+        card: u64
+    }
+
+// =================== Public Functions ===================
 
     public fun init_normal_game(clock: &Clock, ctx: &mut TxContext) {
         let i: u64 = 0;
@@ -210,6 +220,7 @@ module solitaire::solitaire {
                 column.hidden_cards = column.hidden_cards - 1;
                 let card = reveal_card(clock, &mut game.available_cards);
                 vector::push_back(&mut column.cards, card);
+                event::emit(CardRevealed {card});
             };
         } else {
             let last_card_index = vector::length(&pile.cards) - 1;
@@ -222,6 +233,7 @@ module solitaire::solitaire {
                 column.hidden_cards = column.hidden_cards - 1;
                 let card = reveal_card(clock, &mut game.available_cards);
                 vector::push_back(&mut column.cards, card);
+                event::emit(CardRevealed {card});
             };
         };
         game.player_moves = game.player_moves + 1;
@@ -252,6 +264,7 @@ module solitaire::solitaire {
                 src_column.hidden_cards = src_column.hidden_cards - 1;
                 let card = reveal_card(clock, &mut game.available_cards);
                 vector::push_back(&mut src_column.cards, card);
+                event::emit(CardRevealed {card});
             };
         } else {
             let last_card_index = vector::length(&dest_column.cards) - 1;
@@ -268,6 +281,7 @@ module solitaire::solitaire {
                     src_column.hidden_cards = src_column.hidden_cards - 1;
                     let card = reveal_card(clock, &mut game.available_cards);
                     vector::push_back(&mut src_column.cards, card);
+                    event::emit(CardRevealed {card});
                 };
             } else {
                 assert!((card_mod == *dest_column_card - HEARTS_INDEX - 1) || (*dest_column_card >= DIAMONDS_INDEX && card_mod == *dest_column_card - DIAMONDS_INDEX - 1), EInvalidPlacement);
@@ -279,6 +293,7 @@ module solitaire::solitaire {
                     src_column.hidden_cards = src_column.hidden_cards - 1;
                     let card = reveal_card(clock, &mut game.available_cards);
                     vector::push_back(&mut src_column.cards, card);
+                    event::emit(CardRevealed {card});
                 };
             };
         };
@@ -320,6 +335,7 @@ module solitaire::solitaire {
         game.deck.hidden_cards = game.deck.hidden_cards - 1;
         let card = reveal_card(clock, &mut game.available_cards);
         vector::push_back(&mut game.deck.cards, card);
+        event::emit(CardRevealed {card});
     }
 
     /// This function is used to cycle through the open deck cards and rotate their order, one at a time. 
