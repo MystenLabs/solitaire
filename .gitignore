@@ -37,3 +37,7 @@ setup/*.env
 ./app/.env.local
 
 docs/.structurizr
+app/.env
+app/.env.local*
+app/.env.test*
+app/.env.main*
