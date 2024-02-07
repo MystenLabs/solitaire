@@ -39,7 +39,15 @@ export function useSolitaireGameMoves() {
         if (over.id.includes('empty-column-droppable')) {
             const isNotKing = bottomCardOfObjectToMove.rank !== 12;
             const columnIsNotEmpty = columns[columnIndexOfOver].cards.length !== 0;
-            if (isNotKing || columnIsNotEmpty) {
+            if (columnIsNotEmpty) {
+                const topCardOfDestination = new CardDetails(columns[columnIndexOfOver].cards[columns[columnIndexOfOver].cards.length - 1]);
+                const sameSuit = bottomCardOfObjectToMove.suit === topCardOfDestination.suit;
+                const destinationRankDifference = topCardOfDestination.rank - bottomCardOfObjectToMove.rank == 1;
+                if (sameSuit || !destinationRankDifference) {
+                    console.error("Illegal move")
+                    return;
+                }
+            } else if (isNotKing) {
                 console.error("Illegal move")
                 return;
             }
@@ -171,7 +179,15 @@ export function useSolitaireGameMoves() {
         if (over.id.includes('empty-column-droppable')) {
             const isNotKing = bottomCardOfObjectToMove.rank !== 12;
             const columnIsNotEmpty = columns[columnIndexOfOver].cards.length !== 0;
-            if (isNotKing || columnIsNotEmpty) {
+            if (columnIsNotEmpty) {
+                const topCardOfDestination = new CardDetails(columns[columnIndexOfOver].cards[columns[columnIndexOfOver].cards.length - 1]);
+                const sameSuit = bottomCardOfObjectToMove.suit === topCardOfDestination.suit;
+                const destinationRankDifference = topCardOfDestination.rank - bottomCardOfObjectToMove.rank == 1;
+                if (sameSuit || !destinationRankDifference) {
+                    console.error("Illegal move")
+                    return;
+                }
+            } else if (isNotKing) {
                 console.error("Illegal move")
                 return;
             }
@@ -221,7 +237,15 @@ export function useSolitaireGameMoves() {
         if (over.id.includes('empty-column-droppable')) {
             const isNotKing = bottomCardOfObjectToMove.rank !== 12;
             const columnIsNotEmpty = columns[columnIndexOfOver].cards.length !== 0;
-            if (isNotKing || columnIsNotEmpty) {
+            if (columnIsNotEmpty) {
+                const topCardOfDestination = new CardDetails(columns[columnIndexOfOver].cards[columns[columnIndexOfOver].cards.length - 1]);
+                const sameSuit = bottomCardOfObjectToMove.suit === topCardOfDestination.suit;
+                const destinationRankDifference = topCardOfDestination.rank - bottomCardOfObjectToMove.rank == 1;
+                if (sameSuit || !destinationRankDifference) {
+                    console.error("Illegal move")
+                    return;
+                }
+            } else if (isNotKing) {
                 console.error("Illegal move")
                 return;
             }
