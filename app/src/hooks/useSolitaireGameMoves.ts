@@ -45,9 +45,9 @@ export function useSolitaireGameMoves() {
             }
         } else {
             const topCardOfDestination = new CardDetails(columns[columnIndexOfOver].cards[columns[columnIndexOfOver].cards.length - 1]);
-            const sameColor = bottomCardOfObjectToMove.color === topCardOfDestination.color;
+            const sameSuit = bottomCardOfObjectToMove.suit === topCardOfDestination.suit;
             const destinationRankDifference = topCardOfDestination.rank - bottomCardOfObjectToMove.rank == 1;
-            if (sameColor || !destinationRankDifference) {
+            if (sameSuit || !destinationRankDifference) {
                 console.error("Illegal move")
                 return;
             }
@@ -116,9 +116,9 @@ export function useSolitaireGameMoves() {
             }
         } else {
             const topCardOfDestination = new CardDetails(piles[pileIndexOfOver].cards[piles[pileIndexOfOver].cards.length - 1]);
-            const notSameColor = bottomCardOfObjectToMove.color !== topCardOfDestination.color;
+            const notSameSuit = bottomCardOfObjectToMove.suit !== topCardOfDestination.suit;
             const destinationRankDifference = bottomCardOfObjectToMove.rank - topCardOfDestination.rank == 1;
-            if (notSameColor || !destinationRankDifference) {
+            if (notSameSuit || !destinationRankDifference) {
                 console.error("Illegal move")
                 return;
             }
