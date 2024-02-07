@@ -41,9 +41,9 @@ export function useSolitaireGameMoves() {
             const columnIsNotEmpty = columns[columnIndexOfOver].cards.length !== 0;
             if (columnIsNotEmpty) {
                 const topCardOfDestination = new CardDetails(columns[columnIndexOfOver].cards[columns[columnIndexOfOver].cards.length - 1]);
-                const sameSuit = bottomCardOfObjectToMove.suit === topCardOfDestination.suit;
+                const sameColor = bottomCardOfObjectToMove.color === topCardOfDestination.color;
                 const destinationRankDifference = topCardOfDestination.rank - bottomCardOfObjectToMove.rank == 1;
-                if (sameSuit || !destinationRankDifference) {
+                if (sameColor || !destinationRankDifference) {
                     console.error("Illegal move")
                     return;
                 }
@@ -53,9 +53,9 @@ export function useSolitaireGameMoves() {
             }
         } else {
             const topCardOfDestination = new CardDetails(columns[columnIndexOfOver].cards[columns[columnIndexOfOver].cards.length - 1]);
-            const sameSuit = bottomCardOfObjectToMove.suit === topCardOfDestination.suit;
+            const sameColor = bottomCardOfObjectToMove.color === topCardOfDestination.color;
             const destinationRankDifference = topCardOfDestination.rank - bottomCardOfObjectToMove.rank == 1;
-            if (sameSuit || !destinationRankDifference) {
+            if (sameColor || !destinationRankDifference) {
                 console.error("Illegal move")
                 return;
             }
@@ -181,9 +181,9 @@ export function useSolitaireGameMoves() {
             const columnIsNotEmpty = columns[columnIndexOfOver].cards.length !== 0;
             if (columnIsNotEmpty) {
                 const topCardOfDestination = new CardDetails(columns[columnIndexOfOver].cards[columns[columnIndexOfOver].cards.length - 1]);
-                const sameSuit = bottomCardOfObjectToMove.suit === topCardOfDestination.suit;
+                const sameColor = bottomCardOfObjectToMove.color === topCardOfDestination.color;
                 const destinationRankDifference = topCardOfDestination.rank - bottomCardOfObjectToMove.rank == 1;
-                if (sameSuit || !destinationRankDifference) {
+                if (sameColor || !destinationRankDifference) {
                     console.error("Illegal move")
                     return;
                 }
@@ -239,9 +239,9 @@ export function useSolitaireGameMoves() {
             const columnIsNotEmpty = columns[columnIndexOfOver].cards.length !== 0;
             if (columnIsNotEmpty) {
                 const topCardOfDestination = new CardDetails(columns[columnIndexOfOver].cards[columns[columnIndexOfOver].cards.length - 1]);
-                const sameSuit = bottomCardOfObjectToMove.suit === topCardOfDestination.suit;
+                const sameColor = bottomCardOfObjectToMove.color === topCardOfDestination.color;
                 const destinationRankDifference = topCardOfDestination.rank - bottomCardOfObjectToMove.rank == 1;
-                if (sameSuit || !destinationRankDifference) {
+                if (sameColor || !destinationRankDifference) {
                     console.error("Illegal move")
                     return;
                 }
@@ -296,9 +296,9 @@ export function useSolitaireGameMoves() {
             const pileIsNotEmpty = piles[pileIndexOfOver].cards.length !== 0;
             if (pileIsNotEmpty) {
                 const topCardOfDestination = new CardDetails(piles[pileIndexOfOver].cards[piles[pileIndexOfOver].cards.length - 1]);
-                const notSameColor = bottomCardOfObjectToMove.color !== topCardOfDestination.color;
+                const notSameSuit = bottomCardOfObjectToMove.suit !== topCardOfDestination.suit;
                 const destinationRankDifference = bottomCardOfObjectToMove.rank - topCardOfDestination.rank == 1;
-                if (notSameColor || !destinationRankDifference) {
+                if (notSameSuit || !destinationRankDifference) {
                     console.error("Illegal move")
                     return;
                 }
