@@ -59,7 +59,6 @@ export default function GameBoard({ game }: { game: GameProps }) {
       columns,
       deck
     );
-    console.log(cardOriginType, "to", cardDestinationType);
     if (cardOriginType === "column" && cardDestinationType === "column") {
       const move = updateColumnToColumnMove(active, over, columns, setColumns);
       if (move) columnToColumn(move.from, move.card, move.to);
@@ -95,8 +94,6 @@ export default function GameBoard({ game }: { game: GameProps }) {
   const clickDeck = async () => {
     if (deck.hidden_cards !== 0) {
       try {
-        console.log("clickDeck");
-
         const newCard = await handleOpenDeckCard(game.id);
 
         setDeck((prevDeck) => ({
@@ -119,7 +116,6 @@ export default function GameBoard({ game }: { game: GameProps }) {
   };
 
   const deckToPile = async (pileIndex: number) => {
-    console.log("deckToPile");
     try {
       await handleFromDeckToPile(game.id, pileIndex);
     } catch (e) {
@@ -128,7 +124,6 @@ export default function GameBoard({ game }: { game: GameProps }) {
   };
 
   const deckToColumn = async (columnIndex: number) => {
-    console.log("deckToColumn");
     try {
       await handleFromDeckToColumn(game.id, columnIndex);
     } catch (e) {
@@ -137,7 +132,6 @@ export default function GameBoard({ game }: { game: GameProps }) {
   };
 
   const columnToPile = async (columnIndex: number, pileIndex: number) => {
-    console.log("columnToPile");
     try {
       const newCard = await handleFromColumnToPile(
         game.id,
@@ -169,7 +163,6 @@ export default function GameBoard({ game }: { game: GameProps }) {
     card: number,
     toColumnIndex: number
   ) => {
-    console.log("columnToColumn", fromColumnIndex, card, toColumnIndex);
     try {
       const newCard = await handleFromColumnToColumn(
         game.id,
@@ -198,7 +191,6 @@ export default function GameBoard({ game }: { game: GameProps }) {
   };
 
   const pileToColumn = async (pileIndex: number, columnIndex: number) => {
-    console.log("pileToColumn");
     try {
       await handleFromPileToColumn(
         game.id,

@@ -41,7 +41,6 @@ export const useSolitaireActions = () => {
         },
       })
       .then((resp) => {
-        console.log(resp);
         if (resp.effects?.status.status !== "success") {
           throw new Error("Transaction failed");
         }
@@ -66,7 +65,6 @@ export const useSolitaireActions = () => {
         },
       })
       .then((resp) => {
-        console.log(resp);
         if (resp.effects?.status.status !== "success") {
           throw new Error("Transaction failed");
         }
@@ -95,7 +93,6 @@ export const useSolitaireActions = () => {
         },
       })
       .then((resp) => {
-        console.log(resp);
         if (resp.effects?.status.status !== "success") {
           throw new Error("Transaction failed");
         }
@@ -131,7 +128,6 @@ export const useSolitaireActions = () => {
         },
       })
       .then((resp) => {
-        console.log(resp);
         if (resp.effects?.status.status !== "success") {
           throw new Error("Transaction failed");
         }
@@ -166,7 +162,6 @@ export const useSolitaireActions = () => {
         },
       })
       .then((resp) => {
-        console.log(resp);
         if (resp.effects?.status.status !== "success") {
           throw new Error("Transaction failed");
         }
@@ -191,7 +186,6 @@ export const useSolitaireActions = () => {
         },
       })
       .then((resp) => {
-        console.log(JSON.stringify(resp, null, 2));
         if (resp.effects?.status.status !== "success") {
           throw new Error("Transaction failed");
         }
@@ -222,7 +216,6 @@ export const useSolitaireActions = () => {
         },
       })
       .then((resp) => {
-        console.log(resp);
         if (resp.effects?.status.status !== "success") {
           throw new Error("Transaction failed");
         }
