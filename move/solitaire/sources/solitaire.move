@@ -249,6 +249,10 @@ module solitaire::solitaire {
         };
         // One column needs to be removed because it is not allowed to take 2 mutable references to the same vector.
         let dest_column = vector::remove(&mut game.columns, dest_column_index);
+        // If the destination column is to the left of the source column, we need to decrease the index of the source column.
+        if (dest_column_index < src_column_index) {
+            src_column_index = src_column_index - 1;
+        };
         let src_column = vector::borrow_mut(&mut game.columns, src_column_index);
         let (exist, index) = vector::index_of(&src_column.cards, &card);
         assert!(exist, ECardNotInColumn);

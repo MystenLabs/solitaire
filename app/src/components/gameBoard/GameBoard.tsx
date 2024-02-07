@@ -7,7 +7,7 @@ import { Deck as DeckProps } from "../../models/deck";
 import { Card } from "../cards/Card";
 import { useSolitaireActions } from "@/hooks/useSolitaireActions";
 import toast from "react-hot-toast";
-import { DndContext, useDroppable } from "@dnd-kit/core";
+import { DndContext } from "@dnd-kit/core";
 import Pile from "./Pile";
 import Column from "./Column";
 import { EmptyDroppable } from "./EmptyDroppable";
@@ -61,9 +61,10 @@ export default function GameBoard({ game }: { game: GameProps }) {
     );
     console.log(cardOriginType, "to", cardDestinationType);
     if (cardOriginType === "column" && cardDestinationType === "column") {
-      updateColumnToColumnMove(active, over, columns, setColumns);
+      const move = updateColumnToColumnMove(active, over, columns, setColumns);
+      if (move) columnToColumn(move.from, move.card, move.to);
     } else if (cardOriginType === "column" && cardDestinationType === "pile") {
-      updateColumnToPileMove(
+      const move = updateColumnToPileMove(
         active,
         over,
         columns,
@@ -71,8 +72,9 @@ export default function GameBoard({ game }: { game: GameProps }) {
         piles,
         setPiles
       );
+      if (move) columnToPile(move.from, move.to);
     } else if (cardOriginType === "pile" && cardDestinationType === "column") {
-      updatePileToColumnMove(
+      const move = updatePileToColumnMove(
         active,
         over,
         piles,
@@ -80,10 +82,13 @@ export default function GameBoard({ game }: { game: GameProps }) {
         columns,
         setColumns
       );
+      if (move) pileToColumn(move.from, move.to)
     } else if (cardOriginType === "deck" && cardDestinationType === "column") {
-      updateDeckToColumnMove(active, over, deck, setDeck, columns, setColumns);
+      const move = updateDeckToColumnMove(active, over, deck, setDeck, columns, setColumns);
+      if (move) deckToColumn(move.to);
     } else if (cardOriginType === "deck" && cardDestinationType === "pile") {
-      updateDeckToPileMove(active, over, deck, setDeck, piles, setPiles);
+      const move = updateDeckToPileMove(active, over, deck, setDeck, piles, setPiles);
+      if (move) deckToPile(move.to);
     }
   }
 
@@ -91,8 +96,9 @@ export default function GameBoard({ game }: { game: GameProps }) {
     if (deck.hidden_cards !== 0) {
       try {
         console.log("clickDeck");
+
         const newCard = await handleOpenDeckCard(game.id);
-        // TODO: deserialize updatedGame using GameProps
+
         setDeck((prevDeck) => ({
           ...prevDeck, // Spread the previous deck to copy its properties
           hidden_cards: prevDeck.hidden_cards - 1, // Subtract 1 from hidden_cards
@@ -113,37 +119,46 @@ export default function GameBoard({ game }: { game: GameProps }) {
   };
 
   const deckToPile = async (pileIndex: number) => {
+    console.log("deckToPile");
     try {
-      const updatedGame = await handleFromDeckToPile(game.id, pileIndex);
-      // TODO deserialize updatedGame using GameProps
-      // setDeck(updatedGame.deck);
-      // setPiles(updatedGame.piles);
+      await handleFromDeckToPile(game.id, pileIndex);
     } catch (e) {
       toast.error("Transaction Failed");
     }
   };
 
   const deckToColumn = async (columnIndex: number) => {
+    console.log("deckToColumn");
     try {
-      const updatedGame = await handleFromDeckToColumn(game.id, columnIndex);
-      // TODO deserialize updatedGame using GameProps
-      // setDeck(updatedGame.deck);
-      // setColumn(updatedGame.columns);
+      await handleFromDeckToColumn(game.id, columnIndex);
     } catch (e) {
       toast.error("Transaction Failed");
     }
   };
 
   const columnToPile = async (columnIndex: number, pileIndex: number) => {
+    console.log("columnToPile");
     try {
-      const updatedGame = await handleFromColumnToPile(
+      const newCard = await handleFromColumnToPile(
         game.id,
         columnIndex,
         pileIndex
       );
-      // TODO deserialize updatedGame using GameProps
-      // setColumns(updatedGame.columns);
-      // setPiles(updatedGame.piles);
+      if (newCard) {
+        setColumns((prevColumns) =>
+          prevColumns.map((column, index) => {
+            if (index === columnIndex) {
+              return {
+                ...column, 
+                hidden_cards: column.hidden_cards - 1, 
+                cards: [...column.cards, newCard], 
+              };
+            } else {
+              return column;
+            }
+          })
+        );
+      }
     } catch (e) {
       toast.error("Transaction Failed");
     }
@@ -154,30 +169,42 @@ export default function GameBoard({ game }: { game: GameProps }) {
     card: number,
     toColumnIndex: number
   ) => {
+    console.log("columnToColumn", fromColumnIndex, card, toColumnIndex);
     try {
-      const updatedGame = await handleFromColumnToColumn(
+      const newCard = await handleFromColumnToColumn(
         game.id,
         fromColumnIndex,
         card,
         toColumnIndex
       );
-      // TODO: deserialize updatedGame using GameProps
-      // setColumns(updatedGame.columns);
+      if (newCard) {
+        setColumns((prevColumns) =>
+          prevColumns.map((column, index) => {
+            if (index === fromColumnIndex) {
+              return {
+                ...column,
+                hidden_cards: column.hidden_cards - 1, 
+                cards: [...column.cards, newCard], 
+              };
+            } else {
+              return column;
+            }
+          })
+        );
+      }
     } catch (e) {
       toast.error("Transaction Failed");
     }
   };
 
   const pileToColumn = async (pileIndex: number, columnIndex: number) => {
+    console.log("pileToColumn");
     try {
-      const updatedGame = await handleFromPileToColumn(
+      await handleFromPileToColumn(
         game.id,
         pileIndex,
         columnIndex
       );
-      // TODO: deserialize updatedGame using GameProps
-      // setColumns(updatedGame.columns);
-      // setPiles(updatedGame.piles);
     } catch (e) {
       toast.error("Transaction Failed");
     }

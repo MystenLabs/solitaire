@@ -84,14 +84,14 @@ export const useSolitaireActions = () => {
   ) => {
     const tx = fromColumnToPile(gameId, columnIndex, pileIndex);
     const keypair = await enokiFlow.getKeypair();
-    await suiClient
+    return await suiClient
       .signAndExecuteTransactionBlock({
         transactionBlock: tx,
         signer: keypair,
         requestType: "WaitForLocalExecution",
         options: {
           showEffects: true,
-          showObjectChanges: true,
+          showEvents: true,
         },
       })
       .then((resp) => {
@@ -99,6 +99,12 @@ export const useSolitaireActions = () => {
         if (resp.effects?.status.status !== "success") {
           throw new Error("Transaction failed");
         }
+        const cardRevealedEvent = resp.events?.find(
+            (event) =>
+              event.type ===
+              `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::CardRevealed`
+          )?.parsedJson as CardRevealedEvent;
+          return cardRevealedEvent?.card;
       })
       .catch((err) => {
         console.log(err);
@@ -114,14 +120,14 @@ export const useSolitaireActions = () => {
   ) => {
     const tx = fromColumnToColumn(gameId, fromColumnIndex, card, toColumnIndex);
     const keypair = await enokiFlow.getKeypair();
-    await suiClient
+    return await suiClient
       .signAndExecuteTransactionBlock({
         transactionBlock: tx,
         signer: keypair,
         requestType: "WaitForLocalExecution",
         options: {
           showEffects: true,
-          showObjectChanges: true,
+          showEvents: true,
         },
       })
       .then((resp) => {
@@ -129,6 +135,12 @@ export const useSolitaireActions = () => {
         if (resp.effects?.status.status !== "success") {
           throw new Error("Transaction failed");
         }
+        const cardRevealedEvent = resp.events?.find(
+            (event) =>
+              event.type ===
+              `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::CardRevealed`
+          )?.parsedJson as CardRevealedEvent;
+          return cardRevealedEvent?.card;
       })
       .catch((err) => {
         console.log(err);

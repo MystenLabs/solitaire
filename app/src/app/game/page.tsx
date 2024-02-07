@@ -21,8 +21,6 @@ const GamePage = () => {
   const onGameCreation = async (mode: 'easy' | 'normal') => {
     setSpinning(true);
     let game: Game | undefined = undefined;
-    const keypair = await enokiFlow.getKeypair()
-    console.log(keypair.getPublicKey().toSuiAddress());
     if (mode === 'easy') {
       game = await handleExecuteInitEasyGame();
     } else if (mode === 'normal') {
@@ -34,6 +32,7 @@ const GamePage = () => {
       throw new Error('Failed to initialize game');
     }
     setSpinning(false);
+    console.log(game.id);
     setGame(game);
   }
 
