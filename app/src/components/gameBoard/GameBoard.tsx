@@ -24,6 +24,7 @@ interface GameProps {
 export default function GameBoard({ game }: { game: GameProps }) {
   const [deck, setDeck] = useState<DeckProps>({
     hidden_cards: game.deck.hidden_cards,
+    open_cards: 0,
     cards: [],
   });
   const [piles, setPiles] = useState<PileProps[]>(game.piles);
@@ -81,24 +82,47 @@ export default function GameBoard({ game }: { game: GameProps }) {
         columns,
         setColumns
       );
-      if (move) pileToColumn(move.from, move.to)
+      if (move) pileToColumn(move.from, move.to);
     } else if (cardOriginType === "deck" && cardDestinationType === "column") {
-      const move = updateDeckToColumnMove(active, over, deck, setDeck, columns, setColumns);
+      const move = updateDeckToColumnMove(
+        active,
+        over,
+        deck,
+        setDeck,
+        columns,
+        setColumns
+      );
       if (move) deckToColumn(move.to);
     } else if (cardOriginType === "deck" && cardDestinationType === "pile") {
-      const move = updateDeckToPileMove(active, over, deck, setDeck, piles, setPiles);
+      const move = updateDeckToPileMove(
+        active,
+        over,
+        deck,
+        setDeck,
+        piles,
+        setPiles
+      );
       if (move) deckToPile(move.to);
     }
   }
 
   const clickDeck = async () => {
+    if (!deck.hidden_cards && deck.cards.length === deck.open_cards) {
+      setDeck((prevDeck) => ({
+        ...prevDeck,
+        hidde_cards: prevDeck.hidden_cards,
+        open_cards: 0,
+        cards: [...prevDeck.cards],
+      }));
+      return;
+    }
     if (deck.hidden_cards !== 0) {
       try {
         const newCard = await handleOpenDeckCard(game.id);
-
         setDeck((prevDeck) => ({
           ...prevDeck, // Spread the previous deck to copy its properties
           hidden_cards: prevDeck.hidden_cards - 1, // Subtract 1 from hidden_cards
+          open_cards: prevDeck.open_cards + 1, // Add 1 to open_cards
           cards: [...prevDeck.cards, newCard], // Add newCard to the end of cards array
         }));
       } catch (e) {
@@ -143,9 +167,9 @@ export default function GameBoard({ game }: { game: GameProps }) {
           prevColumns.map((column, index) => {
             if (index === columnIndex) {
               return {
-                ...column, 
-                hidden_cards: column.hidden_cards - 1, 
-                cards: [...column.cards, newCard], 
+                ...column,
+                hidden_cards: column.hidden_cards - 1,
+                cards: [...column.cards, newCard],
               };
             } else {
               return column;
@@ -176,8 +200,8 @@ export default function GameBoard({ game }: { game: GameProps }) {
             if (index === fromColumnIndex) {
               return {
                 ...column,
-                hidden_cards: column.hidden_cards - 1, 
-                cards: [...column.cards, newCard], 
+                hidden_cards: column.hidden_cards - 1,
+                cards: [...column.cards, newCard],
               };
             } else {
               return column;
@@ -192,11 +216,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
 
   const pileToColumn = async (pileIndex: number, columnIndex: number) => {
     try {
-      await handleFromPileToColumn(
-        game.id,
-        pileIndex,
-        columnIndex
-      );
+      await handleFromPileToColumn(game.id, pileIndex, columnIndex);
     } catch (e) {
       toast.error("Transaction Failed");
     }
@@ -214,16 +234,16 @@ export default function GameBoard({ game }: { game: GameProps }) {
 
           {/* Place where the open deck cards are being displayed */}
           <li className="min-w-[120px] h-[166px]" key={"openCard"}>
-            {!!deck.cards.length && (
+            {!!deck.open_cards && (
               <div style={{ position: "relative" }}>
                 <div style={{ position: "absolute", zIndex: 2 }}>
-                  <Card id={Number(deck.cards[deck.cards.length - 1])} />
+                  <Card id={Number(deck.cards[deck.open_cards - 1])} />
                 </div>
                 {
                   // Show the following card if there is one after the top deck card
-                  deck.cards.length > 1 && (
+                  deck.open_cards > 1 && (
                     <div style={{ position: "absolute", zIndex: 1 }}>
-                      <Card id={Number(deck.cards[deck.cards.length - 2])} />
+                      <Card id={Number(deck.cards[deck.open_cards - 2])} />
                     </div>
                   )
                 }
