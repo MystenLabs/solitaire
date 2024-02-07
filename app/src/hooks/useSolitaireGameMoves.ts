@@ -62,6 +62,8 @@ export function useSolitaireGameMoves() {
         // TODO - Open column card if revealed
 
         setColumns(over ? newColumns : columns);
+
+        return { from: columnIndexOfActive, card: active.id, to: columnIndexOfOver}
     }
 
     const updateColumnToPileMove = (active: any, over: any,
@@ -135,6 +137,7 @@ export function useSolitaireGameMoves() {
 
         setColumns(over ? newColumns : columns);
         setPiles(over ? newPiles : piles);
+        return { from: columnIndexOfActive, to: pileIndexOfOver}
     }
 
     const updatePileToColumnMove = (active: any, over: any,
@@ -188,6 +191,7 @@ export function useSolitaireGameMoves() {
 
         setColumns(over ? newColumns : columns);
         setPiles(over ? newPiles : piles);
+        return { from: pileIndexOfActive, to: columnIndexOfOver}
     }
 
     const updateDeckToColumnMove = (active: any, over: any,
@@ -237,6 +241,7 @@ export function useSolitaireGameMoves() {
 
         setColumns(over ? newColumns : columns);
         setDeck(over ? newDeck : deck);
+        return {to: columnIndexOfOver}
     }
 
     const updateDeckToPileMove = (active: any, over: any,
@@ -293,6 +298,7 @@ export function useSolitaireGameMoves() {
 
         setPiles(over ? newPiles : piles);
         setDeck(over ? newDeck : deck);
+        return {to: pileIndexOfOver}
     }
 
 
