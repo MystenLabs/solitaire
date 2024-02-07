@@ -216,7 +216,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
           <li className="min-w-[120px] h-[166px]" key={"openCard"}>
             {!!deck.cards.length && (
               <div style={{ position: "relative" }}>
-                <div style={{ position: "absolute", zIndex: 2 }}>
+                <div style={{ position: "absolute", zIndex: 2, rotate: "-5deg" }}>
                   <Card id={Number(deck.cards[deck.cards.length - 1])} />
                 </div>
                 {
