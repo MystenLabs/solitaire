@@ -216,14 +216,14 @@ export default function GameBoard({ game }: { game: GameProps }) {
           <li className="min-w-[120px] h-[166px]" key={"openCard"}>
             {!!deck.cards.length && (
               <div style={{ position: "relative" }}>
-                <div style={{ position: "absolute", zIndex: 2, rotate: deck.cards.length > 1 ? "-5deg" : 'none'}}>
+                <div style={{ position: "absolute", zIndex: 2}}>
                   <Card id={Number(deck.cards[deck.cards.length - 1])} />
                 </div>
                 {
                   // Show the following card if there is one after the top deck card
                   deck.cards.length > 1 && (
-                    <div style={{ position: "absolute", zIndex: 1 }}>
-                      <Card id={Number(deck.cards[deck.cards.length - 2])} />
+                    <div style={{ position: "absolute", zIndex: 1, rotate: deck.cards.length > 1 ? "-5deg" : 'none' }}>
+                      <Card id={Number(deck.cards[deck.cards.length - 2])} draggable={false} />
                     </div>
                   )
                 }
