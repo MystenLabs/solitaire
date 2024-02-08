@@ -112,9 +112,9 @@ export function useSolitaireGameMoves() {
             const pileIsNotEmpty = piles[pileIndexOfOver].cards.length !== 0;
             if (pileIsNotEmpty) {
                 const topCardOfDestination = new CardDetails(piles[pileIndexOfOver].cards[piles[pileIndexOfOver].cards.length - 1]);
-                const notSameColor = bottomCardOfObjectToMove.color !== topCardOfDestination.color;
+                const notSameSuit = bottomCardOfObjectToMove.suit !== topCardOfDestination.suit;
                 const destinationRankDifference = bottomCardOfObjectToMove.rank - topCardOfDestination.rank == 1;
-                if (notSameColor || !destinationRankDifference) {
+                if (notSameSuit || !destinationRankDifference) {
                     console.error("Illegal move")
                     return;
                 }
@@ -292,6 +292,7 @@ export function useSolitaireGameMoves() {
         /* Check if the move is legal! If not, return early. */
         const bottomCardOfObjectToMove = new CardDetails(objectToMove);
         if (over.id.includes('empty-pile-droppable')) {
+            console.log('EMPTY PILE')
             const isNotAce = bottomCardOfObjectToMove.rank !== 0;
             const pileIsNotEmpty = piles[pileIndexOfOver].cards.length !== 0;
             if (pileIsNotEmpty) {
@@ -308,9 +309,9 @@ export function useSolitaireGameMoves() {
             }
         } else {
             const topCardOfDestination = new CardDetails(piles[pileIndexOfOver].cards[piles[pileIndexOfOver].cards.length - 1]);
-            const notSameColor = bottomCardOfObjectToMove.color !== topCardOfDestination.color;
+            const notSameSuit = bottomCardOfObjectToMove.suit !== topCardOfDestination.suit;
             const destinationRankDifference = bottomCardOfObjectToMove.rank - topCardOfDestination.rank == 1;
-            if (notSameColor || !destinationRankDifference) {
+            if (notSameSuit || !destinationRankDifference) {
                 console.error("Illegal move")
                 return;
             }
