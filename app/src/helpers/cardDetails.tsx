@@ -23,4 +23,19 @@ export class CardDetails {
             throw new Error(`Invalid card id: ${this.id}. Card id should be between 0 and 51`);
         }
     }
+
+    get suit(): 'clubs' | 'spades' | 'hearts' | 'diamonds' {
+        const idNumber = Number(this.id);
+        if (idNumber >= 0 && idNumber < 13) {
+            return 'clubs';
+        } else if (idNumber >= 13 && idNumber < 26) {
+            return 'spades';
+        } else if (idNumber >= 26 && idNumber < 39) {
+            return 'hearts';
+        } else if (idNumber >= 39 && idNumber < 52) {
+            return 'diamonds';
+        } else {
+            throw new Error(`Invalid card id: ${this.id}. Card id should be between 0 and 51`);
+        }
+    }
 }
