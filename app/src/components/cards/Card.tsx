@@ -4,7 +4,7 @@ import Image from "next/image";
 import {useDraggable, useDroppable} from '@dnd-kit/core';
 import {useId} from "react";
 
-export const Card = ({ id, children, marginTop, draggable = true }: { id: number, children?: ReactNode, marginTop?: any, draggable: boolean }) => {
+export const Card = ({ id, children, marginTop, draggable = true }: { id: number, children?: ReactNode, marginTop?: any, draggable?: boolean }) => {
     let idOfHiddenCard = useId();
     const isHiddenCard = id == -1;
     let cardId = !isHiddenCard ? String(id) : idOfHiddenCard;

@@ -222,7 +222,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
                 {
                   // Show the following card if there is one after the top deck card
                   deck.cards.length > 1 && (
-                    <div style={{ position: "absolute", zIndex: 1, rotate: deck.cards.length > 1 ? "-5deg" : 'none' }}>
+                    <div style={{ position: "absolute", zIndex: 1, rotate: deck.cards.length > 1 ? "-10deg" : 'none' }}>
                       <Card id={Number(deck.cards[deck.cards.length - 2])} draggable={false} />
                     </div>
                   )
