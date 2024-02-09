@@ -39,7 +39,15 @@ export function useSolitaireGameMoves() {
         if (over.id.includes('empty-column-droppable')) {
             const isNotKing = bottomCardOfObjectToMove.rank !== 12;
             const columnIsNotEmpty = columns[columnIndexOfOver].cards.length !== 0;
-            if (isNotKing || columnIsNotEmpty) {
+            if (columnIsNotEmpty) {
+                const topCardOfDestination = new CardDetails(columns[columnIndexOfOver].cards[columns[columnIndexOfOver].cards.length - 1]);
+                const sameColor = bottomCardOfObjectToMove.color === topCardOfDestination.color;
+                const destinationRankDifference = topCardOfDestination.rank - bottomCardOfObjectToMove.rank == 1;
+                if (sameColor || !destinationRankDifference) {
+                    console.error("Illegal move")
+                    return;
+                }
+            } else if (isNotKing) {
                 console.error("Illegal move")
                 return;
             }
@@ -104,9 +112,9 @@ export function useSolitaireGameMoves() {
             const pileIsNotEmpty = piles[pileIndexOfOver].cards.length !== 0;
             if (pileIsNotEmpty) {
                 const topCardOfDestination = new CardDetails(piles[pileIndexOfOver].cards[piles[pileIndexOfOver].cards.length - 1]);
-                const notSameColor = bottomCardOfObjectToMove.color !== topCardOfDestination.color;
+                const notSameSuit = bottomCardOfObjectToMove.suit !== topCardOfDestination.suit;
                 const destinationRankDifference = bottomCardOfObjectToMove.rank - topCardOfDestination.rank == 1;
-                if (notSameColor || !destinationRankDifference) {
+                if (notSameSuit || !destinationRankDifference) {
                     console.error("Illegal move")
                     return;
                 }
@@ -116,9 +124,9 @@ export function useSolitaireGameMoves() {
             }
         } else {
             const topCardOfDestination = new CardDetails(piles[pileIndexOfOver].cards[piles[pileIndexOfOver].cards.length - 1]);
-            const notSameColor = bottomCardOfObjectToMove.color !== topCardOfDestination.color;
+            const notSameSuit = bottomCardOfObjectToMove.suit !== topCardOfDestination.suit;
             const destinationRankDifference = bottomCardOfObjectToMove.rank - topCardOfDestination.rank == 1;
-            if (notSameColor || !destinationRankDifference) {
+            if (notSameSuit || !destinationRankDifference) {
                 console.error("Illegal move")
                 return;
             }
@@ -171,7 +179,15 @@ export function useSolitaireGameMoves() {
         if (over.id.includes('empty-column-droppable')) {
             const isNotKing = bottomCardOfObjectToMove.rank !== 12;
             const columnIsNotEmpty = columns[columnIndexOfOver].cards.length !== 0;
-            if (isNotKing || columnIsNotEmpty) {
+            if (columnIsNotEmpty) {
+                const topCardOfDestination = new CardDetails(columns[columnIndexOfOver].cards[columns[columnIndexOfOver].cards.length - 1]);
+                const sameColor = bottomCardOfObjectToMove.color === topCardOfDestination.color;
+                const destinationRankDifference = topCardOfDestination.rank - bottomCardOfObjectToMove.rank == 1;
+                if (sameColor || !destinationRankDifference) {
+                    console.error("Illegal move")
+                    return;
+                }
+            } else if (isNotKing) {
                 console.error("Illegal move")
                 return;
             }
@@ -222,7 +238,15 @@ export function useSolitaireGameMoves() {
         if (over.id.includes('empty-column-droppable')) {
             const isNotKing = bottomCardOfObjectToMove.rank !== 12;
             const columnIsNotEmpty = columns[columnIndexOfOver].cards.length !== 0;
-            if (isNotKing || columnIsNotEmpty) {
+            if (columnIsNotEmpty) {
+                const topCardOfDestination = new CardDetails(columns[columnIndexOfOver].cards[columns[columnIndexOfOver].cards.length - 1]);
+                const sameColor = bottomCardOfObjectToMove.color === topCardOfDestination.color;
+                const destinationRankDifference = topCardOfDestination.rank - bottomCardOfObjectToMove.rank == 1;
+                if (sameColor || !destinationRankDifference) {
+                    console.error("Illegal move")
+                    return;
+                }
+            } else if (isNotKing) {
                 console.error("Illegal move")
                 return;
             }
@@ -270,13 +294,14 @@ export function useSolitaireGameMoves() {
         /* Check if the move is legal! If not, return early. */
         const bottomCardOfObjectToMove = new CardDetails(objectToMove);
         if (over.id.includes('empty-pile-droppable')) {
+            console.log('EMPTY PILE')
             const isNotAce = bottomCardOfObjectToMove.rank !== 0;
             const pileIsNotEmpty = piles[pileIndexOfOver].cards.length !== 0;
             if (pileIsNotEmpty) {
                 const topCardOfDestination = new CardDetails(piles[pileIndexOfOver].cards[piles[pileIndexOfOver].cards.length - 1]);
-                const notSameColor = bottomCardOfObjectToMove.color !== topCardOfDestination.color;
+                const notSameSuit = bottomCardOfObjectToMove.suit !== topCardOfDestination.suit;
                 const destinationRankDifference = bottomCardOfObjectToMove.rank - topCardOfDestination.rank == 1;
-                if (notSameColor || !destinationRankDifference) {
+                if (notSameSuit || !destinationRankDifference) {
                     console.error("Illegal move")
                     return;
                 }
@@ -286,9 +311,9 @@ export function useSolitaireGameMoves() {
             }
         } else {
             const topCardOfDestination = new CardDetails(piles[pileIndexOfOver].cards[piles[pileIndexOfOver].cards.length - 1]);
-            const notSameColor = bottomCardOfObjectToMove.color !== topCardOfDestination.color;
+            const notSameSuit = bottomCardOfObjectToMove.suit !== topCardOfDestination.suit;
             const destinationRankDifference = bottomCardOfObjectToMove.rank - topCardOfDestination.rank == 1;
-            if (notSameColor || !destinationRankDifference) {
+            if (notSameSuit || !destinationRankDifference) {
                 console.error("Illegal move")
                 return;
             }

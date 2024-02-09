@@ -222,10 +222,29 @@ export default function GameBoard({ game }: { game: GameProps }) {
     }
   };
 
+  const openDeckCardsComponents = () => {
+  if (deck.cards.length > 1) {
+    return (
+        <div style={{rotate: deck.cards.length > 1 ? "-10deg" : 'none'}}>
+          <Card id={Number(deck.cards[deck.cards.length - 2])} draggable={false}>
+            <div style={{rotate: "10deg", marginTop: "-135%"}}>
+              <Card id={Number(deck.cards[deck.cards.length - 1])}/>
+            </div>
+          </Card>
+        </div>
+    );
+  } else if (!!deck.cards.length) {
+    return (
+        <Card id={Number(deck.cards[deck.cards.length - 1])}/>
+    );
+  }
+};
+
+
   return (
-    <DndContext onDragEnd={handleDragEnd}>
-      <div className="px-60 h-full w-full flex flex-col items-center space-y-7 pt-14 gap-y-36">
-        <ul className="w-full h-200 flex justify-between items-center">
+      <DndContext onDragEnd={handleDragEnd}>
+        <div className="px-60 h-full w-full flex flex-col items-center space-y-7 pt-14 gap-y-36">
+          <ul className="w-full h-200 flex justify-between items-center">
           {/* Set up card deck */}
           <li key={"cardDeck"} onClick={clickDeck}>
             {!!deck.hidden_cards && <Card id={-1}></Card>}
@@ -234,21 +253,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
 
           {/* Place where the open deck cards are being displayed */}
           <li className="min-w-[120px] h-[166px]" key={"openCard"}>
-            {!!deck.open_cards && (
-              <div style={{ position: "relative" }}>
-                <div style={{ position: "absolute", zIndex: 2 }}>
-                  <Card id={Number(deck.cards[deck.open_cards - 1])} />
-                </div>
-                {
-                  // Show the following card if there is one after the top deck card
-                  deck.open_cards > 1 && (
-                    <div style={{ position: "absolute", zIndex: 1 }}>
-                      <Card id={Number(deck.cards[deck.open_cards - 2])} />
-                    </div>
-                  )
-                }
-              </div>
-            )}
+            {openDeckCardsComponents()}
           </li>
 
           {/* Empty placeholder */}
