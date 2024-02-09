@@ -222,38 +222,58 @@ export default function GameBoard({ game }: { game: GameProps }) {
     }
   };
 
-  const openDeckCardsComponents = () => {
-  if (deck.cards.length > 1) {
+  const openCards = () => {
     return (
-        <div style={{rotate: deck.cards.length > 1 ? "-10deg" : 'none'}}>
-          <Card id={Number(deck.cards[deck.cards.length - 2])} draggable={false}>
-            <div style={{rotate: "10deg", marginTop: "-135%"}}>
-              <Card id={Number(deck.cards[deck.cards.length - 1])}/>
-            </div>
-          </Card>
-        </div>
-    );
-  } else if (!!deck.cards.length) {
-    return (
-        <Card id={Number(deck.cards[deck.cards.length - 1])}/>
-    );
+      <>
+      {deck.open_cards > 1 && (
+        <Card
+          id={Number(deck.cards[deck.open_cards - 2])}
+          draggable={false}
+        >
+          <div style={{ marginTop: "-140%" }}>
+            <Card id={Number(deck.cards[deck.open_cards - 1])} />
+          </div>
+        </Card>
+      )}
+      {deck.open_cards === 1 && (
+        <Card id={Number(deck.cards[deck.open_cards - 1])} />
+      )}
+      </>
+    )
   }
-};
 
+  const deckRotated = () => {
+    return (
+      <div className="relative">
+        <div className="aboslute top-0" style={{ rotate: "-5deg" }}>
+          <Card id={-1} draggable={false} />
+        </div>
+        <div className="absolute top-0" style={{ rotate: "3deg" }}>
+          <Card id={-1} draggable={false} />
+        </div>
+        <button className="absolute top-0" style={{ rotate: "none" }}>
+          <Card id={-1} draggable={false} />
+        </button>
+      </div>
+    );
+  };
 
   return (
-      <DndContext onDragEnd={handleDragEnd}>
-        <div className="px-60 h-full w-full flex flex-col items-center space-y-7 pt-14 gap-y-36">
-          <ul className="w-full h-200 flex justify-between items-center">
+    <DndContext onDragEnd={handleDragEnd}>
+      <div className="px-60 h-full w-full flex flex-col items-center space-y-7 pt-14 gap-y-36">
+        <ul className="w-full h-200 flex justify-between items-center">
           {/* Set up card deck */}
           <li key={"cardDeck"} onClick={clickDeck}>
-            {!!deck.hidden_cards && <Card id={-1}></Card>}
-            {!deck.hidden_cards && <div className="w-[120px] h-[166px]"></div>}
+            {!!deck.hidden_cards || deck.open_cards !== deck.cards.length ? (
+              deckRotated()
+            ) : (
+              <div className="w-[120px] h-[166px]"></div>
+            )}
           </li>
 
           {/* Place where the open deck cards are being displayed */}
           <li className="min-w-[120px] h-[166px]" key={"openCard"}>
-            {openDeckCardsComponents()}
+            {openCards()}
           </li>
 
           {/* Empty placeholder */}
