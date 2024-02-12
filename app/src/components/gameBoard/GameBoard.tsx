@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { useState } from "react";
 import { Pile as PileProps } from "../../models/pile";
 import { Column as ColumnProps } from "../../models/column";
 import { Deck as DeckProps } from "../../models/deck";
@@ -13,6 +13,9 @@ import Column from "./Column";
 import { EmptyDroppable } from "./EmptyDroppable";
 import { useSolitaireGameMoves } from "@/hooks/useSolitaireGameMoves";
 import { findCardOriginType } from "@/helpers/cardOrigin";
+import { cardIdToSvg } from "@/helpers/cardMappings";
+import Image from "next/image";
+import circleArrow from "../../../public/circle-arrow-icon.svg"
 
 interface GameProps {
   id: string;
@@ -134,11 +137,12 @@ export default function GameBoard({ game }: { game: GameProps }) {
         setDeck((prevDeck) => {
           const rotatedCard = prevDeck.cards.splice(0, 1)[0];
           return {
-          ...prevDeck,
-          hidden_cards: 0,
-          open_cards: prevDeck.open_cards + 1,
-          cards: [...prevDeck.cards, rotatedCard],
-        }})
+            ...prevDeck,
+            hidden_cards: 0,
+            open_cards: prevDeck.open_cards + 1,
+            cards: [...prevDeck.cards, rotatedCard],
+          };
+        });
         // TODO: deserialize updatedGame using GameProps
         //setDeck(deck);
       } catch (e) {
@@ -233,34 +237,34 @@ export default function GameBoard({ game }: { game: GameProps }) {
   const openCards = () => {
     return (
       <>
-      {deck.open_cards > 1 && (
-        <Card
-          id={Number(deck.cards[deck.cards.length - 2])}
-          draggable={false}
-        >
-          <div style={{ marginTop: "-140%" }}>
-            <Card id={Number(deck.cards[deck.cards.length - 1])} />
-          </div>
-        </Card>
-      )}
-      {deck.open_cards === 1 && (
-        <Card id={Number(deck.cards[deck.cards.length - 1])} />
-      )}
+        {deck.open_cards > 1 && (
+          <Card
+            id={Number(deck.cards[deck.cards.length - 2])}
+            draggable={false}
+          >
+            <div style={{ marginTop: "-140%" }}>
+              <Card id={Number(deck.cards[deck.cards.length - 1])} />
+            </div>
+          </Card>
+        )}
+        {deck.open_cards === 1 && (
+          <Card id={Number(deck.cards[deck.cards.length - 1])} />
+        )}
       </>
-    )
-  }
+    );
+  };
 
   const deckRotated = () => {
     return (
       <div className="relative">
-        <div className="aboslute top-0" style={{ rotate: "-5deg" }}>
-          <Card id={-1} draggable={false} />
+        <div className="aboslute top-0 h-[166px] min-w-[120px]" style={{ rotate: "-5deg" }}>
+          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} />
         </div>
-        <div className="absolute top-0" style={{ rotate: "3deg" }}>
-          <Card id={-1} draggable={false} />
+        <div className="absolute top-0 h-[166px] min-w-[120px]" style={{ rotate: "3deg" }}>
+          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} />
         </div>
-        <button className="absolute top-0" style={{ rotate: "none" }}>
-          <Card id={-1} draggable={false} />
+        <button className="absolute top-0 h-[166px] min-w-[120px]" style={{ rotate: "none" }}>
+          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} />
         </button>
       </div>
     );
@@ -275,7 +279,9 @@ export default function GameBoard({ game }: { game: GameProps }) {
             {!!deck.hidden_cards || deck.open_cards !== deck.cards.length ? (
               deckRotated()
             ) : (
-              <div className="w-[120px] h-[166px]"></div>
+              <button className="flex justify-center items-center w-[120px] h-[166px]">
+                <Image src={circleArrow} alt={"circle-arrow"} width={80} height={120} />
+              </button>
             )}
           </li>
 
