@@ -130,7 +130,15 @@ export default function GameBoard({ game }: { game: GameProps }) {
       }
     } else {
       try {
-        const deck = await handleRotateOpenDeckCards(game.id);
+        const res = await handleRotateOpenDeckCards(game.id);
+        setDeck((prevDeck) => {
+          const rotatedCard = prevDeck.cards.splice(0, 1)[0];
+          return {
+          ...prevDeck,
+          hidden_cards: 0,
+          open_cards: prevDeck.open_cards + 1,
+          cards: [...prevDeck.cards, rotatedCard],
+        }})
         // TODO: deserialize updatedGame using GameProps
         //setDeck(deck);
       } catch (e) {
@@ -227,16 +235,16 @@ export default function GameBoard({ game }: { game: GameProps }) {
       <>
       {deck.open_cards > 1 && (
         <Card
-          id={Number(deck.cards[deck.open_cards - 2])}
+          id={Number(deck.cards[deck.cards.length - 2])}
           draggable={false}
         >
           <div style={{ marginTop: "-140%" }}>
-            <Card id={Number(deck.cards[deck.open_cards - 1])} />
+            <Card id={Number(deck.cards[deck.cards.length - 1])} />
           </div>
         </Card>
       )}
       {deck.open_cards === 1 && (
-        <Card id={Number(deck.cards[deck.open_cards - 1])} />
+        <Card id={Number(deck.cards[deck.cards.length - 1])} />
       )}
       </>
     )
