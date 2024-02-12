@@ -24,9 +24,8 @@ export const Card = ({ id, children, marginTop, draggable = true }: { id: number
         height: "166px",
         minWidth: "120px",
         marginTop: marginTop,
-        cursor: isDragging ? 'grabbing' : 'grab',
-
-};
+        cursor: (id === -1 ? 'default' : (isDragging ? 'grabbing' : 'grab')),
+    };
 
     const setNodeRef = (node: any) => {
         setDraggableNodeRef(node);

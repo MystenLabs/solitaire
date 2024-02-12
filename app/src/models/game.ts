@@ -26,6 +26,7 @@ export class Game {
         const deckHiddenCards: number = contents.deck.fields.hidden_cards
         this.deck = {
             cards: deckCards,
+            open_cards: 0,
             hidden_cards: deckHiddenCards,
         };
         this.piles = contents.piles.map(

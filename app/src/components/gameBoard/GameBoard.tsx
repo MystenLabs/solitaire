@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { useState } from "react";
 import { Pile as PileProps } from "../../models/pile";
 import { Column as ColumnProps } from "../../models/column";
 import { Deck as DeckProps } from "../../models/deck";
@@ -13,6 +13,9 @@ import Column from "./Column";
 import { EmptyDroppable } from "./EmptyDroppable";
 import { useSolitaireGameMoves } from "@/hooks/useSolitaireGameMoves";
 import { findCardOriginType } from "@/helpers/cardOrigin";
+import { cardIdToSvg } from "@/helpers/cardMappings";
+import Image from "next/image";
+import circleArrow from "../../../public/circle-arrow-icon.svg"
 
 interface GameProps {
   id: string;
@@ -24,6 +27,7 @@ interface GameProps {
 export default function GameBoard({ game }: { game: GameProps }) {
   const [deck, setDeck] = useState<DeckProps>({
     hidden_cards: game.deck.hidden_cards,
+    open_cards: 0,
     cards: [],
   });
   const [piles, setPiles] = useState<PileProps[]>(game.piles);
@@ -81,24 +85,47 @@ export default function GameBoard({ game }: { game: GameProps }) {
         columns,
         setColumns
       );
-      if (move) pileToColumn(move.from, move.to)
+      if (move) pileToColumn(move.from, move.to);
     } else if (cardOriginType === "deck" && cardDestinationType === "column") {
-      const move = updateDeckToColumnMove(active, over, deck, setDeck, columns, setColumns);
+      const move = updateDeckToColumnMove(
+        active,
+        over,
+        deck,
+        setDeck,
+        columns,
+        setColumns
+      );
       if (move) deckToColumn(move.to);
     } else if (cardOriginType === "deck" && cardDestinationType === "pile") {
-      const move = updateDeckToPileMove(active, over, deck, setDeck, piles, setPiles);
+      const move = updateDeckToPileMove(
+        active,
+        over,
+        deck,
+        setDeck,
+        piles,
+        setPiles
+      );
       if (move) deckToPile(move.to);
     }
   }
 
   const clickDeck = async () => {
+    if (!deck.hidden_cards && deck.cards.length === deck.open_cards) {
+      setDeck((prevDeck) => ({
+        ...prevDeck,
+        hidde_cards: prevDeck.hidden_cards,
+        open_cards: 0,
+        cards: [...prevDeck.cards],
+      }));
+      return;
+    }
     if (deck.hidden_cards !== 0) {
       try {
         const newCard = await handleOpenDeckCard(game.id);
-
         setDeck((prevDeck) => ({
           ...prevDeck, // Spread the previous deck to copy its properties
           hidden_cards: prevDeck.hidden_cards - 1, // Subtract 1 from hidden_cards
+          open_cards: prevDeck.open_cards + 1, // Add 1 to open_cards
           cards: [...prevDeck.cards, newCard], // Add newCard to the end of cards array
         }));
       } catch (e) {
@@ -106,7 +133,16 @@ export default function GameBoard({ game }: { game: GameProps }) {
       }
     } else {
       try {
-        const deck = await handleRotateOpenDeckCards(game.id);
+        const res = await handleRotateOpenDeckCards(game.id);
+        setDeck((prevDeck) => {
+          const rotatedCard = prevDeck.cards.splice(0, 1)[0];
+          return {
+            ...prevDeck,
+            hidden_cards: 0,
+            open_cards: prevDeck.open_cards + 1,
+            cards: [...prevDeck.cards, rotatedCard],
+          };
+        });
         // TODO: deserialize updatedGame using GameProps
         //setDeck(deck);
       } catch (e) {
@@ -143,9 +179,9 @@ export default function GameBoard({ game }: { game: GameProps }) {
           prevColumns.map((column, index) => {
             if (index === columnIndex) {
               return {
-                ...column, 
-                hidden_cards: column.hidden_cards - 1, 
-                cards: [...column.cards, newCard], 
+                ...column,
+                hidden_cards: column.hidden_cards - 1,
+                cards: [...column.cards, newCard],
               };
             } else {
               return column;
@@ -176,8 +212,8 @@ export default function GameBoard({ game }: { game: GameProps }) {
             if (index === fromColumnIndex) {
               return {
                 ...column,
-                hidden_cards: column.hidden_cards - 1, 
-                cards: [...column.cards, newCard], 
+                hidden_cards: column.hidden_cards - 1,
+                cards: [...column.cards, newCard],
               };
             } else {
               return column;
@@ -192,46 +228,66 @@ export default function GameBoard({ game }: { game: GameProps }) {
 
   const pileToColumn = async (pileIndex: number, columnIndex: number) => {
     try {
-      await handleFromPileToColumn(
-        game.id,
-        pileIndex,
-        columnIndex
-      );
+      await handleFromPileToColumn(game.id, pileIndex, columnIndex);
     } catch (e) {
       toast.error("Transaction Failed");
     }
   };
 
-  let openDeckCardsComponents;
-  if (deck.cards.length > 1) {
-    openDeckCardsComponents =
-        <div style={{rotate: deck.cards.length > 1 ? "-10deg" : 'none'}}>
-          <Card id={Number(deck.cards[deck.cards.length - 2])} draggable={false}>
-            <div style={{rotate: "10deg", marginTop: "-135%"}}>
-              <Card id={Number(deck.cards[deck.cards.length - 1])}/>
+  const openCards = () => {
+    return (
+      <>
+        {deck.open_cards > 1 && (
+          <Card
+            id={Number(deck.cards[deck.cards.length - 2])}
+            draggable={false}
+          >
+            <div style={{ marginTop: "-140%" }}>
+              <Card id={Number(deck.cards[deck.cards.length - 1])} />
             </div>
           </Card>
-        </div>
-  } else if (!!deck.cards.length) {
-    openDeckCardsComponents = (
-        <Card id={Number(deck.cards[deck.cards.length - 1])}/>
-    )
-  }
+        )}
+        {deck.open_cards === 1 && (
+          <Card id={Number(deck.cards[deck.cards.length - 1])} />
+        )}
+      </>
+    );
+  };
 
+  const deckRotated = () => {
+    return (
+      <div className="relative">
+        <div className="aboslute top-0 h-[166px] min-w-[120px]" style={{ rotate: "-5deg" }}>
+          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} />
+        </div>
+        <div className="absolute top-0 h-[166px] min-w-[120px]" style={{ rotate: "3deg" }}>
+          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} />
+        </div>
+        <button className="absolute top-0 h-[166px] min-w-[120px]" style={{ rotate: "none" }}>
+          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} />
+        </button>
+      </div>
+    );
+  };
 
   return (
-      <DndContext onDragEnd={handleDragEnd}>
-        <div className="px-60 h-full w-full flex flex-col items-center space-y-7 pt-14 gap-y-36">
-          <ul className="w-full h-200 flex justify-between items-center">
+    <DndContext onDragEnd={handleDragEnd}>
+      <div className="px-60 h-full w-full flex flex-col items-center space-y-7 pt-14 gap-y-36">
+        <ul className="w-full h-200 flex justify-between items-center">
           {/* Set up card deck */}
           <li key={"cardDeck"} onClick={clickDeck}>
-            {!!deck.hidden_cards && <Card id={-1}></Card>}
-            {!deck.hidden_cards && <div className="w-[120px] h-[166px]"></div>}
+            {!!deck.hidden_cards || deck.open_cards !== deck.cards.length ? (
+              deckRotated()
+            ) : (
+              <button className="flex justify-center items-center w-[120px] h-[166px]">
+                <Image src={circleArrow} alt={"circle-arrow"} width={80} height={120} />
+              </button>
+            )}
           </li>
 
           {/* Place where the open deck cards are being displayed */}
           <li className="min-w-[120px] h-[166px]" key={"openCard"}>
-            {openDeckCardsComponents}
+            {openCards()}
           </li>
 
           {/* Empty placeholder */}

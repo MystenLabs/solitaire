@@ -231,6 +231,7 @@ export function useSolitaireGameMoves() {
         /* Update the values of the columns */
         let newDeck = {...deck};
         const objectToMove = newDeck.cards.pop()!;
+        newDeck.open_cards -= 1;
 
         /* Check if the move is legal! If not, return early. */
         const bottomCardOfObjectToMove = new CardDetails(objectToMove);
@@ -288,6 +289,7 @@ export function useSolitaireGameMoves() {
         /* Update the values of the columns */
         const objectToMove = deck.cards.pop()!;
         let newDeck = {...deck};
+        newDeck.open_cards -= 1;
 
         /* Check if the move is legal! If not, return early. */
         const bottomCardOfObjectToMove = new CardDetails(objectToMove);
