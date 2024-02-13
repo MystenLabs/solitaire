@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Pile as PileProps } from "../../models/pile";
 import { Column as ColumnProps } from "../../models/column";
 import { Deck as DeckProps } from "../../models/deck";
@@ -16,6 +16,8 @@ import { findCardOriginType } from "@/helpers/cardOrigin";
 import { cardIdToSvg } from "@/helpers/cardMappings";
 import Image from "next/image";
 import circleArrow from "../../../public/circle-arrow-icon.svg"
+import { set } from "zod";
+import { LoadingContext } from "@/contexts/LoadingProvider";
 
 interface GameProps {
   id: string;
@@ -32,6 +34,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
   });
   const [piles, setPiles] = useState<PileProps[]>(game.piles);
   const [columns, setColumns] = useState<ColumnProps[]>(game.columns);
+  const { isMoveLoading, setIsMoveLoading } = useContext(LoadingContext);
 
   const {
     handleFromDeckToPile,
@@ -119,6 +122,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
       }));
       return;
     }
+    setIsMoveLoading(true);
     if (deck.hidden_cards !== 0) {
       try {
         const newCard = await handleOpenDeckCard(game.id);
@@ -149,25 +153,33 @@ export default function GameBoard({ game }: { game: GameProps }) {
         toast.error("Transaction Failed");
       }
     }
+    setIsMoveLoading(false);
   };
 
   const deckToPile = async (pileIndex: number) => {
+    setIsMoveLoading(true);
     try {
       await handleFromDeckToPile(game.id, pileIndex);
     } catch (e) {
       toast.error("Transaction Failed");
+    } finally {
+      setIsMoveLoading(false);
     }
   };
 
   const deckToColumn = async (columnIndex: number) => {
+    setIsMoveLoading(true);
     try {
       await handleFromDeckToColumn(game.id, columnIndex);
     } catch (e) {
       toast.error("Transaction Failed");
+    } finally {
+      setIsMoveLoading(false);
     }
   };
 
   const columnToPile = async (columnIndex: number, pileIndex: number) => {
+    setIsMoveLoading(true);
     try {
       const newCard = await handleFromColumnToPile(
         game.id,
@@ -191,6 +203,8 @@ export default function GameBoard({ game }: { game: GameProps }) {
       }
     } catch (e) {
       toast.error("Transaction Failed");
+    } finally {
+      setIsMoveLoading(false);
     }
   };
 
@@ -199,6 +213,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
     card: number,
     toColumnIndex: number
   ) => {
+    setIsMoveLoading(true);
     try {
       const newCard = await handleFromColumnToColumn(
         game.id,
@@ -223,14 +238,19 @@ export default function GameBoard({ game }: { game: GameProps }) {
       }
     } catch (e) {
       toast.error("Transaction Failed");
+    } finally {
+      setIsMoveLoading(false);
     }
   };
 
   const pileToColumn = async (pileIndex: number, columnIndex: number) => {
+    setIsMoveLoading(true);
     try {
       await handleFromPileToColumn(game.id, pileIndex, columnIndex);
     } catch (e) {
       toast.error("Transaction Failed");
+    } finally {
+      setIsMoveLoading(false);
     }
   };
 
@@ -263,9 +283,9 @@ export default function GameBoard({ game }: { game: GameProps }) {
         <div className="absolute top-0 h-[166px] min-w-[120px]" style={{ rotate: "3deg" }}>
           <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} />
         </div>
-        <button className="absolute top-0 h-[166px] min-w-[120px]" style={{ rotate: "none" }}>
+        <div className={`${isMoveLoading ? 'cursor-wait' : 'cursor-pointer'} absolute top-0 h-[166px] min-w-[120px]`} style={{ rotate: "none" }}>
           <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} />
-        </button>
+        </div>
       </div>
     );
   };
@@ -275,7 +295,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
       <div className="px-60 h-full w-full flex flex-col items-center space-y-7 pt-14 gap-y-36">
         <ul className="w-full h-200 flex justify-between items-center">
           {/* Set up card deck */}
-          <li key={"cardDeck"} onClick={clickDeck}>
+          <button className={isMoveLoading ? 'cursor-wait' : ''} key={"cardDeck"} onClick={clickDeck} disabled={isMoveLoading}>
             {!!deck.hidden_cards || deck.open_cards !== deck.cards.length ? (
               deckRotated()
             ) : (
@@ -283,7 +303,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
                 <Image src={circleArrow} alt={"circle-arrow"} width={80} height={120} />
               </button>
             )}
-          </li>
+          </button>
 
           {/* Place where the open deck cards are being displayed */}
           <li className="min-w-[120px] h-[166px]" key={"openCard"}>
