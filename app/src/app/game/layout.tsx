@@ -6,6 +6,7 @@ import { Spinner } from "@/components/general/Spinner";
 import google from "../../../../app/public/assets/logos/google_email.svg";
 import Image from "next/image";
 import React from "react";
+import { LoadingProvider } from "@/contexts/LoadingProvider";
 
 export default function MemberRootLayout({ children }: ChildrenProps) {
   const { user, isLoading } = useAuthentication();
@@ -15,6 +16,6 @@ export default function MemberRootLayout({ children }: ChildrenProps) {
   ) : user?.role === "anonymous" ? (
     "Not allowed"
   ) : (
-    children
+    <LoadingProvider>{children}</LoadingProvider>
   );
 }

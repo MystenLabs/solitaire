@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { DifficultySelection } from "@/components/difficultySelection/DifficultySelection";
 import google from "../../../../app/public/assets/logos/google_email.svg";
 import Image from "next/image";
@@ -9,6 +9,7 @@ import GameBoard from "@/components/gameBoard/GameBoard";
 import {Game} from "@/models/game";
 import {useSolitaireActions} from "@/hooks/useSolitaireActions";
 import {AccountDropdown} from "@/components/user/accountDropdown";
+import { LoadingContext, LoadingProvider } from "@/contexts/LoadingProvider";
 
 
 const GamePage = () => {
@@ -17,6 +18,7 @@ const GamePage = () => {
   const [game, setGame] = useState<Game | null>(null);
   const [moves, setMoves] = useState<number>(0);
   const { handleExecuteInitEasyGame, handleExecuteInitNormalGame} = useSolitaireActions();
+  const { isMoveLoading } = useContext(LoadingContext);
 
   const onGameCreation = async (mode: 'easy' | 'normal') => {
     setSpinning(true);
@@ -41,7 +43,7 @@ const GamePage = () => {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className={`min-h-screen ${isMoveLoading ? 'cursor-wait' : 'cursor-default'}`}>
       <div className="flex align-bottom pt-10 px-20 justify-between">
         <div className="logo text-white text-[28px] font-bold font-['Mysten Walter Alte']">
           Mysten Solitaire
@@ -50,7 +52,7 @@ const GamePage = () => {
           <div className="flex justify-center items-center gap-x-4 pl-4 pr-1 bg-black bg-opacity-10 rounded-[40px] border border-black border-opacity-10">
               <div className="text-stone-100 text-base font-normal">Moves: {moves}</div>
               <div className="text-stone-100 text-base font-normal">Time: 00:00</div>
-              <button className="text-white text-base font-bold bg-black rounded-[40px] p-2">End game</button>
+              <div className={`${isMoveLoading ? 'cursor-wait' : ''} text-white text-base font-bold bg-black rounded-[40px] p-2`}>End game</div>
           </div>
         )}
         <AccountDropdown user={user} enokiFlow={enokiFlow} />

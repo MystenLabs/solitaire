@@ -1,17 +1,19 @@
-import React, {ReactNode} from 'react';
+import React, {ReactNode, useContext} from 'react';
 import { cardIdToSvg } from "@/helpers/cardMappings";
 import Image from "next/image";
 import {useDraggable, useDroppable} from '@dnd-kit/core';
 import {useId} from "react";
+import { LoadingContext } from '@/contexts/LoadingProvider';
 
 export const Card = ({ id, children, marginTop, draggable = true }: { id: number, children?: ReactNode, marginTop?: any, draggable?: boolean }) => {
+    const { isMoveLoading } = useContext(LoadingContext);
     let idOfHiddenCard = useId();
     const isHiddenCard = id == -1;
     let cardId = !isHiddenCard ? String(id) : idOfHiddenCard;
 
     const {attributes, listeners, setNodeRef: setDraggableNodeRef, transform, isDragging} = useDraggable({
         id: cardId,
-        disabled: isHiddenCard || !draggable,
+        disabled: isHiddenCard || !draggable || isMoveLoading,
     });
 
     const {isOver, setNodeRef: setDroppableNodeRef} = useDroppable({
@@ -24,7 +26,7 @@ export const Card = ({ id, children, marginTop, draggable = true }: { id: number
         height: "166px",
         minWidth: "120px",
         marginTop: marginTop,
-        cursor: (id === -1 ? 'default' : (isDragging ? 'grabbing' : 'grab')),
+        cursor: (isMoveLoading ? 'wait' : (id === -1 ? 'default' : (isDragging ? 'grabbing' : 'grab'))),
     };
 
     const setNodeRef = (node: any) => {
