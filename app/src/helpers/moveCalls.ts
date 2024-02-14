@@ -118,7 +118,8 @@ export function finishGame(game: string) {
     tx.moveCall({
         target: `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::finish_game`,
         arguments: [
-            tx.object(game)
+            tx.object(game),
+            tx.object(CLOCK)
         ],
     });
     return tx;
