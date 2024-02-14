@@ -265,7 +265,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
     } catch (e) {
       toast.error("Transaction Failed");
     }
-  }
+  };
 
   const checkIfFinished = () => {
     if (piles.every((pile) => pile.cards.length === 13)) {
@@ -333,7 +333,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
           >
             {!!deck.hidden_cards || deck.open_cards !== deck.cards.length ? (
               deckRotated()
-            ) : (
+            ) : deck.cards.length !== 0 ? (
               <button className="flex justify-center items-center w-[120px] h-[166px]">
                 <Image
                   src={circleArrow}
@@ -342,6 +342,8 @@ export default function GameBoard({ game }: { game: GameProps }) {
                   height={120}
                 />
               </button>
+            ) : (
+              <div className="w-[120px] h-[166px]"></div>
             )}
           </button>
 
@@ -363,16 +365,16 @@ export default function GameBoard({ game }: { game: GameProps }) {
           ))}
         </ul>
         <ul className="w-full flex justify-between  ">
-            {columns.map((column, index) => (
-              <li key={index}>
-                <EmptyDroppable
-                  index={index}
-                  id={`empty-column-droppable-${index}`}
-                >
-                  <Column column={column} index={index} />
-                </EmptyDroppable>
-              </li>
-            ))}
+          {columns.map((column, index) => (
+            <li key={index}>
+              <EmptyDroppable
+                index={index}
+                id={`empty-column-droppable-${index}`}
+              >
+                <Column column={column} index={index} />
+              </EmptyDroppable>
+            </li>
+          ))}
         </ul>
         {isFinished && <FinishGame finishGame={finishGame} />}
       </div>
