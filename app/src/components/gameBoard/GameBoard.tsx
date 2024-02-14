@@ -15,9 +15,10 @@ import { useSolitaireGameMoves } from "@/hooks/useSolitaireGameMoves";
 import { findCardOriginType } from "@/helpers/cardOrigin";
 import { cardIdToSvg } from "@/helpers/cardMappings";
 import Image from "next/image";
-import circleArrow from "../../../public/circle-arrow-icon.svg"
+import circleArrow from "../../../public/circle-arrow-icon.svg";
 import { set } from "zod";
 import { LoadingContext } from "@/contexts/LoadingProvider";
+import FinishGame from "./FinishGame";
 
 interface GameProps {
   id: string;
@@ -34,6 +35,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
   });
   const [piles, setPiles] = useState<PileProps[]>(game.piles);
   const [columns, setColumns] = useState<ColumnProps[]>(game.columns);
+  const [isFinished, setIsFinished] = useState<boolean>(false);
   const { isMoveLoading, setIsMoveLoading } = useContext(LoadingContext);
 
   const {
@@ -44,6 +46,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
     handleFromPileToColumn,
     handleOpenDeckCard,
     handleRotateOpenDeckCards,
+    handleFinishGame,
   } = useSolitaireActions();
 
   const {
@@ -164,6 +167,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
       toast.error("Transaction Failed");
     } finally {
       setIsMoveLoading(false);
+      checkIfFinished();
     }
   };
 
@@ -205,6 +209,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
       toast.error("Transaction Failed");
     } finally {
       setIsMoveLoading(false);
+      checkIfFinished();
     }
   };
 
@@ -254,6 +259,20 @@ export default function GameBoard({ game }: { game: GameProps }) {
     }
   };
 
+  const finishGame = async () => {
+    try {
+      await handleFinishGame(game.id);
+    } catch (e) {
+      toast.error("Transaction Failed");
+    }
+  }
+
+  const checkIfFinished = () => {
+    if (piles.every((pile) => pile.cards.length === 0)) {
+      setIsFinished(true);
+    }
+  };
+
   const openCards = () => {
     return (
       <>
@@ -277,13 +296,24 @@ export default function GameBoard({ game }: { game: GameProps }) {
   const deckRotated = () => {
     return (
       <div className="relative">
-        <div className="aboslute top-0 h-[166px] min-w-[120px]" style={{ rotate: "-5deg" }}>
+        <div
+          className="aboslute top-0 h-[166px] min-w-[120px]"
+          style={{ rotate: "-5deg" }}
+        >
           <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} />
         </div>
-        <div className="absolute top-0 h-[166px] min-w-[120px]" style={{ rotate: "3deg" }}>
+        <div
+          className="absolute top-0 h-[166px] min-w-[120px]"
+          style={{ rotate: "3deg" }}
+        >
           <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} />
         </div>
-        <div className={`${isMoveLoading ? 'cursor-wait' : 'cursor-pointer'} absolute top-0 h-[166px] min-w-[120px]`} style={{ rotate: "none" }}>
+        <div
+          className={`${
+            isMoveLoading ? "cursor-wait" : "cursor-pointer"
+          } absolute top-0 h-[166px] min-w-[120px]`}
+          style={{ rotate: "none" }}
+        >
           <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} />
         </div>
       </div>
@@ -295,12 +325,22 @@ export default function GameBoard({ game }: { game: GameProps }) {
       <div className="px-60 h-full w-full flex flex-col items-center space-y-7 pt-14 gap-y-36">
         <ul className="w-full h-200 flex justify-between items-center">
           {/* Set up card deck */}
-          <button className={isMoveLoading ? 'cursor-wait' : ''} key={"cardDeck"} onClick={clickDeck} disabled={isMoveLoading}>
+          <button
+            className={isMoveLoading ? "cursor-wait" : ""}
+            key={"cardDeck"}
+            onClick={clickDeck}
+            disabled={isMoveLoading}
+          >
             {!!deck.hidden_cards || deck.open_cards !== deck.cards.length ? (
               deckRotated()
             ) : (
               <button className="flex justify-center items-center w-[120px] h-[166px]">
-                <Image src={circleArrow} alt={"circle-arrow"} width={80} height={120} />
+                <Image
+                  src={circleArrow}
+                  alt={"circle-arrow"}
+                  width={80}
+                  height={120}
+                />
               </button>
             )}
           </button>
@@ -323,17 +363,18 @@ export default function GameBoard({ game }: { game: GameProps }) {
           ))}
         </ul>
         <ul className="w-full flex justify-between  ">
-          {columns.map((column, index) => (
-            <li key={index}>
-              <EmptyDroppable
-                index={index}
-                id={`empty-column-droppable-${index}`}
-              >
-                <Column column={column} index={index} />
-              </EmptyDroppable>
-            </li>
-          ))}
+            {columns.map((column, index) => (
+              <li key={index}>
+                <EmptyDroppable
+                  index={index}
+                  id={`empty-column-droppable-${index}`}
+                >
+                  <Column column={column} index={index} />
+                </EmptyDroppable>
+              </li>
+            ))}
         </ul>
+        {isFinished && <FinishGame finishGame={finishGame} />}
       </div>
     </DndContext>
   );
