@@ -10,6 +10,7 @@ import {
   initNormalGame,
   openDeckCard,
   rotateOpenDeckCards,
+  finishGame,
 } from "@/helpers/moveCalls";
 import { Game } from "@/models/game";
 import { SuiTransactionBlockResponse } from "@mysten/sui.js/client";
@@ -226,6 +227,30 @@ export const useSolitaireActions = () => {
       });
   };
 
+  const handleFinishGame = async (gameId: string) => {
+    const tx = finishGame(gameId);
+    const keypair = await enokiFlow.getKeypair();
+    await suiClient
+      .signAndExecuteTransactionBlock({
+        transactionBlock: tx,
+        signer: keypair,
+        requestType: "WaitForLocalExecution",
+        options: {
+          showEffects: true,
+          showObjectChanges: true,
+        },
+      })
+      .then((resp) => {
+        if (resp.effects?.status.status !== "success") {
+          throw new Error("Transaction failed");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        throw new Error("Transaction failed");
+      });
+  }
+
   async function execute(
     transactionBlock: TransactionBlock,
     keypair: EnokiKeypair
@@ -278,5 +303,6 @@ export const useSolitaireActions = () => {
     handleRotateOpenDeckCards,
     handleExecuteInitEasyGame,
     handleExecuteInitNormalGame,
+    handleFinishGame,
   };
 };
