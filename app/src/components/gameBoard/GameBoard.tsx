@@ -268,7 +268,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
   }
 
   const checkIfFinished = () => {
-    if (piles.every((pile) => pile.cards.length === 0)) {
+    if (piles.every((pile) => pile.cards.length === 13)) {
       setIsFinished(true);
     }
   };
