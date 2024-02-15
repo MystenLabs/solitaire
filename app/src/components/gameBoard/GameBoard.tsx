@@ -19,6 +19,7 @@ import circleArrow from "../../../public/circle-arrow-icon.svg";
 import { set } from "zod";
 import { LoadingContext } from "@/contexts/LoadingProvider";
 import FinishGame from "./FinishGame";
+import WonModal from "./WonModal";
 
 interface GameProps {
   id: string;
@@ -36,6 +37,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
   const [piles, setPiles] = useState<PileProps[]>(game.piles);
   const [columns, setColumns] = useState<ColumnProps[]>(game.columns);
   const [isFinished, setIsFinished] = useState<boolean>(false);
+  const [wonModal, setWonModal] = useState<boolean>(true);
   const { isMoveLoading, setIsMoveLoading } = useContext(LoadingContext);
 
   const {
@@ -262,6 +264,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
   const finishGame = async () => {
     try {
       await handleFinishGame(game.id);
+      setWonModal(true);
     } catch (e) {
       toast.error("Transaction Failed");
     }
@@ -377,6 +380,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
           ))}
         </ul>
         {isFinished && <FinishGame finishGame={finishGame} />}
+        {wonModal && <WonModal gameId={game.id}/>}
       </div>
     </DndContext>
   );
