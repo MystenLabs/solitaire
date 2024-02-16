@@ -16,7 +16,6 @@ import { findCardOriginType } from "@/helpers/cardOrigin";
 import { cardIdToSvg } from "@/helpers/cardMappings";
 import Image from "next/image";
 import circleArrow from "../../../public/circle-arrow-icon.svg";
-import { set } from "zod";
 import { LoadingContext } from "@/contexts/LoadingProvider";
 import FinishGame from "./FinishGame";
 import WonModal from "./WonModal";
