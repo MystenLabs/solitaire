@@ -21,11 +21,8 @@ const AuthPage = () => {
       .then(async (res: any) => {
         console.log({ res });
         const session = await enokiFlow.getSession();
-        const keypair = session?.ephemeralKeyPair!;
-        let privateKeyArray = Uint8Array.from(Array.from(fromB64(keypair!)));
-        const address = Ed25519Keypair.fromSecretKey(privateKeyArray)
-          .getPublicKey()
-          .toSuiAddress();
+        const keypair = await enokiFlow.getKeypair();
+        const address = keypair.toSuiAddress();
         const jwt = session?.jwt;
         const decodedJwt: any = jwtDecode(jwt!);
         handleLoginAs({
