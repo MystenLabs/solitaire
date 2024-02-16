@@ -37,7 +37,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
   const [piles, setPiles] = useState<PileProps[]>(game.piles);
   const [columns, setColumns] = useState<ColumnProps[]>(game.columns);
   const [isFinished, setIsFinished] = useState<boolean>(false);
-  const [wonModal, setWonModal] = useState<boolean>(true);
+  const [wonModal, setWonModal] = useState<boolean>(false);
   const { isMoveLoading, setIsMoveLoading } = useContext(LoadingContext);
 
   const {

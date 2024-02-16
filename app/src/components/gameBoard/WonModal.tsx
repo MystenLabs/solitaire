@@ -34,26 +34,49 @@ export default function WonModal({ gameId }: Props) {
 
   useEffect(() => {
     const getGame = async () => {
+      const allData = [];
       try {
-        const gamesObject = await suiClient.getOwnedObjects({
-          owner: address,
-          filter: {
-            StructType: `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::Game`,
-          },
-          options: {
-            showContent: true,
-          },
-        });
-        //console.log("games", games);
-        if (gamesObject.data.length !== 0) {
-          const endedGames = gamesObject.data.filter((game) => (game.data?.content as unknown as GameFields).fields.end_time !== "0");
-          const games = endedGames.map(
-            (game) => {
-              const fields = game.data?.content as unknown as GameFields;
-              const id = game.data?.objectId;
-              return { id, ...fields };
-            }
+        let { nextCursor, hasNextPage, data } = await suiClient.getOwnedObjects(
+          {
+            owner: address,
+            filter: {
+              StructType: `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::Game`,
+            },
+            options: {
+              showContent: true,
+            },
+          }
+        );
+
+        allData.push(...data);
+
+        while (!!hasNextPage) {
+          const resp = await suiClient.getOwnedObjects({
+            owner: address,
+            filter: {
+              StructType: `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::Game`,
+            },
+            options: {
+              showContent: true,
+            },
+            ...(!!hasNextPage && { cursor: nextCursor }),
+          });
+          hasNextPage = resp.hasNextPage;
+          nextCursor = resp.nextCursor;
+          data = resp.data;
+          allData.push(...data);
+        }
+        if (allData.length !== 0) {
+          const endedGames = allData.filter(
+            (game) =>
+              (game.data?.content as unknown as GameFields).fields.end_time !==
+              "0"
           );
+          const games = endedGames.map((game) => {
+            const fields = game.data?.content as unknown as GameFields;
+            const id = game.data?.objectId;
+            return { id, ...fields };
+          });
           setGames(games);
         }
       } catch (error) {
@@ -167,23 +190,29 @@ export default function WonModal({ gameId }: Props) {
 }
 
 function formatTimestamp(timestamp: number): string {
-  const date = new Date(typeof timestamp === 'string' ? Number(timestamp) : timestamp);
+  const date = new Date(
+    typeof timestamp === "string" ? Number(timestamp) : timestamp
+  );
 
   const dateOptions: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'short', // 'short' will give you abbreviated month names
-    day: 'numeric',
-    timeZone: 'UTC'
-  };
-  
-  const timeOptions: Intl.DateTimeFormatOptions = {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-    timeZone: 'UTC'
+    year: "numeric",
+    month: "short", // 'short' will give you abbreviated month names
+    day: "numeric",
+    timeZone: "UTC",
   };
 
-  const formattedDate = new Intl.DateTimeFormat('en-US', dateOptions).format(date);
-  const formattedTime = new Intl.DateTimeFormat('en-US', timeOptions).format(date);
+  const timeOptions: Intl.DateTimeFormatOptions = {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: "UTC",
+  };
+
+  const formattedDate = new Intl.DateTimeFormat("en-US", dateOptions).format(
+    date
+  );
+  const formattedTime = new Intl.DateTimeFormat("en-US", timeOptions).format(
+    date
+  );
   return `${formattedDate} ${formattedTime} UTC`;
 }
