@@ -157,7 +157,7 @@ export default function WonModal({ gameId }: Props) {
                 </div>
                 <div className="flex flex-col items-center justify-start w-full max-h-[280px] overflow-auto">
                   {games.map((game) => (
-                    <div className="group flex items-center justify-center px-2 py-4 gap-8 w-full hover:bg-indigo-100 hover:rounded-lg">
+                    <div key={game.id} className="group flex items-center justify-center px-2 py-4 gap-8 w-full hover:bg-indigo-100 hover:rounded-lg">
                       <div className="flex-grow text-sm font-normal text-zinc-800 opacity-90 w-full">
                         {formatTimestamp(Number(game.fields.end_time))}
                       </div>
