@@ -10,6 +10,7 @@ import {
 } from "@radix-ui/react-dropdown-menu";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import {EnokiFlow} from "@mysten/enoki";
+import toast from "react-hot-toast";
 
 export const AccountDropdown = ({user, enokiFlow}: { user: UserProps, enokiFlow: EnokiFlow }) => {
     const logout = async () => {
@@ -17,6 +18,10 @@ export const AccountDropdown = ({user, enokiFlow}: { user: UserProps, enokiFlow:
         localStorage.clear();
         window.location.replace("/");
     };
+    const copyAddress = () => {
+        navigator.clipboard.writeText(user.address);
+        toast.success("Address copied to clipboard");
+    }
 
     return (
         <DropdownMenu>
@@ -38,6 +43,9 @@ export const AccountDropdown = ({user, enokiFlow}: { user: UserProps, enokiFlow:
             <DropdownMenuContent>
                 <DropdownMenuItem onSelect={logout} className={"select-none rounded-[36px] border border-white px-14 py-1 text-center text-white bg-white bg-opacity-10 text-base leading-tight cursor-pointer"}>
                     👋 Logout
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={copyAddress} className={"select-none rounded-[36px] border border-white px-14 py-1 text-center text-white bg-white bg-opacity-10 text-base leading-tight cursor-pointer"}>
+                    {user?.address.slice(0, 10)+'...'}
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
