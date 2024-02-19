@@ -60,6 +60,7 @@ const GamePage = () => {
                     console.log('Deleting unfinished game');
                     await handleDeleteUnfinishedGame(game.id);
                     setGame(null);
+                    setMoves(0);
                   } catch (e) {
                     console.debug(e)
                   }
