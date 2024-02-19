@@ -27,7 +27,12 @@ interface GameProps {
   piles: PileProps[];
 }
 
-export default function GameBoard({ game }: { game: GameProps }) {
+interface MoveProps {
+  moves: number;
+  setMoves: any;
+}
+
+export default function GameBoard({ game, move }: { game: GameProps, move: MoveProps}) {
   const [deck, setDeck] = useState<DeckProps>({
     hidden_cards: game.deck.hidden_cards,
     open_cards: 0,
@@ -136,6 +141,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
           open_cards: prevDeck.open_cards + 1, // Add 1 to open_cards
           cards: [...prevDeck.cards, newCard], // Add newCard to the end of cards array
         }));
+        move.setMoves((prevMoves: number) => prevMoves + 1);
       } catch (e) {
         toast.error("Transaction Failed");
       }
@@ -151,8 +157,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
             cards: [...prevDeck.cards, rotatedCard],
           };
         });
-        // TODO: deserialize updatedGame using GameProps
-        //setDeck(deck);
+        move.setMoves((prevMoves: number) => prevMoves + 1);
       } catch (e) {
         toast.error("Transaction Failed");
       }
@@ -164,6 +169,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
     setIsMoveLoading(true);
     try {
       await handleFromDeckToPile(game.id, pileIndex);
+      move.setMoves((prevMoves: number) => prevMoves + 1);
     } catch (e) {
       toast.error("Transaction Failed");
     } finally {
@@ -176,6 +182,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
     setIsMoveLoading(true);
     try {
       await handleFromDeckToColumn(game.id, columnIndex);
+      move.setMoves((prevMoves: number) => prevMoves + 1);
     } catch (e) {
       toast.error("Transaction Failed");
     } finally {
@@ -191,6 +198,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
         columnIndex,
         pileIndex
       );
+      move.setMoves((prevMoves: number) => prevMoves + 1);
       if (newCard) {
         setColumns((prevColumns) =>
           prevColumns.map((column, index) => {
@@ -227,6 +235,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
         card,
         toColumnIndex
       );
+      move.setMoves((prevMoves: number) => prevMoves + 1);
       if (newCard) {
         setColumns((prevColumns) =>
           prevColumns.map((column, index) => {
@@ -253,6 +262,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
     setIsMoveLoading(true);
     try {
       await handleFromPileToColumn(game.id, pileIndex, columnIndex);
+      move.setMoves((prevMoves: number) => prevMoves + 1);
     } catch (e) {
       toast.error("Transaction Failed");
     } finally {
@@ -379,7 +389,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
           ))}
         </ul>
         {isFinished && <FinishGame finishGame={finishGame} />}
-        {wonModal && <WonModal gameId={game.id}/>}
+        {wonModal && <WonModal gameId={game.id} moves={move.moves}/>}
       </div>
     </DndContext>
   );
