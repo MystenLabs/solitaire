@@ -29,7 +29,10 @@ export function useSolitaireGameMoves() {
         }
 
         /* Update the values of the columns */
-        let newColumns = [...columns];
+        let newColumns = columns.map(column => ({
+            ...column, 
+            cards: [...column.cards] // This creates a deep copy of the cards array
+          }));
         const objectsToMove = newColumns[columnIndexOfActive].cards.slice(
             newColumns[columnIndexOfActive].cards.indexOf(String(active.id))
         );
@@ -96,7 +99,10 @@ export function useSolitaireGameMoves() {
         }
 
         /* Update the values of the columns */
-        let newColumns = [...columns];
+        let newColumns = columns.map(column => ({
+            ...column, // This copies the column's primitive properties and references
+            cards: [...column.cards] // This creates a deep copy of the cards array
+          }));
         const objectsToMove = newColumns[columnIndexOfActive].cards.slice(
             newColumns[columnIndexOfActive].cards.indexOf(String(active.id))
         );
@@ -171,7 +177,10 @@ export function useSolitaireGameMoves() {
         }
 
         /* Update the values of the columns */
-        let newPiles = [...piles];
+        let newPiles = piles.map((pile) => ({
+            ...pile,
+            cards: [...pile.cards] // This creates a deep copy of the cards array
+        }));
         const objectToMove = newPiles[pileIndexOfActive].cards.pop()!;
 
         /* Check if the move is legal! If not, return early. */
@@ -229,7 +238,10 @@ export function useSolitaireGameMoves() {
         }
 
         /* Update the values of the columns */
-        let newDeck = {...deck};
+        let newDeck = {
+            ...deck,
+            cards: [...deck.cards] // Creates a new array copy of deck.cards
+          };
         const objectToMove = newDeck.cards.pop()!;
         newDeck.open_cards -= 1;
 
@@ -287,8 +299,11 @@ export function useSolitaireGameMoves() {
         }
 
         /* Update the values of the columns */
-        const objectToMove = deck.cards.pop()!;
-        let newDeck = {...deck};
+        let newDeck = {
+            ...deck,
+            cards: [...deck.cards] // Creates a new array copy of deck.cards
+          };
+        const objectToMove = newDeck.cards.pop()!;
         newDeck.open_cards -= 1;
 
         /* Check if the move is legal! If not, return early. */

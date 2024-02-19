@@ -43,15 +43,14 @@ const GamePage = () => {
   }
 
   return (
-    <div className={`min-h-screen ${isMoveLoading ? 'cursor-wait' : 'cursor-default'}`}>
+    <div className={`min-h-screen overflow-hidden ${isMoveLoading ? 'cursor-wait' : 'cursor-default'}`}>
       <div className="flex align-bottom pt-10 px-20 justify-between">
         <div className="logo text-white text-[28px] font-bold font-['Mysten Walter Alte']">
           Mysten Solitaire
         </div>
         {game && (
-          <div className="flex justify-center items-center gap-x-4 pl-4 pr-1 bg-black bg-opacity-10 rounded-[40px] border border-black border-opacity-10">
+          <div className="flex justify-center items-center gap-x-10 pl-4 pr-1 bg-black bg-opacity-10 rounded-[40px] border border-black border-opacity-10">
               <div className="text-stone-100 text-base font-normal">Moves: {moves}</div>
-              <div className="text-stone-100 text-base font-normal">Time: 00:00</div>
               <div className={`${isMoveLoading ? 'cursor-wait' : ''} text-white text-base font-bold bg-black rounded-[40px] p-2`}>End game</div>
           </div>
         )}
@@ -62,7 +61,7 @@ const GamePage = () => {
           <DifficultySelection onGameCreation={onGameCreation} />
         </div>
       ) : (
-        <GameBoard game={game.elements} />
+        <GameBoard game={game.elements} move={{moves, setMoves}} />
       )}
     </div>
   );

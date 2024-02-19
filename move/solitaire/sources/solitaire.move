@@ -339,6 +339,7 @@ module solitaire::solitaire {
         game.deck.hidden_cards = game.deck.hidden_cards - 1;
         let card = reveal_card(clock, &mut game.available_cards);
         vector::push_back(&mut game.deck.cards, card);
+        game.player_moves = game.player_moves + 1;
         event::emit(CardRevealed {card});
     }
 
@@ -354,6 +355,7 @@ module solitaire::solitaire {
 
     /// This funtion needs to be called when the player has finished the game.
     public fun finish_game(game: &mut Game, clock: &Clock, _ctx: &mut TxContext) {
+        assert!(game.end_time == 0, EGameHasFinished);
         let i = 0;
         while (i < PILE_COUNT) {
             let pile = vector::borrow(&game.piles, i);

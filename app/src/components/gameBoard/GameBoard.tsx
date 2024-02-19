@@ -19,6 +19,7 @@ import circleArrow from "../../../public/circle-arrow-icon.svg";
 import { LoadingContext } from "@/contexts/LoadingProvider";
 import FinishGame from "./FinishGame";
 import WonModal from "./WonModal";
+import { Game } from "@/models/game";
 
 interface GameProps {
   id: string;
@@ -27,7 +28,12 @@ interface GameProps {
   piles: PileProps[];
 }
 
-export default function GameBoard({ game }: { game: GameProps }) {
+interface MoveProps {
+  moves: number;
+  setMoves: any;
+}
+
+export default function GameBoard({ game, move }: { game: GameProps, move: MoveProps}) {
   const [deck, setDeck] = useState<DeckProps>({
     hidden_cards: game.deck.hidden_cards,
     open_cards: 0,
@@ -48,6 +54,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
     handleOpenDeckCard,
     handleRotateOpenDeckCards,
     handleFinishGame,
+    getGameObjectDetails
   } = useSolitaireActions();
 
   const {
@@ -116,6 +123,21 @@ export default function GameBoard({ game }: { game: GameProps }) {
     }
   }
 
+  const handleFailedTransaction = async () => {
+    const onchainGame = await getGameObjectDetails(game.id);
+          const newGame = new Game(onchainGame);
+          setDeck((prevDeck) => {
+            return {
+              ...prevDeck,
+              hidden_cards: newGame.deck.hidden_cards,
+              open_cards: prevDeck.open_cards,
+              cards: newGame.deck.cards,
+            }
+          });
+          setColumns(newGame.columns);
+          setPiles(newGame.piles);
+  }
+
   const clickDeck = async () => {
     if (!deck.hidden_cards && deck.cards.length === deck.open_cards) {
       setDeck((prevDeck) => ({
@@ -136,8 +158,16 @@ export default function GameBoard({ game }: { game: GameProps }) {
           open_cards: prevDeck.open_cards + 1, // Add 1 to open_cards
           cards: [...prevDeck.cards, newCard], // Add newCard to the end of cards array
         }));
+        move.setMoves((prevMoves: number) => prevMoves + 1);
       } catch (e) {
         toast.error("Transaction Failed");
+        // Fetch onchain Game and set the state again
+        try {
+          await handleFailedTransaction();
+        } catch (fetchError) {
+          console.error("Failed to fetch game", fetchError);
+          toast.error("Failed to update game");
+    }
       }
     } else {
       try {
@@ -151,10 +181,15 @@ export default function GameBoard({ game }: { game: GameProps }) {
             cards: [...prevDeck.cards, rotatedCard],
           };
         });
-        // TODO: deserialize updatedGame using GameProps
-        //setDeck(deck);
+        move.setMoves((prevMoves: number) => prevMoves + 1);
       } catch (e) {
         toast.error("Transaction Failed");
+        try {
+          await handleFailedTransaction();
+        } catch (fetchError) {
+          console.error("Failed to fetch game", fetchError);
+          toast.error("Failed to update game");
+    }
       }
     }
     setIsMoveLoading(false);
@@ -164,8 +199,15 @@ export default function GameBoard({ game }: { game: GameProps }) {
     setIsMoveLoading(true);
     try {
       await handleFromDeckToPile(game.id, pileIndex);
+      move.setMoves((prevMoves: number) => prevMoves + 1);
     } catch (e) {
       toast.error("Transaction Failed");
+      try {
+        await handleFailedTransaction();
+      } catch (fetchError) {
+        console.error("Failed to fetch game", fetchError);
+        toast.error("Failed to update game");
+  }
     } finally {
       setIsMoveLoading(false);
       checkIfFinished();
@@ -176,8 +218,15 @@ export default function GameBoard({ game }: { game: GameProps }) {
     setIsMoveLoading(true);
     try {
       await handleFromDeckToColumn(game.id, columnIndex);
+      move.setMoves((prevMoves: number) => prevMoves + 1);
     } catch (e) {
       toast.error("Transaction Failed");
+      try {
+        await handleFailedTransaction();
+      } catch (fetchError) {
+        console.error("Failed to fetch game", fetchError);
+        toast.error("Failed to update game");
+  }
     } finally {
       setIsMoveLoading(false);
     }
@@ -191,6 +240,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
         columnIndex,
         pileIndex
       );
+      move.setMoves((prevMoves: number) => prevMoves + 1);
       if (newCard) {
         setColumns((prevColumns) =>
           prevColumns.map((column, index) => {
@@ -208,6 +258,12 @@ export default function GameBoard({ game }: { game: GameProps }) {
       }
     } catch (e) {
       toast.error("Transaction Failed");
+      try {
+        await handleFailedTransaction();
+      } catch (fetchError) {
+        console.error("Failed to fetch game", fetchError);
+        toast.error("Failed to update game");
+  }
     } finally {
       setIsMoveLoading(false);
       checkIfFinished();
@@ -227,6 +283,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
         card,
         toColumnIndex
       );
+      move.setMoves((prevMoves: number) => prevMoves + 1);
       if (newCard) {
         setColumns((prevColumns) =>
           prevColumns.map((column, index) => {
@@ -244,6 +301,12 @@ export default function GameBoard({ game }: { game: GameProps }) {
       }
     } catch (e) {
       toast.error("Transaction Failed");
+      try {
+        await handleFailedTransaction();
+      } catch (fetchError) {
+        console.error("Failed to fetch game", fetchError);
+        toast.error("Failed to update game");
+  }
     } finally {
       setIsMoveLoading(false);
     }
@@ -253,8 +316,15 @@ export default function GameBoard({ game }: { game: GameProps }) {
     setIsMoveLoading(true);
     try {
       await handleFromPileToColumn(game.id, pileIndex, columnIndex);
+      move.setMoves((prevMoves: number) => prevMoves + 1);
     } catch (e) {
       toast.error("Transaction Failed");
+      try {
+        await handleFailedTransaction();
+      } catch (fetchError) {
+        console.error("Failed to fetch game", fetchError);
+        toast.error("Failed to update game");
+  }
     } finally {
       setIsMoveLoading(false);
     }
@@ -323,7 +393,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
   };
 
   return (
-    <DndContext onDragEnd={handleDragEnd}>
+    <DndContext onDragEnd={handleDragEnd} autoScroll={false}>
       <div className="px-60 h-full w-full flex flex-col items-center space-y-7 pt-14 gap-y-36">
         <ul className="w-full h-200 flex justify-between items-center">
           {/* Set up card deck */}
@@ -379,7 +449,7 @@ export default function GameBoard({ game }: { game: GameProps }) {
           ))}
         </ul>
         {isFinished && <FinishGame finishGame={finishGame} />}
-        {wonModal && <WonModal gameId={game.id}/>}
+        {wonModal && <WonModal gameId={game.id} moves={move.moves}/>}
       </div>
     </DndContext>
   );

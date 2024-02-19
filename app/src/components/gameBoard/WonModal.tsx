@@ -10,6 +10,7 @@ import GameHistory from "./GameHistory";
 
 interface Props {
   gameId: string;
+  moves: number;
 }
 
 interface GameFields {
@@ -24,7 +25,7 @@ export interface Game extends GameFields {
   id: string | undefined;
 }
 
-export default function WonModal({ gameId }: Props) {
+export default function WonModal({ gameId, moves }: Props) {
   const [showHistory, setShowHistory] = useState(false);
   const [games, setGames] = useState<Game[]>([]);
   const { suiClient } = useSui();
@@ -78,6 +79,8 @@ export default function WonModal({ gameId }: Props) {
             const id = game.data?.objectId;
             return { id, ...fields };
           });
+          games.sort((a, b) => {return Number(b.fields.end_time) - Number(a.fields.end_time)})
+          games.filter((game) => game.id !== gameId);
           setGames(games);
         }
       } catch (error) {
@@ -101,7 +104,7 @@ export default function WonModal({ gameId }: Props) {
                   Moves
                 </div>
                 <div className="text-base font-bold text-right text-neutral-900 opacity-90">
-                  55
+                  {moves}
                 </div>
               </div>
               <a
