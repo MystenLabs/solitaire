@@ -22,6 +22,7 @@ module solitaire::solitaire {
     const EGameNotFinished: u64 = 11;
     const EGameHasFinished: u64 = 12;
     const EInvalidTurnDeckCard: u64 = 13;
+    const EGameHasNotFinished: u64 = 14;
 
 // =================== Constants ===================
     const CARD_COUNT: u64 = 52;
@@ -363,6 +364,50 @@ module solitaire::solitaire {
             i = i + 1;
         };
         game.end_time = clock::timestamp_ms(clock);
+    }
+
+    public fun delete_unfinished_game(game: Game, _ctx: &mut TxContext) {
+        assert!(game.end_time == 0, EGameHasNotFinished);
+        let Game {
+            id,
+            deck,
+            piles,
+            columns,
+            available_cards: _,
+            player: _,
+            start_time: _,
+            end_time: _,
+            player_moves: _,
+            difficulty: _,
+        } = game;
+
+        let Deck {
+            hidden_cards: _,
+            cards: _,
+        } = deck;
+
+        let i = 0;
+        while (i < PILE_COUNT) {
+            let pile = vector::pop_back(&mut piles);
+            let Pile {
+                cards: _,
+            } = pile;
+            i = i + 1;
+        };
+        vector::destroy_empty(piles);
+
+        let j = 0;
+        while (j < COLUMN_COUNT) {
+            let column = vector::pop_back(&mut columns);
+            let Column {
+                hidden_cards: _,
+                cards: _,
+            } = column;
+            j = j + 1;
+        };
+        vector::destroy_empty(columns);
+
+        object::delete(id);
     }
 
     /// Internal function that sets up the 7 columns of cards.

@@ -124,3 +124,14 @@ export function finishGame(game: string) {
     });
     return tx;
 }
+
+export function deleteUnfinishedGame(game: string) {
+    const tx = new TransactionBlock();
+    tx.moveCall({
+        target: `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::delete_unfinished_game`,
+        arguments: [
+            tx.object(game)
+        ],
+    });
+    return tx;
+}

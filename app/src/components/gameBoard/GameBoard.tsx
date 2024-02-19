@@ -19,6 +19,7 @@ import circleArrow from "../../../public/circle-arrow-icon.svg";
 import { LoadingContext } from "@/contexts/LoadingProvider";
 import FinishGame from "./FinishGame";
 import WonModal from "./WonModal";
+import {useEffect} from "react";
 import { Game } from "@/models/game";
 
 interface GameProps {
@@ -54,7 +55,8 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
     handleOpenDeckCard,
     handleRotateOpenDeckCards,
     handleFinishGame,
-    getGameObjectDetails
+    handleDeleteUnfinishedGame,
+    getGameObjectDetails,
   } = useSolitaireActions();
 
   const {
@@ -64,6 +66,18 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
     updateDeckToColumnMove,
     updateDeckToPileMove,
   } = useSolitaireGameMoves();
+
+  // If the user leaves the page, the on-chain game will be deleted.
+  useEffect(() => {
+    async function handleUnload(e: BeforeUnloadEvent) {
+      e.preventDefault();
+      return (e.returnValue = ""); // Trick to return the value on assignment
+    }
+    window.addEventListener("beforeunload", handleUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleUnload);
+    }
+  }, []);
 
   function handleDragEnd(event: any) {
     const { active, over } = event;

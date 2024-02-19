@@ -11,6 +11,7 @@ import {
   openDeckCard,
   rotateOpenDeckCards,
   finishGame,
+  deleteUnfinishedGame
 } from "@/helpers/moveCalls";
 import { Game } from "@/models/game";
 import { SuiTransactionBlockResponse } from "@mysten/sui.js/client";
@@ -246,8 +247,32 @@ export const useSolitaireActions = () => {
         }
       })
       .catch((err) => {
-        console.log(err);
+        console.warn(err);
         throw new Error("Transaction failed");
+      });
+  }
+
+  const handleDeleteUnfinishedGame = async (gameId: string) => {
+    const tx = deleteUnfinishedGame(gameId);
+    const keypair = await enokiFlow.getKeypair();
+    await suiClient
+      .signAndExecuteTransactionBlock({
+        transactionBlock: tx,
+        signer: keypair,
+        requestType: "WaitForLocalExecution",
+        options: {
+          showEffects: true,
+          showObjectChanges: true,
+        },
+      })
+      .then((resp) => {
+        if (resp.effects?.status.status !== "success") {
+          throw new Error("Game deletion failed");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        throw new Error("Game deletion failed");
       });
   }
 
@@ -304,6 +329,7 @@ export const useSolitaireActions = () => {
     handleExecuteInitEasyGame,
     handleExecuteInitNormalGame,
     handleFinishGame,
-    getGameObjectDetails
+    handleDeleteUnfinishedGame,
+    getGameObjectDetails,
   };
 };
