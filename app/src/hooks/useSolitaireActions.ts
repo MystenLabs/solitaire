@@ -268,10 +268,10 @@ export const useSolitaireActions = () => {
   }
 
   async function getGameObjectDetails(
-    initGameRes: SuiTransactionBlockResponse
+    objectId: string | undefined
   ) {
     let res = await suiClient.getObject({
-      id: initGameRes.effects!.created![0].reference.objectId,
+      id: objectId!,
       options: { showContent: true },
     });
     return res;
@@ -281,7 +281,7 @@ export const useSolitaireActions = () => {
     const transactionBlock = initNormalGame();
     const keypair = await enokiFlow.getKeypair();
     let res = await execute(transactionBlock, keypair);
-    let gameObjectRes = await getGameObjectDetails(res);
+    let gameObjectRes = await getGameObjectDetails(res.effects?.created![0].reference.objectId);
     return new Game(gameObjectRes!);
   };
 
@@ -289,7 +289,7 @@ export const useSolitaireActions = () => {
     const transactionBlock = initEasyGame();
     const keypair = await enokiFlow.getKeypair();
     let res = await execute(transactionBlock, keypair);
-    let gameObjectRes = await getGameObjectDetails(res);
+    let gameObjectRes = await getGameObjectDetails(res.effects?.created![0].reference.objectId);
     return new Game(gameObjectRes!);
   };
 
@@ -304,5 +304,6 @@ export const useSolitaireActions = () => {
     handleExecuteInitEasyGame,
     handleExecuteInitNormalGame,
     handleFinishGame,
+    getGameObjectDetails
   };
 };

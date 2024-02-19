@@ -19,6 +19,7 @@ import circleArrow from "../../../public/circle-arrow-icon.svg";
 import { LoadingContext } from "@/contexts/LoadingProvider";
 import FinishGame from "./FinishGame";
 import WonModal from "./WonModal";
+import { Game } from "@/models/game";
 
 interface GameProps {
   id: string;
@@ -53,6 +54,7 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
     handleOpenDeckCard,
     handleRotateOpenDeckCards,
     handleFinishGame,
+    getGameObjectDetails
   } = useSolitaireActions();
 
   const {
@@ -121,6 +123,21 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
     }
   }
 
+  const handleFailedTransaction = async () => {
+    const onchainGame = await getGameObjectDetails(game.id);
+          const newGame = new Game(onchainGame);
+          setDeck((prevDeck) => {
+            return {
+              ...prevDeck,
+              hidden_cards: newGame.deck.hidden_cards,
+              open_cards: prevDeck.open_cards,
+              cards: newGame.deck.cards,
+            }
+          });
+          setColumns(newGame.columns);
+          setPiles(newGame.piles);
+  }
+
   const clickDeck = async () => {
     if (!deck.hidden_cards && deck.cards.length === deck.open_cards) {
       setDeck((prevDeck) => ({
@@ -144,6 +161,13 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
         move.setMoves((prevMoves: number) => prevMoves + 1);
       } catch (e) {
         toast.error("Transaction Failed");
+        // Fetch onchain Game and set the state again
+        try {
+          await handleFailedTransaction();
+        } catch (fetchError) {
+          console.error("Failed to fetch game", fetchError);
+          toast.error("Failed to update game");
+    }
       }
     } else {
       try {
@@ -160,6 +184,12 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
         move.setMoves((prevMoves: number) => prevMoves + 1);
       } catch (e) {
         toast.error("Transaction Failed");
+        try {
+          await handleFailedTransaction();
+        } catch (fetchError) {
+          console.error("Failed to fetch game", fetchError);
+          toast.error("Failed to update game");
+    }
       }
     }
     setIsMoveLoading(false);
@@ -172,6 +202,12 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
       move.setMoves((prevMoves: number) => prevMoves + 1);
     } catch (e) {
       toast.error("Transaction Failed");
+      try {
+        await handleFailedTransaction();
+      } catch (fetchError) {
+        console.error("Failed to fetch game", fetchError);
+        toast.error("Failed to update game");
+  }
     } finally {
       setIsMoveLoading(false);
       checkIfFinished();
@@ -185,6 +221,12 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
       move.setMoves((prevMoves: number) => prevMoves + 1);
     } catch (e) {
       toast.error("Transaction Failed");
+      try {
+        await handleFailedTransaction();
+      } catch (fetchError) {
+        console.error("Failed to fetch game", fetchError);
+        toast.error("Failed to update game");
+  }
     } finally {
       setIsMoveLoading(false);
     }
@@ -216,6 +258,12 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
       }
     } catch (e) {
       toast.error("Transaction Failed");
+      try {
+        await handleFailedTransaction();
+      } catch (fetchError) {
+        console.error("Failed to fetch game", fetchError);
+        toast.error("Failed to update game");
+  }
     } finally {
       setIsMoveLoading(false);
       checkIfFinished();
@@ -253,6 +301,12 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
       }
     } catch (e) {
       toast.error("Transaction Failed");
+      try {
+        await handleFailedTransaction();
+      } catch (fetchError) {
+        console.error("Failed to fetch game", fetchError);
+        toast.error("Failed to update game");
+  }
     } finally {
       setIsMoveLoading(false);
     }
@@ -265,6 +319,12 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
       move.setMoves((prevMoves: number) => prevMoves + 1);
     } catch (e) {
       toast.error("Transaction Failed");
+      try {
+        await handleFailedTransaction();
+      } catch (fetchError) {
+        console.error("Failed to fetch game", fetchError);
+        toast.error("Failed to update game");
+  }
     } finally {
       setIsMoveLoading(false);
     }

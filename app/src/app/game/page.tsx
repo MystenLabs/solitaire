@@ -43,7 +43,7 @@ const GamePage = () => {
   }
 
   return (
-    <div className={`min-h-screen ${isMoveLoading ? 'cursor-wait' : 'cursor-default'}`}>
+    <div className={`min-h-screen overflow-hidden ${isMoveLoading ? 'cursor-wait' : 'cursor-default'}`}>
       <div className="flex align-bottom pt-10 px-20 justify-between">
         <div className="logo text-white text-[28px] font-bold font-['Mysten Walter Alte']">
           Mysten Solitaire

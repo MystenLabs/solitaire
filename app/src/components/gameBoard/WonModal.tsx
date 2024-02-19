@@ -79,6 +79,8 @@ export default function WonModal({ gameId, moves }: Props) {
             const id = game.data?.objectId;
             return { id, ...fields };
           });
+          games.sort((a, b) => {return Number(b.fields.end_time) - Number(a.fields.end_time)})
+          games.filter((game) => game.id !== gameId);
           setGames(games);
         }
       } catch (error) {
