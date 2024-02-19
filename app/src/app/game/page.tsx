@@ -59,6 +59,7 @@ const GamePage = () => {
                   try {
                     console.log('Deleting unfinished game');
                     await handleDeleteUnfinishedGame(game.id);
+                    window.location.href = '/game';
                   } catch (e) {
                     console.debug(e)
                   }
