@@ -333,7 +333,7 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
   };
 
   return (
-    <DndContext onDragEnd={handleDragEnd}>
+    <DndContext onDragEnd={handleDragEnd} autoScroll={false}>
       <div className="px-60 h-full w-full flex flex-col items-center space-y-7 pt-14 gap-y-36">
         <ul className="w-full h-200 flex justify-between items-center">
           {/* Set up card deck */}
