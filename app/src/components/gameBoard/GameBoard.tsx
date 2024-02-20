@@ -55,7 +55,6 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
     handleOpenDeckCard,
     handleRotateOpenDeckCards,
     handleFinishGame,
-    handleDeleteUnfinishedGame,
     getGameObjectDetails,
   } = useSolitaireActions();
 
@@ -70,7 +69,9 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
   // If the user leaves the page, the on-chain game will be deleted.
   useEffect(() => {
     async function handleUnload(e: BeforeUnloadEvent) {
-      e.preventDefault();
+      if (wonModal === false) {
+        e.preventDefault();
+      }
       return (e.returnValue = ""); // Trick to return the value on assignment
     }
     window.addEventListener("beforeunload", handleUnload);

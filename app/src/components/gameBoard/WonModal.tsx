@@ -32,7 +32,6 @@ export default function WonModal({ gameId, moves }: Props) {
   const {
     user: { address },
   } = useAuthentication();
-  const { enokiFlow } = useAuthentication();
 
   useEffect(() => {
     const getGame = async () => {
@@ -80,8 +79,8 @@ export default function WonModal({ gameId, moves }: Props) {
             return { id, ...fields };
           });
           games.sort((a, b) => {return Number(b.fields.end_time) - Number(a.fields.end_time)})
-          games.filter((game) => game.id !== gameId);
-          setGames(games);
+          const filteredGames = games.filter((game) => game.id !== gameId);
+          setGames(filteredGames);
         }
       } catch (error) {
         console.error(error);
