@@ -12,13 +12,16 @@ export default function Column({ column, index }: { column: Column, index: numbe
     );
     allCards.push(...column.cards);
 
+    const isNormalCard = (id: any) => { return id !== undefined && id !== null; }
+
     // Generate stack the of cards:
     return (
         <div>
             {allCards.reduceRight(
-                (accumulator, id) => {
+                (accumulator, id, currentIndex) => {
                     return (
-                        <Card id={id !== undefined && id !== null ? Number(id) : -1} marginTop={'-110%'}>
+                        <Card id={isNormalCard(id) ? Number(id) : -1}
+                              marginTop={currentIndex > 0 && currentIndex <= column.hidden_cards ? '-130%' : '-110%'}>
                             {accumulator}
                         </Card>
                     )
