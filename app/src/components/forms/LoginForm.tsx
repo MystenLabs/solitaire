@@ -22,6 +22,7 @@ export const LoginForm = () => {
     const protocol = window.location.protocol;
     const host = window.location.host;
     const customRedirectUri = `${protocol}//${host}/auth`;
+    if (!!sessionStorage.getItem(`@enoki/flow/session/${process.env.NEXT_PUBLIC_ENOKI_API_KEY!}`)) return;
     const authURL = await enokiFlow.createAuthorizationURL({
       provider: "google",
       clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,

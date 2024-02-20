@@ -1,9 +1,7 @@
 "use client";
 
 import { useAuthentication } from "@/contexts/Authentication";
-import { fromB64 } from "@mysten/sui.js/utils";
-import { Ed25519Keypair } from "@mysten/sui.js/keypairs/ed25519";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 
 // bad practice but is not exported from @mysten/enoki
@@ -12,6 +10,12 @@ import { Spinner } from "@/components/general/Spinner";
 
 const AuthPage = () => {
   const { enokiFlow, handleLoginAs, setIsLoading } = useAuthentication();
+  const [enokiActive, setEnokiActive] = useState(false);
+
+  useEffect(() => {
+    if (enokiActive) return;
+    setEnokiActive(true);
+  }, [enokiFlow]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -40,7 +44,7 @@ const AuthPage = () => {
         console.log({ err });
         setIsLoading(false);
       });
-  }, [enokiFlow]);
+  }, [enokiActive]);
 
   return <Spinner />;
 };
