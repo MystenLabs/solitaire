@@ -439,7 +439,7 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
           </li>
 
           {/* Empty placeholder */}
-          <li className="w-[120px] h-[166px]"></li>
+          <li className="w-[120px] h-[166px] flex-shrink-0"></li>
 
           {/* Set up piles */}
           {piles.map((pile, index) => (
