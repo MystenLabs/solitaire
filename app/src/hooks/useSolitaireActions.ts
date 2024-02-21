@@ -14,9 +14,8 @@ import {
   deleteUnfinishedGame
 } from "@/helpers/moveCalls";
 import { Game } from "@/models/game";
-import { SuiTransactionBlockResponse } from "@mysten/sui.js/client";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import { EnokiKeypair } from "@mysten/enoki";
+import { GetTransactionBlockParams } from "@mysten/sui.js/client";
 
 interface CardRevealedEvent {
   card: string;
@@ -278,43 +277,54 @@ export const useSolitaireActions = () => {
 
   async function execute(
     transactionBlock: TransactionBlock,
-    keypair: EnokiKeypair
   ) {
-    const res = await suiClient.signAndExecuteTransactionBlock({
-      signer: keypair,
-      transactionBlock,
-      options: {
-        showEffects: true,
-        showEvents: true,
-        showObjectChanges: true,
-      },
-    });
-    return res;
+    try {
+      const {digest} = await enokiFlow.sponsorAndExecuteTransactionBlock({
+        network: 'testnet',
+        transactionBlock,
+        client: suiClient,
+      });
+      return digest;
+    } catch (error) {
+      console.error(error);
+      throw new Error("Transaction sponsorship failed");
+    }
   }
 
   async function getGameObjectDetails(
-    objectId: string | undefined
+    digest: string | undefined
   ) {
-    let res = await suiClient.getObject({
-      id: objectId!,
-      options: { showContent: true },
+    if (!digest) throw new Error("NO DIGEST: Not able to get game object details.");
+    let res = await suiClient.getTransactionBlock({
+      digest,
+      options: {
+        showEffects: true,
+        showObjectChanges: true,
+        showEvents: true,
+      }
+    } as GetTransactionBlockParams);
+    let objectId = res.effects?.created![0].reference.objectId;
+    if (!objectId) throw new Error("NO OBJECT ID: Not able to get game object details. Was the transaction successful?");
+    return await suiClient.getObject({
+        id: objectId,
+        options: {
+          showContent: true,
+        }
     });
-    return res;
   }
 
   const handleExecuteInitNormalGame = async () => {
     const transactionBlock = initNormalGame();
-    const keypair = await enokiFlow.getKeypair();
-    let res = await execute(transactionBlock, keypair);
-    let gameObjectRes = await getGameObjectDetails(res.effects?.created![0].reference.objectId);
+    let digest = await execute(transactionBlock);
+    let gameObjectRes = await getGameObjectDetails(digest);
+    console.log(gameObjectRes);
     return new Game(gameObjectRes!);
   };
 
   const handleExecuteInitEasyGame = async () => {
     const transactionBlock = initEasyGame();
-    const keypair = await enokiFlow.getKeypair();
-    let res = await execute(transactionBlock, keypair);
-    let gameObjectRes = await getGameObjectDetails(res.effects?.created![0].reference.objectId);
+    let digest = await execute(transactionBlock);
+    let gameObjectRes = await getGameObjectDetails(digest);
     return new Game(gameObjectRes!);
   };
 
