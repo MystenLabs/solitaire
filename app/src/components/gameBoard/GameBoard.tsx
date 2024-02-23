@@ -20,14 +20,7 @@ import { LoadingContext } from "@/contexts/LoadingProvider";
 import FinishGame from "./FinishGame";
 import WonModal from "./WonModal";
 import {useEffect} from "react";
-import { Game } from "@/models/game";
-
-interface GameProps {
-  id: string;
-  columns: ColumnProps[];
-  deck: DeckProps;
-  piles: PileProps[];
-}
+import { Game, GameProps } from "@/models/game";
 
 interface MoveProps {
   moves: number;
@@ -36,9 +29,9 @@ interface MoveProps {
 
 export default function GameBoard({ game, move }: { game: GameProps, move: MoveProps}) {
   const [deck, setDeck] = useState<DeckProps>({
+    cards: game.deck.cards,
     hidden_cards: game.deck.hidden_cards,
     open_cards: 0,
-    cards: [],
   });
   const [piles, setPiles] = useState<PileProps[]>(game.piles);
   const [columns, setColumns] = useState<ColumnProps[]>(game.columns);
@@ -69,7 +62,7 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
   // If the user leaves the page, the on-chain game will be deleted.
   useEffect(() => {
     async function handleUnload(e: BeforeUnloadEvent) {
-      if (wonModal === false) {
+      if (!wonModal) {
         e.preventDefault();
       }
       return (e.returnValue = ""); // Trick to return the value on assignment

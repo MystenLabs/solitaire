@@ -8,36 +8,37 @@ import {Game} from "@/models/game";
 import {useSolitaireActions} from "@/hooks/useSolitaireActions";
 import {AccountDropdown} from "@/components/user/accountDropdown";
 import { LoadingContext } from "@/contexts/LoadingProvider";
-
+import { GameProps } from "@/models/game";
+import toast from "react-hot-toast";
 
 const GamePage = () => {
   const [spinning, setSpinning] = useState<boolean>(false);
   const { user, isLoading, enokiFlow } = useAuthentication();
-  const [game, setGame] = useState<Game | null>(null);
+  const [game, setGame] = useState<GameProps | null>(null);
   const [moves, setMoves] = useState<number>(0);
   const {
     handleExecuteInitEasyGame,
     handleExecuteInitNormalGame,
     handleDeleteUnfinishedGame,
   } = useSolitaireActions();
-  const { isMoveLoading } = useContext(LoadingContext);
+  const { isMoveLoading, setIsMoveLoading } = useContext(LoadingContext);
 
   const onGameCreation = async (mode: 'easy' | 'normal') => {
     setSpinning(true);
-    let game: Game | undefined = undefined;
+    let newGame: Game | undefined = undefined;
     if (mode === 'easy') {
-      game = await handleExecuteInitEasyGame();
+      newGame = await handleExecuteInitEasyGame();
     } else if (mode === 'normal') {
-      game = await handleExecuteInitNormalGame();
+      newGame = await handleExecuteInitNormalGame();
     } else {
       throw new Error('Invalid difficulty mode');
     }
-    if (!game) {
+    if (!newGame) {
       throw new Error('Failed to initialize game');
     }
     setSpinning(false);
-    console.log(game.id);
-    setGame(game);
+    console.log("Game id:", newGame.id);
+    setGame(newGame.elements);
   }
 
   if (isLoading || spinning) {
@@ -55,16 +56,18 @@ const GamePage = () => {
               <div className="text-stone-100 text-base font-normal">Moves: {moves}</div>
               <button onClick={
                 async () => {
-                  setSpinning(true);
                   try {
+                    setIsMoveLoading(true);
                     console.log('Deleting unfinished game');
                     await handleDeleteUnfinishedGame(game.id);
                     setGame(null);
                     setMoves(0);
                   } catch (e) {
-                    console.debug(e)
+                    console.error(e);
+                    toast.error('Could not end unfinished game.');
+                  } finally {
+                    setIsMoveLoading(false);
                   }
-                  setSpinning(false);
                 }
               } className={`${isMoveLoading ? 'cursor-wait' : ''} text-white text-base font-bold bg-black rounded-[40px] p-2`}>
                 End game
@@ -78,7 +81,7 @@ const GamePage = () => {
           <DifficultySelection onGameCreation={onGameCreation} />
         </div>
       ) : (
-        <GameBoard game={game.elements} move={{moves, setMoves}} />
+        <GameBoard game={game} move={{moves, setMoves}} />
       )}
     </div>
   );

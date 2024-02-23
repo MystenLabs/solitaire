@@ -1,8 +1,15 @@
 // @ts-ignore
 import { SuiTransactionBlockResponse } from "@mysten/sui.js";
-import { Column } from './column';
-import { Deck } from './deck';
-import { Pile } from './pile';
+import {Column as ColumnProps, Column} from './column';
+import {Deck as DeckProps, Deck} from './deck';
+import {Pile as PileProps, Pile} from './pile';
+
+export interface GameProps {
+    id: string;
+    columns: ColumnProps[];
+    deck: DeckProps;
+    piles: PileProps[];
+}
 
 export class Game {
     id: string;
@@ -38,7 +45,7 @@ export class Game {
         );
     }
 
-    get elements(): any {
+    get elements(): GameProps {
         return {
             id: this.id,
             columns: this.columns,
