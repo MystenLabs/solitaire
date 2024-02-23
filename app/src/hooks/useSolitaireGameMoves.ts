@@ -309,7 +309,6 @@ export function useSolitaireGameMoves() {
         /* Check if the move is legal! If not, return early. */
         const bottomCardOfObjectToMove = new CardDetails(objectToMove);
         if (over.id.includes('empty-pile-droppable')) {
-            console.log('EMPTY PILE')
             const isNotAce = bottomCardOfObjectToMove.rank !== 0;
             const pileIsNotEmpty = piles[pileIndexOfOver].cards.length !== 0;
             if (pileIsNotEmpty) {

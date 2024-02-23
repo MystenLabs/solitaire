@@ -333,7 +333,8 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
       await handleFromPileToColumn(game.id, pileIndex, columnIndex);
       move.setMoves((prevMoves: number) => prevMoves + 1);
     } catch (e) {
-      toast.error("Transaction Failed");
+      console.error(e);
+      toast.error(`Transaction Failed`);
       try {
         await handleFailedTransaction();
       } catch (fetchError) {
