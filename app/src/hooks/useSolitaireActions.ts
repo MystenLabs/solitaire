@@ -291,7 +291,7 @@ export const useSolitaireActions = () => {
     }
   }
 
-  async function getGameObjectDetails(
+  async function getGameObjectDetailsByDigest(
     digest: string | undefined
   ) {
     if (!digest) throw new Error("NO DIGEST: Not able to get game object details.");
@@ -313,10 +313,22 @@ export const useSolitaireActions = () => {
     });
   }
 
+  async function getGameObjectDetailsById(
+      objectId: string | undefined
+  ) {
+    if (!objectId) throw new Error("NO OBJECT ID: Not able to get game object details. Was the transaction successful?");
+    return await suiClient.getObject({
+      id: objectId,
+      options: {
+        showContent: true,
+      }
+    });
+  }
+
   const handleExecuteInitNormalGame = async () => {
     const transactionBlock = initNormalGame();
     let digest = await execute(transactionBlock);
-    let gameObjectRes = await getGameObjectDetails(digest);
+    let gameObjectRes = await getGameObjectDetailsByDigest(digest);
     console.log(gameObjectRes);
     return new Game(gameObjectRes!);
   };
@@ -324,7 +336,7 @@ export const useSolitaireActions = () => {
   const handleExecuteInitEasyGame = async () => {
     const transactionBlock = initEasyGame();
     let digest = await execute(transactionBlock);
-    let gameObjectRes = await getGameObjectDetails(digest);
+    let gameObjectRes = await getGameObjectDetailsByDigest(digest);
     return new Game(gameObjectRes!);
   };
 
@@ -340,6 +352,7 @@ export const useSolitaireActions = () => {
     handleExecuteInitNormalGame,
     handleFinishGame,
     handleDeleteUnfinishedGame,
-    getGameObjectDetails,
+    getGameObjectDetails: getGameObjectDetailsByDigest,
+    getGameObjectDetailsById,
   };
 };

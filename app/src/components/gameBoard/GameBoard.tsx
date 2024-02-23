@@ -55,7 +55,7 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
     handleOpenDeckCard,
     handleRotateOpenDeckCards,
     handleFinishGame,
-    getGameObjectDetails,
+    getGameObjectDetailsById
   } = useSolitaireActions();
 
   const {
@@ -139,7 +139,7 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
   }
 
   const handleFailedTransaction = async () => {
-    const onchainGame = await getGameObjectDetails(game.id);
+    const onchainGame = await getGameObjectDetailsById(game.id);
           const newGame = new Game(onchainGame);
           setDeck((prevDeck) => {
             return {
