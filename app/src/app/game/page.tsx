@@ -69,7 +69,8 @@ const GamePage = () => {
                     setIsMoveLoading(false);
                   }
                 }
-              } className={`${isMoveLoading ? 'cursor-wait' : ''} text-white text-base font-bold bg-black rounded-[40px] p-2`}>
+              } className={`${isMoveLoading ? 'cursor-wait bg-gray-600' : 'bg-black'} text-white text-base font-bold rounded-[40px] p-2`}
+                      style={{pointerEvents: isMoveLoading? 'none': undefined}}>
                 End game
               </button>
           </div>
