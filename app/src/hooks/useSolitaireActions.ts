@@ -31,30 +31,20 @@ export const useSolitaireActions = () => {
     columnIndex: number
   ) => {
     const tx = fromDeckToColumn(gameId, columnIndex);
-    return await execute(tx)
-        .then(({object, events, effects}) => {
-        if (effects?.status.status !== "success") {
-          throw new Error("Transaction failed");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        throw new Error("Transaction failed");
-      });
+    try {
+      return await execute(tx);
+    } catch (error) {
+      throw new Error(`From pile to column: ${error}`);
+    }
   };
 
   const handleFromDeckToPile = async (gameId: string, pileIndex: number) => {
     const tx = fromDeckToPile(gameId, pileIndex);
-    return await execute(tx)
-        .then(({object, events, effects}) => {
-        if (effects?.status.status !== "success") {
-          throw new Error("Transaction failed");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        throw new Error("Transaction failed");
-      });
+    try {
+      return await execute(tx);
+    } catch (error) {
+      throw new Error(`From deck to pile: ${error}`);
+    }
   };
 
   const handleFromColumnToPile = async (
@@ -64,7 +54,8 @@ export const useSolitaireActions = () => {
   ) => {
     const tx = fromColumnToPile(gameId, columnIndex, pileIndex);
     return await execute(tx)
-        .then(({object, events, effects}) => {
+        .then((res) => {
+          const { object, events, effects } = res ?? {};
         if (effects?.status.status !== "success") {
           throw new Error("Transaction failed");
         }
@@ -88,22 +79,23 @@ export const useSolitaireActions = () => {
     toColumnIndex: number
   ) => {
     const tx = fromColumnToColumn(gameId, fromColumnIndex, card, toColumnIndex);
-    return await execute(tx)
-        .then(({object, events, effects}) => {
-        if (effects?.status.status !== "success") {
+    return await execute(tx, true)
+        .then((res) => {
+          const { object, events, effects } = res ?? {};
+          if (effects?.status.status !== "success") {
+            throw new Error("Transaction failed");
+          }
+          const cardRevealedEvent = events?.find(
+              (event) =>
+                event.type ===
+                `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::CardRevealed`
+            )?.parsedJson as CardRevealedEvent;
+            return cardRevealedEvent?.card;
+        })
+        .catch((err) => {
+          console.log(err);
           throw new Error("Transaction failed");
-        }
-        const cardRevealedEvent = events?.find(
-            (event) =>
-              event.type ===
-              `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::CardRevealed`
-          )?.parsedJson as CardRevealedEvent;
-          return cardRevealedEvent?.card;
-      })
-      .catch((err) => {
-        console.log(err);
-        throw new Error("Transaction failed");
-      });
+        });
   };
 
   const handleFromPileToColumn = async (
@@ -121,8 +113,9 @@ export const useSolitaireActions = () => {
 
   const handleOpenDeckCard = async (gameId: string) => {
     const tx = openDeckCard(gameId);
-    return await execute(tx)
-      .then(({object, events, effects}) => {
+    return await execute(tx, true)
+      .then((res) => {
+        const { object, events, effects } = res ?? {};
         if (effects?.status.status !== "success") {
           throw new Error("Transaction failed");
         }
@@ -167,8 +160,24 @@ export const useSolitaireActions = () => {
     }
   }
 
+  /**
+   * Executes a transaction block.
+   *
+   * This function is responsible for executing a transaction block.
+   * It first sponsors and executes the transaction block
+   * using the `sponsorAndExecuteTransactionBlock` method from the `enokiFlow` object. If the transaction is successful,
+   * it returns the digest of the transaction. If the `getTransactionDetails` parameter is set to true, it fetches the
+   * details of the transaction using the `getGameObjectDetailsByDigest` method and returns them.
+   *
+   * @param {TransactionBlock} transactionBlock - The transaction block to be executed.
+   * @param {boolean} getTransactionDetails - A boolean indicating whether to fetch the details of the transaction. Defaults to false.
+   * @throws Will throw an error if the transaction sponsorship fails.
+   * @returns {Promise<SuiObjectResponse>} A promise that resolves to the digest of the transaction if `getTransactionDetails` is false,
+   * or the details of the transaction if `getTransactionDetails` is true.
+   */
   async function execute(
     transactionBlock: TransactionBlock,
+    getTransactionDetails: boolean = false,
   ) {
     let sponsorDigest;
     try {
@@ -182,10 +191,15 @@ export const useSolitaireActions = () => {
       console.error(error);
       throw new Error(`Transaction sponsorship failed ${error}`);
     }
-    const {object, events, effects} = await getGameObjectDetailsByDigest(sponsorDigest);
-    const error = object.error;
-    if (error) throw new Error(`Transaction sponsorship failed ${error}`);
-    return {object, events, effects};
+    if (getTransactionDetails) {
+      const {
+        object,
+        events,
+        effects} = await getGameObjectDetailsByDigest(sponsorDigest);
+      const error = object.error;
+      if (error) throw new Error(`Transaction sponsorship failed ${error}`);
+      return {object, events, effects};
+    }
   }
 
   async function getGameObjectDetailsByDigest(
@@ -239,13 +253,13 @@ export const useSolitaireActions = () => {
 
   const handleExecuteInitNormalGame = async () => {
     const transactionBlock = initNormalGame();
-    let {object, events} = await execute(transactionBlock);
+    let { object } = await execute(transactionBlock, true) ?? {};
     return new Game(object!);
   };
 
   const handleExecuteInitEasyGame = async () => {
     const transactionBlock = initEasyGame();
-    let {object, events} = await execute(transactionBlock);
+    let {object} = await execute(transactionBlock) ?? {};
     return new Game(object!);
   };
 
