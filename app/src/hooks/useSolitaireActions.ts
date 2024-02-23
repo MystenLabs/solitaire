@@ -259,7 +259,7 @@ export const useSolitaireActions = () => {
 
   const handleExecuteInitEasyGame = async () => {
     const transactionBlock = initEasyGame();
-    let {object} = await execute(transactionBlock) ?? {};
+    let {object} = await execute(transactionBlock, true) ?? {};
     return new Game(object!);
   };
 
