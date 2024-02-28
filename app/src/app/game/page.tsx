@@ -36,7 +36,6 @@ const GamePage = () => {
       throw new Error('Failed to initialize game');
     }
     setSpinning(false);
-    console.log(game.id);
     setGame(game);
   }
 
@@ -57,7 +56,6 @@ const GamePage = () => {
                 async () => {
                   setSpinning(true);
                   try {
-                    console.log('Deleting unfinished game');
                     await handleDeleteUnfinishedGame(game.id);
                     setGame(null);
                     setMoves(0);

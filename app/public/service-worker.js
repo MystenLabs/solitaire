@@ -49,7 +49,6 @@ self.addEventListener("message", (event) => {
 self.addEventListener("notificationclick", function (event) {
   console.log("Notification clicked.");
   event.notification.close();
-  console.log("aaaaaa");
 
   console.log(event.notification.data);
 

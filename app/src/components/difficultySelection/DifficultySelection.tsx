@@ -59,7 +59,6 @@ export const DifficultySelection = ({
     document.body.style.cursor = "default";
     setIsLoading(false);
   };
-  console.log("HAS ENOUGH BALANCE", enoughBalance);
   return (
     <div className="flex flex-col items-center justify-center rounded-3xl bg-white px-10 backdrop-blur-2xl">
       <p
