@@ -23,7 +23,6 @@ const AuthPage = () => {
     enokiFlow
       .handleAuthCallback(hash)
       .then(async (res: any) => {
-        console.log({ res });
         const session = await enokiFlow.getSession();
         const keypair = await enokiFlow.getKeypair();
         const address = keypair.toSuiAddress();
@@ -41,7 +40,6 @@ const AuthPage = () => {
         setIsLoading(false);
       })
       .catch((err: any) => {
-        console.log({ err });
         setIsLoading(false);
       });
   }, [enokiActive]);

@@ -48,7 +48,7 @@ export const useSolitaireActions = () => {
         }
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
         throw new Error("Transaction failed");
       });
   };
@@ -72,7 +72,7 @@ export const useSolitaireActions = () => {
         }
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
         throw new Error("Transaction failed");
       });
   };
@@ -106,7 +106,7 @@ export const useSolitaireActions = () => {
           return cardRevealedEvent?.card;
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
         throw new Error("Transaction failed");
       });
   };
@@ -141,7 +141,7 @@ export const useSolitaireActions = () => {
           return cardRevealedEvent?.card;
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
         throw new Error("Transaction failed");
       });
   };
@@ -169,7 +169,7 @@ export const useSolitaireActions = () => {
         }
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
         throw new Error("Transaction failed");
       });
   };
@@ -199,7 +199,7 @@ export const useSolitaireActions = () => {
         return cardRevealedEvent?.card;
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
         throw new Error("Transaction failed");
       });
   };
@@ -223,7 +223,7 @@ export const useSolitaireActions = () => {
         }
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
         throw new Error("Transaction failed");
       });
   };
@@ -271,7 +271,7 @@ export const useSolitaireActions = () => {
         }
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
         throw new Error("Game deletion failed");
       });
   }
