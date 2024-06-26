@@ -23,10 +23,10 @@ export const ProvidersAndLayout = ({ children }: ChildrenProps) => {
         }}
       >
         <div className="relative w-full h-screen flex-col">
-          <div className="sticky top-0 w-full flex justify-evenly items-center bg-white py-3 px-5">
-            <span className="text-opacity-90 text-[14px] text-[#4F4F4F]">[Mysten Solitaire] is provided for testnet purposes only and do not involve real money or the opportunity to win real money.</span>
+          <div className="absolute top-0 w-full flex justify-evenly items-center bg-white py-3 px-5">
+            <span className="text-opacity-90 text-[14px] text-[#4F4F4F]">[Mysten Solitaire] is provided for testnet purposes only and does not involve real money or the opportunity to win real money.</span>
           </div>
-          <div className="flex-1 p-4 bg-grey-100">
+          <div className="flex bg-grey-100">
             <div className="mx-auto">{children}</div>
           </div>
           <InfoIcon/>
