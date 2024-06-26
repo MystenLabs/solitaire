@@ -4,9 +4,9 @@ import { DifficultySelection } from "@/components/difficultySelection/Difficulty
 import { useAuthentication } from "@/contexts/Authentication";
 import { Spinner } from "@/components/general/Spinner";
 import GameBoard from "@/components/gameBoard/GameBoard";
-import {Game} from "@/models/game";
-import {useSolitaireActions} from "@/hooks/useSolitaireActions";
-import {AccountDropdown} from "@/components/user/accountDropdown";
+import { Game } from "@/models/game";
+import { useSolitaireActions } from "@/hooks/useSolitaireActions";
+import { AccountDropdown } from "@/components/user/accountDropdown";
 import { LoadingContext } from "@/contexts/LoadingProvider";
 
 
@@ -40,43 +40,46 @@ const GamePage = () => {
   }
 
   if (isLoading || spinning) {
-    return <Spinner />;
+    return <Spinner/>;
   }
 
   return (
-    <div className={`${isMoveLoading ? 'cursor-wait' : 'cursor-default'}`}>
-      <div className="flex px-20 justify-between">
+    <div
+      className={`py-5 min-h-screen overflow-x-auto overflow-hidden ${isMoveLoading ? 'cursor-wait' : 'cursor-default'}`}>
+      <div className="flex align-bottom pt-10 px-20 justify-between">
         <div className="logo text-white text-[28px] font-bold font-['Mysten Walter Alte']">
           Mysten Solitaire
         </div>
         {game && (
-          <div className="flex justify-center items-center gap-x-10 pl-4 pr-1 bg-black bg-opacity-10 rounded-[40px] border border-black border-opacity-10">
-              <div className="text-stone-100 text-base font-normal">Moves: {moves}</div>
-              <button onClick={
-                async () => {
-                  setSpinning(true);
-                  try {
-                    await handleDeleteUnfinishedGame(game.id);
-                    setGame(null);
-                    setMoves(0);
-                  } catch (e) {
-                    console.debug(e)
-                  }
-                  setSpinning(false);
+          <div
+            className="flex justify-center items-center gap-x-10 pl-4 pr-1 bg-black bg-opacity-10 rounded-[40px] border border-black border-opacity-10">
+            <div className="text-stone-100 text-base font-normal">Moves: {moves}</div>
+            <button onClick={
+              async () => {
+                setSpinning(true);
+                try {
+                  await handleDeleteUnfinishedGame(game.id);
+                  setGame(null);
+                  setMoves(0);
+                } catch (e) {
+                  console.debug(e)
                 }
-              } className={`${isMoveLoading ? 'cursor-wait' : ''} text-white text-base font-bold bg-black rounded-[40px] p-2`}>
-                End game
-              </button>
+                setSpinning(false);
+              }
+            }
+                    className={`${isMoveLoading ? 'cursor-wait' : ''} text-white text-base font-bold bg-black rounded-[40px] p-2`}>
+              End game
+            </button>
           </div>
         )}
-        <AccountDropdown user={user} enokiFlow={enokiFlow} />
+        <AccountDropdown user={user} enokiFlow={enokiFlow}/>
       </div>
       {!game ? (
         <div className="flex flex-col justify-center items-center mt-32">
-          <DifficultySelection onGameCreation={onGameCreation} />
+          <DifficultySelection onGameCreation={onGameCreation}/>
         </div>
       ) : (
-        <GameBoard game={game.elements} move={{moves, setMoves}} />
+        <GameBoard game={game.elements} move={{ moves, setMoves }}/>
       )}
     </div>
   );
