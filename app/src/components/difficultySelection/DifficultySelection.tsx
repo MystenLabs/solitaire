@@ -6,7 +6,7 @@ import { useAuthentication } from "@/contexts/Authentication";
 import { useEffect, useState } from "react";
 import BigNumber from "bignumber.js";
 import { getBalance } from "@/helpers/getBalance";
-import { SuiClient } from "@mysten/sui.js/client";
+import { SuiClient } from "@mysten/sui/client";
 import toast from "react-hot-toast";
 import { Spinner } from "../general/Spinner";
 
@@ -20,7 +20,7 @@ export const DifficultySelection = ({
   const [enoughBalance, setEnoughBalance] = useState<boolean>(true);
   const hasEnoughBalance = (balance: BigNumber) => {
     return balance.isGreaterThanOrEqualTo(
-      new BigNumber(process.env.MINIMUM_BALANCE_TO_PLAY ?? 1500000000),
+      new BigNumber(process.env.MINIMUM_BALANCE_TO_PLAY ?? 1500000000)
     );
   };
   useEffect(() => {
@@ -40,7 +40,9 @@ export const DifficultySelection = ({
       headers: {
         "Content-Type": "application/json",
         "Enoki-api-key": process.env.NEXT_PUBLIC_ENOKI_API_KEY!,
-        Authorization: `Bearer ${JSON.parse(localStorage.getItem("user")!)["zkLoginSession"]["jwt"]}`,
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user")!)["zkLoginSession"]["jwt"]
+        }`,
       },
     });
     const body = await response.json();
@@ -48,7 +50,7 @@ export const DifficultySelection = ({
       const client = new SuiClient({
         url: process.env.NEXT_PUBLIC_SUI_NETWORK!,
       });
-      await client.waitForTransactionBlock({
+      await client.waitForTransaction({
         digest: body.txDigest,
       });
       toast.success("Top up successful!");
@@ -100,7 +102,9 @@ export const DifficultySelection = ({
             Looks like you do not have enough balance to play.
           </p>
           <button
-            className={`mb-10 rounded-md ${isLoading ? "bg-gray-300" : "bg-black"} p-2 text-white`}
+            className={`mb-10 rounded-md ${
+              isLoading ? "bg-gray-300" : "bg-black"
+            } p-2 text-white`}
             onClick={handleClickTopUp}
           >
             {isLoading && <Spinner />}

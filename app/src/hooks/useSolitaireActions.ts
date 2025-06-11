@@ -14,8 +14,7 @@ import {
   deleteUnfinishedGame
 } from "@/helpers/moveCalls";
 import { Game } from "@/models/game";
-import { SuiTransactionBlockResponse } from "@mysten/sui.js/client";
-import { TransactionBlock } from "@mysten/sui.js/transactions";
+import { Transaction } from "@mysten/sui/transactions";
 import { EnokiKeypair } from "@mysten/enoki";
 
 interface CardRevealedEvent {
@@ -33,8 +32,8 @@ export const useSolitaireActions = () => {
     const tx = fromDeckToColumn(gameId, columnIndex);
     const keypair = await enokiFlow.getKeypair();
     await suiClient
-      .signAndExecuteTransactionBlock({
-        transactionBlock: tx,
+      .signAndExecuteTransaction({
+        transaction: tx,
         signer: keypair,
         requestType: "WaitForLocalExecution",
         options: {
@@ -57,8 +56,8 @@ export const useSolitaireActions = () => {
     const tx = fromDeckToPile(gameId, pileIndex);
     const keypair = await enokiFlow.getKeypair();
     await suiClient
-      .signAndExecuteTransactionBlock({
-        transactionBlock: tx,
+      .signAndExecuteTransaction({
+        transaction: tx,
         signer: keypair,
         requestType: "WaitForLocalExecution",
         options: {
@@ -85,8 +84,8 @@ export const useSolitaireActions = () => {
     const tx = fromColumnToPile(gameId, columnIndex, pileIndex);
     const keypair = await enokiFlow.getKeypair();
     return await suiClient
-      .signAndExecuteTransactionBlock({
-        transactionBlock: tx,
+      .signAndExecuteTransaction({
+        transaction: tx,
         signer: keypair,
         requestType: "WaitForLocalExecution",
         options: {
@@ -120,8 +119,8 @@ export const useSolitaireActions = () => {
     const tx = fromColumnToColumn(gameId, fromColumnIndex, card, toColumnIndex);
     const keypair = await enokiFlow.getKeypair();
     return await suiClient
-      .signAndExecuteTransactionBlock({
-        transactionBlock: tx,
+      .signAndExecuteTransaction({
+        transaction: tx,
         signer: keypair,
         requestType: "WaitForLocalExecution",
         options: {
@@ -154,8 +153,8 @@ export const useSolitaireActions = () => {
     const tx = fromPileToColumn(gameId, pileIndex, columnIndex);
     const keypair = await enokiFlow.getKeypair();
     await suiClient
-      .signAndExecuteTransactionBlock({
-        transactionBlock: tx,
+      .signAndExecuteTransaction({
+        transaction: tx,
         signer: keypair,
         requestType: "WaitForLocalExecution",
         options: {
@@ -178,8 +177,8 @@ export const useSolitaireActions = () => {
     const tx = openDeckCard(gameId);
     const keypair = await enokiFlow.getKeypair();
     return await suiClient
-      .signAndExecuteTransactionBlock({
-        transactionBlock: tx,
+      .signAndExecuteTransaction({
+        transaction: tx,
         signer: keypair,
         requestType: "WaitForLocalExecution",
         options: {
@@ -208,8 +207,8 @@ export const useSolitaireActions = () => {
     const tx = rotateOpenDeckCards(gameId);
     const keypair = await enokiFlow.getKeypair();
     await suiClient
-      .signAndExecuteTransactionBlock({
-        transactionBlock: tx,
+      .signAndExecuteTransaction({
+        transaction: tx,
         signer: keypair,
         requestType: "WaitForLocalExecution",
         options: {
@@ -232,8 +231,8 @@ export const useSolitaireActions = () => {
     const tx = finishGame(gameId);
     const keypair = await enokiFlow.getKeypair();
     await suiClient
-      .signAndExecuteTransactionBlock({
-        transactionBlock: tx,
+      .signAndExecuteTransaction({
+        transaction: tx,
         signer: keypair,
         requestType: "WaitForLocalExecution",
         options: {
@@ -256,8 +255,8 @@ export const useSolitaireActions = () => {
     const tx = deleteUnfinishedGame(gameId);
     const keypair = await enokiFlow.getKeypair();
     await suiClient
-      .signAndExecuteTransactionBlock({
-        transactionBlock: tx,
+      .signAndExecuteTransaction({
+        transaction: tx,
         signer: keypair,
         requestType: "WaitForLocalExecution",
         options: {
@@ -277,12 +276,12 @@ export const useSolitaireActions = () => {
   }
 
   async function execute(
-    transactionBlock: TransactionBlock,
+    transactionBlock: Transaction,
     keypair: EnokiKeypair
   ) {
-    const res = await suiClient.signAndExecuteTransactionBlock({
+    const res = await suiClient.signAndExecuteTransaction({
       signer: keypair,
-      transactionBlock,
+      transaction: transactionBlock,
       options: {
         showEffects: true,
         showEvents: true,
