@@ -9,7 +9,6 @@ import { useSolitaireActions } from "@/hooks/useSolitaireActions";
 import { AccountDropdown } from "@/components/user/accountDropdown";
 import { LoadingContext } from "@/contexts/LoadingProvider";
 
-
 const GamePage = () => {
   const [spinning, setSpinning] = useState<boolean>(false);
   const { user, isLoading, enokiFlow } = useAuthentication();
@@ -22,64 +21,70 @@ const GamePage = () => {
   } = useSolitaireActions();
   const { isMoveLoading } = useContext(LoadingContext);
 
-  const onGameCreation = async (mode: 'easy' | 'normal') => {
+  const onGameCreation = async (mode: "easy" | "normal") => {
     setSpinning(true);
     let game: Game | undefined = undefined;
-    if (mode === 'easy') {
+    if (mode === "easy") {
       game = await handleExecuteInitEasyGame();
-    } else if (mode === 'normal') {
+    } else if (mode === "normal") {
       game = await handleExecuteInitNormalGame();
     } else {
-      throw new Error('Invalid difficulty mode');
+      throw new Error("Invalid difficulty mode");
     }
     if (!game) {
-      throw new Error('Failed to initialize game');
+      throw new Error("Failed to initialize game");
     }
     setSpinning(false);
     setGame(game);
-  }
+  };
 
   if (isLoading || spinning) {
-    return <Spinner/>;
+    return <Spinner fullHeight />;
   }
 
   return (
     <div
-      className={`py-5 min-h-screen overflow-x-auto overflow-hidden ${isMoveLoading ? 'cursor-wait' : 'cursor-default'}`}>
+      className={`py-5 min-h-screen overflow-x-auto overflow-hidden ${
+        isMoveLoading ? "cursor-wait" : "cursor-default"
+      }`}
+    >
       <div className="flex align-bottom pt-10 px-20 justify-between">
         <div className="logo text-white text-[28px] font-bold font-['Mysten Walter Alte']">
           Mysten Solitaire
         </div>
         {game && (
-          <div
-            className="flex justify-center items-center gap-x-10 pl-4 pr-1 bg-black bg-opacity-10 rounded-[40px] border border-black border-opacity-10">
-            <div className="text-stone-100 text-base font-normal">Moves: {moves}</div>
-            <button onClick={
-              async () => {
+          <div className="flex justify-center items-center gap-x-10 pl-4 pr-1 bg-black bg-opacity-10 rounded-[40px] border border-black border-opacity-10">
+            <div className="text-stone-100 text-base font-normal">
+              Moves: {moves}
+            </div>
+            <button
+              onClick={async () => {
                 setSpinning(true);
                 try {
                   await handleDeleteUnfinishedGame(game.id);
                   setGame(null);
                   setMoves(0);
                 } catch (e) {
-                  console.debug(e)
+                  console.debug(e);
                 }
                 setSpinning(false);
-              }
-            }
-                    className={`${isMoveLoading ? 'cursor-wait' : ''} text-white text-base font-bold bg-black rounded-[40px] p-2`}>
+              }}
+              className={`${
+                isMoveLoading ? "cursor-wait" : ""
+              } text-white text-base font-bold bg-black rounded-[40px] p-2`}
+            >
               End game
             </button>
           </div>
         )}
-        <AccountDropdown user={user} enokiFlow={enokiFlow}/>
+        <AccountDropdown user={user} enokiFlow={enokiFlow} />
       </div>
       {!game ? (
         <div className="flex flex-col justify-center items-center mt-32">
-          <DifficultySelection onGameCreation={onGameCreation}/>
+          <DifficultySelection onGameCreation={onGameCreation} />
         </div>
       ) : (
-        <GameBoard game={game.elements} move={{ moves, setMoves }}/>
+        <GameBoard game={game.elements} move={{ moves, setMoves }} />
       )}
     </div>
   );

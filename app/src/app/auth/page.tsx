@@ -44,7 +44,7 @@ const AuthPage = () => {
       });
   }, [enokiActive]);
 
-  return <Spinner />;
+  return <Spinner fullHeight />;
 };
 
 export default AuthPage;
