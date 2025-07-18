@@ -1,5 +1,5 @@
 // @ts-ignore
-import { SuiTransactionBlockResponse } from "@mysten/sui.js";
+import { SuiTransactionBlockResponse } from "@mysten/sui/transactions";
 import { Column } from './column';
 import { Deck } from './deck';
 import { Pile } from './pile';

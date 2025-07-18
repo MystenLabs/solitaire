@@ -10,9 +10,8 @@ import { LoadingProvider } from "@/contexts/LoadingProvider";
 
 export default function MemberRootLayout({ children }: ChildrenProps) {
   const { user, isLoading } = useAuthentication();
-
   return isLoading ? (
-    <Spinner />
+    <Spinner fullHeight />
   ) : user?.role === "anonymous" ? (
     "Not allowed"
   ) : (
