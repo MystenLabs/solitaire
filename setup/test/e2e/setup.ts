@@ -1,13 +1,13 @@
 import type {
 	SuiTransactionBlockResponse,
-} from '@mysten/sui.js/client';
-import { SuiClient } from '@mysten/sui.js/client';
-import { Ed25519Keypair } from '@mysten/sui.js/keypairs/ed25519';
-import { TransactionBlock } from '@mysten/sui.js/transactions';
+} from '@mysten/sui/client';
+import { SuiClient } from '@mysten/sui/client';
+import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
+import { Transaction } from '@mysten/sui/transactions';
 import { expect } from 'vitest';
 
-import { ADMIN_SECRET_KEY, SUI_NETWORK } from '../../src/config.ts';
-import { fromB64 } from '@mysten/sui.js/utils';
+import { ADMIN_SECRET_KEY, SUI_NETWORK } from '../../src/config';
+import { fromB64 } from '@mysten/sui/utils';
 
 const DEFAULT_FULLNODE_URL = SUI_NETWORK;
 
@@ -46,11 +46,11 @@ export async function setupSuiClient() {
 
 export async function executeTransactionBlock(
 	toolbox: TestToolbox,
-	txb: TransactionBlock,
+	tx: Transaction,
 ): Promise<SuiTransactionBlockResponse> {
-	const resp = await toolbox.client.signAndExecuteTransactionBlock({
+	const resp = await toolbox.client.signAndExecuteTransaction({
 		signer: toolbox.keypair,
-		transactionBlock: txb,
+		transaction: tx,
 		options: {
 			showEffects: true,
 			showEvents: true,
