@@ -36,7 +36,7 @@ module solitaire::solitaire {
 
 // =================== Structs ===================
 
-    struct Game has key {
+    public struct Game has key {
         id: UID,
         deck: Deck,
         piles: vector<Pile>,
@@ -52,19 +52,19 @@ module solitaire::solitaire {
 
     /// This is the player Deck containing the cards that are not yet in the game.
     /// All 24 cards in the Deck are initially hidden.
-    struct Deck has store {
+    public struct Deck has store {
         hidden_cards: u64,
         cards: vector<u64>
     }
 
     /// This is a Pile of cards that should be ordered from Ace to King of the same suit.
-    struct Pile has store {
+    public struct Pile has store {
         cards: vector<u64>
     }
 
     /// This is a Column of cards. Initially the game starts with 7 Columns of cards
     /// and only the first card of each Column is visible.
-    struct Column has store {
+    public struct Column has store {
         hidden_cards: u64,
         cards: vector<u64>
     }
@@ -72,16 +72,16 @@ module solitaire::solitaire {
 // =================== Events ===================
 
     /// This event is emitted when a new card is revealed from the deck or column.
-    struct CardRevealed has copy, drop {
+    public struct CardRevealed has copy, drop {
         card: u64
     }
 
 // =================== Public Functions ===================
 
     public fun init_normal_game(clock: &Clock, ctx: &mut TxContext) {
-        let i: u64 = 0;
+        let mut i: u64 = 0;
         // Initialize the stack with all the available cards.
-        let available_cards = vector::empty<u64>();
+        let mut available_cards = vector::empty<u64>();
         while (i < CARD_COUNT) {
             vector::push_back(&mut available_cards, i);
             i = i + 1;
@@ -94,7 +94,7 @@ module solitaire::solitaire {
         };
 
         // Initialize the Piles with an empty vector of cards.
-        let piles = vector::singleton<Pile>(Pile {cards: vector::empty()});
+        let mut piles = vector::singleton<Pile>(Pile {cards: vector::empty()});
         vector::push_back(&mut piles, Pile {cards: vector::empty()});
         vector::push_back(&mut piles, Pile {cards: vector::empty()});
         vector::push_back(&mut piles, Pile {cards: vector::empty()});
@@ -119,8 +119,8 @@ module solitaire::solitaire {
 
     /// An easy game has all the Aces placed on the Piles by default.
     public fun init_easy_game(clock: &Clock, ctx: &mut TxContext) {
-        let i: u64 = 0;
-        let available_cards = vector::empty<u64>();
+        let mut i: u64 = 0;
+        let mut available_cards = vector::empty<u64>();
         while (i < CARD_COUNT) {
             vector::push_back(&mut available_cards, i);
             i = i + 1;
@@ -131,7 +131,7 @@ module solitaire::solitaire {
             cards: vector::empty(),
         };
 
-        let piles = vector::singleton<Pile>(Pile {
+        let mut piles = vector::singleton<Pile>(Pile {
             cards: vector::singleton(vector::remove(&mut available_cards, CLUBS_INDEX))});
         vector::push_back(&mut piles, Pile {
             cards: vector::singleton(vector::remove(&mut available_cards, SPADES_INDEX-1))});
@@ -240,7 +240,7 @@ module solitaire::solitaire {
         game.player_moves = game.player_moves + 1;
     }
 
-    public fun from_column_to_column(game: &mut Game, src_column_index: u64, card: u64, dest_column_index: u64, clock: &Clock, _ctx: &mut TxContext) {
+    public fun from_column_to_column(game: &mut Game, mut src_column_index: u64, card: u64, dest_column_index: u64, clock: &Clock, _ctx: &mut TxContext) {
         assert!(src_column_index < COLUMN_COUNT, EInvalidColumnIndex);
         assert!(dest_column_index < COLUMN_COUNT, EInvalidColumnIndex);
         if (src_column_index == dest_column_index) {
@@ -249,7 +249,7 @@ module solitaire::solitaire {
             return
         };
         // One column needs to be removed because it is not allowed to take 2 mutable references to the same vector.
-        let dest_column = vector::remove(&mut game.columns, dest_column_index);
+        let mut dest_column = vector::remove(&mut game.columns, dest_column_index);
         // If the destination column is to the left of the source column, we need to decrease the index of the source column.
         if (dest_column_index < src_column_index) {
             src_column_index = src_column_index - 1;
@@ -357,7 +357,7 @@ module solitaire::solitaire {
     /// This funtion needs to be called when the player has finished the game.
     public fun finish_game(game: &mut Game, clock: &Clock, _ctx: &mut TxContext) {
         assert!(game.end_time == 0, EGameHasFinished);
-        let i = 0;
+        let mut i = 0;
         while (i < PILE_COUNT) {
             let pile = vector::borrow(&game.piles, i);
             assert!(vector::length(&pile.cards) == 13, EGameNotFinished);
@@ -371,8 +371,8 @@ module solitaire::solitaire {
         let Game {
             id,
             deck,
-            piles,
-            columns,
+            mut piles,
+            mut columns,
             available_cards: _,
             player: _,
             start_time: _,
@@ -386,7 +386,7 @@ module solitaire::solitaire {
             cards: _,
         } = deck;
 
-        let i = 0;
+        let mut i = 0;
         while (i < PILE_COUNT) {
             let pile = vector::pop_back(&mut piles);
             let Pile {
@@ -396,7 +396,7 @@ module solitaire::solitaire {
         };
         vector::destroy_empty(piles);
 
-        let j = 0;
+        let mut j = 0;
         while (j < COLUMN_COUNT) {
             let column = vector::pop_back(&mut columns);
             let Column {
@@ -414,8 +414,8 @@ module solitaire::solitaire {
     /// Each column has the top card revealed and the a number of hidden cards that is equal to the
     /// index of the column, starting from 0.
     fun set_up_columns(clock: &Clock, available_cards: &mut vector<u64>): vector<Column> {
-        let columns = vector::empty<Column>();
-        let i: u64 = 0;
+        let mut columns = vector::empty<Column>();
+        let mut i: u64 = 0;
         while(i < COLUMN_COUNT) {
             let card = reveal_card(clock, available_cards);
             let column = Column {
@@ -529,7 +529,7 @@ module solitaire::solitaire {
 
     #[test_only]
     public fun cheat_fill_all_piles(game: &mut Game) {
-        let i: u64 = 0;
+        let mut i: u64 = 0;
         let indexes = vector<u64>[
             CLUBS_INDEX,
             SPADES_INDEX,
