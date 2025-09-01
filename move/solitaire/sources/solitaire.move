@@ -1,9 +1,5 @@
 module solitaire::solitaire {
-    use sui::tx_context::{Self, TxContext};
     use sui::clock::{Self, Clock};
-    use sui::object::{Self, UID};
-    use sui::transfer::{Self};
-    use std::vector;
     use std::string::{String, utf8};
     use sui::random::Random;
     use sui::event;
@@ -207,7 +203,7 @@ module solitaire::solitaire {
         game.player_moves = game.player_moves + 1;
     }
 
-    public fun from_column_to_pile(game: &mut Game, column_index: u64, pile_index: u64, clock: &Clock, random: &Random, ctx: &mut TxContext) {
+    public fun from_column_to_pile(game: &mut Game, column_index: u64, pile_index: u64, random: &Random, ctx: &mut TxContext) {
         assert!(column_index < COLUMN_COUNT, EInvalidColumnIndex);
         assert!(pile_index < PILE_COUNT, EInvalidPileIndex);
         let column = vector::borrow_mut(&mut game.columns, column_index);
@@ -241,7 +237,7 @@ module solitaire::solitaire {
         game.player_moves = game.player_moves + 1;
     }
 
-    public fun from_column_to_column(game: &mut Game, mut src_column_index: u64, card: u64, dest_column_index: u64, clock: &Clock, random: &Random, ctx: &mut TxContext) {
+    public fun from_column_to_column(game: &mut Game, mut src_column_index: u64, card: u64, dest_column_index: u64, random: &Random, ctx: &mut TxContext) {
         assert!(src_column_index < COLUMN_COUNT, EInvalidColumnIndex);
         assert!(dest_column_index < COLUMN_COUNT, EInvalidColumnIndex);
         if (src_column_index == dest_column_index) {
