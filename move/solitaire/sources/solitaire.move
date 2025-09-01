@@ -75,7 +75,7 @@ module solitaire::solitaire {
 
 // =================== Public Functions ===================
 
-    public fun init_normal_game(clock: &Clock, random: &Random, ctx: &mut TxContext) {
+    entry fun init_normal_game(clock: &Clock, random: &Random, ctx: &mut TxContext) {
         let mut i: u64 = 0;
         // Initialize the stack with all the available cards.
         let mut available_cards = vector::empty<u64>();
@@ -115,7 +115,7 @@ module solitaire::solitaire {
     }
 
     /// An easy game has all the Aces placed on the Piles by default.
-    public fun init_easy_game(clock: &Clock, random: &Random, ctx: &mut TxContext) {
+    entry fun init_easy_game(clock: &Clock, random: &Random, ctx: &mut TxContext) {
         let mut i: u64 = 0;
         let mut available_cards = vector::empty<u64>();
         while (i < CARD_COUNT) {
@@ -155,7 +155,7 @@ module solitaire::solitaire {
         transfer::transfer(game, tx_context::sender(ctx));
     }
 
-    public fun from_deck_to_column(game: &mut Game, column_index: u64, _ctx: &mut TxContext) {
+    entry fun from_deck_to_column(game: &mut Game, column_index: u64, _ctx: &mut TxContext) {
         assert!(column_index < COLUMN_COUNT, EInvalidColumnIndex);
         assert!(vector::length(&game.deck.cards) > 0, ENoAvailableDeckCard);
         let column = vector::borrow_mut(&mut game.columns, column_index);
@@ -182,7 +182,7 @@ module solitaire::solitaire {
         game.player_moves = game.player_moves + 1;
     }
 
-    public fun from_deck_to_pile(game: &mut Game, pile_index: u64, _ctx: &mut TxContext) {
+    entry fun from_deck_to_pile(game: &mut Game, pile_index: u64, _ctx: &mut TxContext) {
         assert!(pile_index < PILE_COUNT, EInvalidPileIndex);
         assert!(vector::length(&game.deck.cards) > 0, ENoAvailableDeckCard);
         let deck_card = vector::pop_back(&mut game.deck.cards);
@@ -203,7 +203,7 @@ module solitaire::solitaire {
         game.player_moves = game.player_moves + 1;
     }
 
-    public fun from_column_to_pile(game: &mut Game, column_index: u64, pile_index: u64, random: &Random, ctx: &mut TxContext) {
+    entry fun from_column_to_pile(game: &mut Game, column_index: u64, pile_index: u64, random: &Random, ctx: &mut TxContext) {
         assert!(column_index < COLUMN_COUNT, EInvalidColumnIndex);
         assert!(pile_index < PILE_COUNT, EInvalidPileIndex);
         let column = vector::borrow_mut(&mut game.columns, column_index);
@@ -237,7 +237,7 @@ module solitaire::solitaire {
         game.player_moves = game.player_moves + 1;
     }
 
-    public fun from_column_to_column(game: &mut Game, mut src_column_index: u64, card: u64, dest_column_index: u64, random: &Random, ctx: &mut TxContext) {
+    entry fun from_column_to_column(game: &mut Game, mut src_column_index: u64, card: u64, dest_column_index: u64, random: &Random, ctx: &mut TxContext) {
         assert!(src_column_index < COLUMN_COUNT, EInvalidColumnIndex);
         assert!(dest_column_index < COLUMN_COUNT, EInvalidColumnIndex);
         if (src_column_index == dest_column_index) {
@@ -303,7 +303,7 @@ module solitaire::solitaire {
         vector::insert(&mut game.columns, dest_column, dest_column_index);
     }
 
-    public fun from_pile_to_column(game: &mut Game, pile_index: u64, column_index: u64, _ctx: &mut TxContext) {
+    entry fun from_pile_to_column(game: &mut Game, pile_index: u64, column_index: u64, _ctx: &mut TxContext) {
         assert!(pile_index < PILE_COUNT, EInvalidPileIndex);
         assert!(column_index < COLUMN_COUNT, EInvalidColumnIndex);
         assert!(game.end_time == 0, EGameHasFinished);
@@ -332,7 +332,7 @@ module solitaire::solitaire {
     }
 
     /// This function is used to reveal a card from the deck if there are still hidden cards.
-    public fun open_deck_card(game: &mut Game, random: &Random, ctx: &mut TxContext) {
+    entry fun open_deck_card(game: &mut Game, random: &Random, ctx: &mut TxContext) {
         assert!(game.deck.hidden_cards > 0, ENoMoreHiddenCards);
         game.deck.hidden_cards = game.deck.hidden_cards - 1;
         let card = reveal_card( &mut game.available_cards, random, ctx);
