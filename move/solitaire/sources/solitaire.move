@@ -5,6 +5,7 @@ module solitaire::solitaire {
     use sui::transfer::{Self};
     use std::vector;
     use std::string::{String, utf8};
+    use sui::random::Random;
     use sui::event;
 
     // =================== Error Codes ===================
@@ -78,7 +79,7 @@ module solitaire::solitaire {
 
 // =================== Public Functions ===================
 
-    public fun init_normal_game(clock: &Clock, ctx: &mut TxContext) {
+    public fun init_normal_game(clock: &Clock, random: &Random, ctx: &mut TxContext) {
         let mut i: u64 = 0;
         // Initialize the stack with all the available cards.
         let mut available_cards = vector::empty<u64>();
@@ -99,7 +100,7 @@ module solitaire::solitaire {
         vector::push_back(&mut piles, Pile {cards: vector::empty()});
         vector::push_back(&mut piles, Pile {cards: vector::empty()});
 
-        let columns = set_up_columns(clock, &mut available_cards);
+        let columns = set_up_columns(&mut available_cards, random, ctx);
 
         let game = Game {
             id: object::new(ctx),
@@ -118,7 +119,7 @@ module solitaire::solitaire {
     }
 
     /// An easy game has all the Aces placed on the Piles by default.
-    public fun init_easy_game(clock: &Clock, ctx: &mut TxContext) {
+    public fun init_easy_game(clock: &Clock, random: &Random, ctx: &mut TxContext) {
         let mut i: u64 = 0;
         let mut available_cards = vector::empty<u64>();
         while (i < CARD_COUNT) {
@@ -140,7 +141,7 @@ module solitaire::solitaire {
         vector::push_back(&mut piles, Pile {
             cards: vector::singleton(vector::remove(&mut available_cards, DIAMONDS_INDEX-3))});
 
-        let columns = set_up_columns(clock, &mut available_cards);
+        let columns = set_up_columns(&mut available_cards, random, ctx);
 
         let game = Game {
             id: object::new(ctx),
@@ -206,7 +207,7 @@ module solitaire::solitaire {
         game.player_moves = game.player_moves + 1;
     }
 
-    public fun from_column_to_pile(game: &mut Game, column_index: u64, pile_index: u64, clock: &Clock, _ctx: &mut TxContext) {
+    public fun from_column_to_pile(game: &mut Game, column_index: u64, pile_index: u64, clock: &Clock, random: &Random, ctx: &mut TxContext) {
         assert!(column_index < COLUMN_COUNT, EInvalidColumnIndex);
         assert!(pile_index < PILE_COUNT, EInvalidPileIndex);
         let column = vector::borrow_mut(&mut game.columns, column_index);
@@ -219,7 +220,7 @@ module solitaire::solitaire {
             // Check if there are hidden cards in the column and reveal one if needed
             if (column.hidden_cards > 0 && vector::is_empty(&column.cards)) {
                 column.hidden_cards = column.hidden_cards - 1;
-                let card = reveal_card(clock, &mut game.available_cards);
+                let card = reveal_card(&mut game.available_cards, random, ctx);
                 vector::push_back(&mut column.cards, card);
                 event::emit(CardRevealed {card});
             };
@@ -232,7 +233,7 @@ module solitaire::solitaire {
             // Check if there are hidden cards in the column and reveal one if needed
             if (column.hidden_cards > 0 && vector::is_empty(&column.cards)) {
                 column.hidden_cards = column.hidden_cards - 1;
-                let card = reveal_card(clock, &mut game.available_cards);
+                let card = reveal_card(&mut game.available_cards, random, ctx);
                 vector::push_back(&mut column.cards, card);
                 event::emit(CardRevealed {card});
             };
@@ -240,7 +241,7 @@ module solitaire::solitaire {
         game.player_moves = game.player_moves + 1;
     }
 
-    public fun from_column_to_column(game: &mut Game, mut src_column_index: u64, card: u64, dest_column_index: u64, clock: &Clock, _ctx: &mut TxContext) {
+    public fun from_column_to_column(game: &mut Game, mut src_column_index: u64, card: u64, dest_column_index: u64, clock: &Clock, random: &Random, ctx: &mut TxContext) {
         assert!(src_column_index < COLUMN_COUNT, EInvalidColumnIndex);
         assert!(dest_column_index < COLUMN_COUNT, EInvalidColumnIndex);
         if (src_column_index == dest_column_index) {
@@ -267,7 +268,7 @@ module solitaire::solitaire {
             };
             if (src_column.hidden_cards > 0 && vector::is_empty(&src_column.cards)) {
                 src_column.hidden_cards = src_column.hidden_cards - 1;
-                let card = reveal_card(clock, &mut game.available_cards);
+                let card = reveal_card(&mut game.available_cards, random, ctx);
                 vector::push_back(&mut src_column.cards, card);
                 event::emit(CardRevealed {card});
             };
@@ -284,7 +285,7 @@ module solitaire::solitaire {
                 };
                 if (src_column.hidden_cards > 0 && vector::is_empty(&src_column.cards)) {
                     src_column.hidden_cards = src_column.hidden_cards - 1;
-                    let card = reveal_card(clock, &mut game.available_cards);
+                    let card = reveal_card(&mut game.available_cards, random, ctx);
                     vector::push_back(&mut src_column.cards, card);
                     event::emit(CardRevealed {card});
                 };
@@ -296,7 +297,7 @@ module solitaire::solitaire {
                 };
                 if (src_column.hidden_cards > 0 && vector::is_empty(&src_column.cards)) {
                     src_column.hidden_cards = src_column.hidden_cards - 1;
-                    let card = reveal_card(clock, &mut game.available_cards);
+                    let card = reveal_card( &mut game.available_cards, random, ctx);
                     vector::push_back(&mut src_column.cards, card);
                     event::emit(CardRevealed {card});
                 };
@@ -335,10 +336,10 @@ module solitaire::solitaire {
     }
 
     /// This function is used to reveal a card from the deck if there are still hidden cards.
-    public fun open_deck_card(game: &mut Game, clock: &Clock, _ctx: &mut TxContext) {
+    public fun open_deck_card(game: &mut Game, random: &Random, ctx: &mut TxContext) {
         assert!(game.deck.hidden_cards > 0, ENoMoreHiddenCards);
         game.deck.hidden_cards = game.deck.hidden_cards - 1;
-        let card = reveal_card(clock, &mut game.available_cards);
+        let card = reveal_card( &mut game.available_cards, random, ctx);
         vector::push_back(&mut game.deck.cards, card);
         game.player_moves = game.player_moves + 1;
         event::emit(CardRevealed {card});
@@ -413,11 +414,11 @@ module solitaire::solitaire {
     /// Internal function that sets up the 7 columns of cards.
     /// Each column has the top card revealed and the a number of hidden cards that is equal to the
     /// index of the column, starting from 0.
-    fun set_up_columns(clock: &Clock, available_cards: &mut vector<u64>): vector<Column> {
+    fun set_up_columns(available_cards: &mut vector<u64>, random: &Random, ctx: &mut TxContext): vector<Column> {
         let mut columns = vector::empty<Column>();
         let mut i: u64 = 0;
         while(i < COLUMN_COUNT) {
-            let card = reveal_card(clock, available_cards);
+            let card = reveal_card(available_cards, random, ctx);
             let column = Column {
                 hidden_cards: i,
                 cards: vector::singleton<u64>(card)
@@ -428,50 +429,23 @@ module solitaire::solitaire {
         columns
     }
 
-    fun reveal_card (clock: &Clock, available_cards: &mut vector<u64>): u64 {
-        // The randomness will be retrieved from the timestamp of the current block.
-        let timestamp =
-            clock::timestamp_ms(clock) +
-            pseudo_random(clock::timestamp_ms(clock) + vector::length(available_cards));
+    fun reveal_card (available_cards: &mut vector<u64>, random: &Random, ctx: &mut TxContext): u64 {
+        // Initialize random generator and variables
+        let mut random_generator = random.new_generator(ctx);
 
         let length = vector::length(available_cards);
+        let cardToRemove = random_generator.generate_u64_in_range(0, length);
+
         // A card is removed from the stack of the available cards based on the modulo of the timestamp.
         // Module length will ensure that we cannot get out of bounds.
-        vector::remove(available_cards, timestamp % length)
+        vector::remove(available_cards, cardToRemove)
     }
 
-    fun pseudo_random(seed: u64): u64 {
-        // Generated using `for _ in echo {1..400}; do echo -n $(shuf -i 1-52 -n 1),; done`
-        let random_order_numbers: vector<u64> = vector<u64>[
-            19,33,19,24,50,21,13,23,44,23,45,21,13,13,37,36,1,
-            19,6,34,37,4,28,49,6,26,3,44,46,28,23,31,8,23,34,
-            38,6,50,20,31,29,15,22,18,9,14,47,6,40,19,39,46,46,
-            42,31,41,2,37,11,32,16,22,36,40,41,44,47,32,3,14,15,
-            3,23,47,23,51,50,40,45,22,37,43,4,39,28,23,45,47,11,
-            37,22,6,38,4,6,14,48,44,50,5,1,17,36,9,51,45,51,7,2,
-            13,9,43,34,14,20,7,7,20,6,49,19,28,38,23,18,49,40,16,
-            44,49,48,15,51,33,7,38,14,8,8,46,29,8,37,23,6,49,28,2,
-            17,46,46,10,20,20,34,3,25,28,33,45,8,2,36,19,22,45,15,
-            23,2,16,35,48,22,1,42,36,19,3,19,48,8,15,4,14,38,20,27,
-            18,9,20,14,44,22,13,51,45,23,35,31,10,16,44,47,51,36,20,
-            6,45,20,8,45,30,7,19,46,45,47,28,3,40,42,32,15,49,45,34,
-            40,40,20,1,18,44,36,47,2,45,43,14,32,19,46,39,13,11,40,
-            52,39,11,44,8,47,31,43,37,18,47,20,39,37,49,26,9,33,32,15,
-            50,42,42,20,4,20,6,47,4,48,45,49,42,47,38,34,11,2,41,13,30,
-            26,20,4,30,39,44,14,8,30,33,33,18,6,8,42,7,41,15,41,37,45,
-            32,31,20,18,49,13,31,18,45,1,4,23,43,20,40,43,40,1,7,27,19,
-            37,6,39,31,24,19,19,14,47,15,11,52,13,17,11,43,3,21,32,50,
-            45,23,15,48,50,48,32,15,2,41,7,25,50,38,7,19,37,30,15,2,7,
-            6,5,47,31,7,6,25,7,18,33,50,50,13,13,19,14,50,15,51,34,9,
-            45,6,20,41,28,9,39,7,47,18,15
-        ];
-        let length = vector::length(&random_order_numbers);
-        *vector::borrow(&random_order_numbers, seed % length)
-    }
+ 
 
     #[test_only]
-    public fun reveal_card_test (clock: &Clock, available_cards: &mut vector<u64>): u64 {
-        reveal_card(clock, available_cards)
+    public fun reveal_card_test (available_cards: &mut vector<u64>, random: &Random, ctx: &mut TxContext): u64 {
+        reveal_card(available_cards, random, ctx)
     }
 
     #[test_only]
