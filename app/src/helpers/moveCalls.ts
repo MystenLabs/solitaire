@@ -3,13 +3,15 @@
 import { Transaction } from "@mysten/sui/transactions";
 
 const CLOCK = "0x0000000000000000000000000000000000000000000000000000000000000006";
+const RANDOM = "0x0000000000000000000000000000000000000000000000000000000000000008";
 
 export function initNormalGame() {
     const tx = new Transaction();
     tx.moveCall({
         target: `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::init_normal_game`,
         arguments: [
-            tx.object(CLOCK)
+            tx.object(CLOCK),
+            tx.object(RANDOM)
         ],
     });
     return tx;
@@ -20,7 +22,8 @@ export function initEasyGame() {
     tx.moveCall({
         target: `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::init_easy_game`,
         arguments: [
-            tx.object(CLOCK)
+            tx.object(CLOCK),
+            tx.object(RANDOM)
         ],
     });
     return tx;
@@ -58,7 +61,7 @@ export function fromColumnToPile(game: string, columnIndex: number, pileIndex: n
             tx.object(game),
             tx.pure.u64(columnIndex),
             tx.pure.u64(pileIndex),
-            tx.object(CLOCK)
+            tx.object(RANDOM)
         ],
     });
     return tx;
@@ -73,7 +76,7 @@ export function fromColumnToColumn(game: string, fromColumnIndex: number, card: 
             tx.pure.u64(fromColumnIndex),
             tx.pure.u64(card),
             tx.pure.u64(toColumnIndex),
-            tx.object(CLOCK)
+            tx.object(RANDOM)
         ],
     });
     return tx;
@@ -98,7 +101,7 @@ export function openDeckCard(game: string) {
         target: `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::open_deck_card`,
         arguments: [
             tx.object(game),
-            tx.object(CLOCK)
+            tx.object(RANDOM)
         ],
     });
     return tx;
