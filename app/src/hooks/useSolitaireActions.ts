@@ -31,49 +31,43 @@ export const useSolitaireActions = () => {
   ) => {
     const tx = fromDeckToColumn(gameId, columnIndex);
     const keypair = await enokiFlow.getKeypair();
-    await suiClient
-      .signAndExecuteTransaction({
-        transaction: tx,
-        signer: keypair,
-        requestType: "WaitForLocalExecution",
-        options: {
-          showEffects: true,
-          showObjectChanges: true,
-        },
-      })
-      .then((resp) => {
-        if (resp.effects?.status.status !== "success") {
-          throw new Error("Transaction failed");
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        throw new Error("Transaction failed");
-      });
+    const resp = await suiClient.signAndExecuteTransaction({
+      transaction: tx,
+      signer: keypair,
+      options: {
+        showEffects: true,
+        showObjectChanges: true,
+      },
+    });
+    
+    await suiClient.waitForTransaction({
+      digest: resp.digest,
+    });
+    
+    if (resp.effects?.status.status !== "success") {
+      throw new Error("Transaction failed");
+    }
   };
 
   const handleFromDeckToPile = async (gameId: string, pileIndex: number) => {
     const tx = fromDeckToPile(gameId, pileIndex);
     const keypair = await enokiFlow.getKeypair();
-    await suiClient
-      .signAndExecuteTransaction({
-        transaction: tx,
-        signer: keypair,
-        requestType: "WaitForLocalExecution",
-        options: {
-          showEffects: true,
-          showObjectChanges: true,
-        },
-      })
-      .then((resp) => {
-        if (resp.effects?.status.status !== "success") {
-          throw new Error("Transaction failed");
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        throw new Error("Transaction failed");
-      });
+    const resp = await suiClient.signAndExecuteTransaction({
+      transaction: tx,
+      signer: keypair,
+      options: {
+        showEffects: true,
+        showObjectChanges: true,
+      },
+    });
+    
+    await suiClient.waitForTransaction({
+      digest: resp.digest,
+    });
+    
+    if (resp.effects?.status.status !== "success") {
+      throw new Error("Transaction failed");
+    }
   };
 
   const handleFromColumnToPile = async (
@@ -83,31 +77,34 @@ export const useSolitaireActions = () => {
   ) => {
     const tx = fromColumnToPile(gameId, columnIndex, pileIndex);
     const keypair = await enokiFlow.getKeypair();
-    return await suiClient
-      .signAndExecuteTransaction({
-        transaction: tx,
-        signer: keypair,
-        requestType: "WaitForLocalExecution",
-        options: {
-          showEffects: true,
-          showEvents: true,
-        },
-      })
-      .then((resp) => {
-        if (resp.effects?.status.status !== "success") {
-          throw new Error("Transaction failed");
-        }
-        const cardRevealedEvent = resp.events?.find(
-            (event) =>
-              event.type ===
-              `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::CardRevealed`
-          )?.parsedJson as CardRevealedEvent;
-          return cardRevealedEvent?.card;
-      })
-      .catch((err) => {
-        console.error(err);
-        throw new Error("Transaction failed");
-      });
+    const resp = await suiClient.signAndExecuteTransaction({
+      transaction: tx,
+      signer: keypair,
+      options: {
+        showEffects: true,
+        showEvents: true,
+      },
+    });
+    
+    const finalResp = await suiClient.waitForTransaction({
+      digest: resp.digest,
+      options: {
+        showEffects: true,
+        showEvents: true,
+      },
+    });
+    
+    if (finalResp.effects?.status.status !== "success") {
+      throw new Error("Transaction failed");
+    }
+    
+    const cardRevealedEvent = finalResp.events?.find(
+      (event) =>
+        event.type ===
+        `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::CardRevealed`
+    )?.parsedJson as CardRevealedEvent;
+    
+    return cardRevealedEvent?.card;
   };
 
   const handleFromColumnToColumn = async (
@@ -118,31 +115,34 @@ export const useSolitaireActions = () => {
   ) => {
     const tx = fromColumnToColumn(gameId, fromColumnIndex, card, toColumnIndex);
     const keypair = await enokiFlow.getKeypair();
-    return await suiClient
-      .signAndExecuteTransaction({
-        transaction: tx,
-        signer: keypair,
-        requestType: "WaitForLocalExecution",
-        options: {
-          showEffects: true,
-          showEvents: true,
-        },
-      })
-      .then((resp) => {
-        if (resp.effects?.status.status !== "success") {
-          throw new Error("Transaction failed");
-        }
-        const cardRevealedEvent = resp.events?.find(
-            (event) =>
-              event.type ===
-              `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::CardRevealed`
-          )?.parsedJson as CardRevealedEvent;
-          return cardRevealedEvent?.card;
-      })
-      .catch((err) => {
-        console.error(err);
-        throw new Error("Transaction failed");
-      });
+    const resp = await suiClient.signAndExecuteTransaction({
+      transaction: tx,
+      signer: keypair,
+      options: {
+        showEffects: true,
+        showEvents: true,
+      },
+    });
+    
+    const finalResp = await suiClient.waitForTransaction({
+      digest: resp.digest,
+      options: {
+        showEffects: true,
+        showEvents: true,
+      },
+    });
+    
+    if (finalResp.effects?.status.status !== "success") {
+      throw new Error("Transaction failed");
+    }
+    
+    const cardRevealedEvent = finalResp.events?.find(
+      (event) =>
+        event.type ===
+        `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::CardRevealed`
+    )?.parsedJson as CardRevealedEvent;
+    
+    return cardRevealedEvent?.card;
   };
 
   const handleFromPileToColumn = async (
@@ -152,134 +152,125 @@ export const useSolitaireActions = () => {
   ) => {
     const tx = fromPileToColumn(gameId, pileIndex, columnIndex);
     const keypair = await enokiFlow.getKeypair();
-    await suiClient
-      .signAndExecuteTransaction({
-        transaction: tx,
-        signer: keypair,
-        requestType: "WaitForLocalExecution",
-        options: {
-          showEffects: true,
-          showObjectChanges: true,
-        },
-      })
-      .then((resp) => {
-        if (resp.effects?.status.status !== "success") {
-          throw new Error("Transaction failed");
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        throw new Error("Transaction failed");
-      });
+    const resp = await suiClient.signAndExecuteTransaction({
+      transaction: tx,
+      signer: keypair,
+      options: {
+        showEffects: true,
+        showObjectChanges: true,
+      },
+    });
+    
+    await suiClient.waitForTransaction({
+      digest: resp.digest,
+    });
+    
+    if (resp.effects?.status.status !== "success") {
+      throw new Error("Transaction failed");
+    }
   };
 
   const handleOpenDeckCard = async (gameId: string) => {
     const tx = openDeckCard(gameId);
     const keypair = await enokiFlow.getKeypair();
-    return await suiClient
-      .signAndExecuteTransaction({
-        transaction: tx,
-        signer: keypair,
-        requestType: "WaitForLocalExecution",
-        options: {
-          showEffects: true,
-          showEvents: true,
-        },
-      })
-      .then((resp) => {
-        if (resp.effects?.status.status !== "success") {
-          throw new Error("Transaction failed");
-        }
-        const cardRevealedEvent = resp.events?.find(
-          (event) =>
-            event.type ===
-            `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::CardRevealed`
-        )?.parsedJson as CardRevealedEvent;
-        return cardRevealedEvent?.card;
-      })
-      .catch((err) => {
-        console.error(err);
-        throw new Error("Transaction failed");
-      });
+    const resp = await suiClient.signAndExecuteTransaction({
+      transaction: tx,
+      signer: keypair,
+      options: {
+        showEffects: true,
+        showEvents: true,
+      },
+    });
+    
+    const finalResp = await suiClient.waitForTransaction({
+      digest: resp.digest,
+      options: {
+        showEffects: true,
+        showEvents: true,
+      },
+    });
+    
+    if (finalResp.effects?.status.status !== "success") {
+      throw new Error("Transaction failed");
+    }
+    
+    const cardRevealedEvent = finalResp.events?.find(
+      (event) =>
+        event.type ===
+        `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::CardRevealed`
+    )?.parsedJson as CardRevealedEvent;
+    
+    return cardRevealedEvent?.card;
   };
 
   const handleRotateOpenDeckCards = async (gameId: string) => {
     const tx = rotateOpenDeckCards(gameId);
     const keypair = await enokiFlow.getKeypair();
-    await suiClient
-      .signAndExecuteTransaction({
-        transaction: tx,
-        signer: keypair,
-        requestType: "WaitForLocalExecution",
-        options: {
-          showEffects: true,
-          showObjectChanges: true,
-        },
-      })
-      .then((resp) => {
-        if (resp.effects?.status.status !== "success") {
-          throw new Error("Transaction failed");
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        throw new Error("Transaction failed");
-      });
+    const resp = await suiClient.signAndExecuteTransaction({
+      transaction: tx,
+      signer: keypair,
+      options: {
+        showEffects: true,
+        showObjectChanges: true,
+      },
+    });
+    
+    await suiClient.waitForTransaction({
+      digest: resp.digest,
+    });
+    
+    if (resp.effects?.status.status !== "success") {
+      throw new Error("Transaction failed");
+    }
   };
 
   const handleFinishGame = async (gameId: string) => {
     const tx = finishGame(gameId);
     const keypair = await enokiFlow.getKeypair();
-    await suiClient
-      .signAndExecuteTransaction({
-        transaction: tx,
-        signer: keypair,
-        requestType: "WaitForLocalExecution",
-        options: {
-          showEffects: true,
-          showObjectChanges: true,
-        },
-      })
-      .then((resp) => {
-        if (resp.effects?.status.status !== "success") {
-          throw new Error("Transaction failed");
-        }
-      })
-      .catch((err) => {
-        console.warn(err);
-        throw new Error("Transaction failed");
-      });
+    const resp = await suiClient.signAndExecuteTransaction({
+      transaction: tx,
+      signer: keypair,
+      options: {
+        showEffects: true,
+        showObjectChanges: true,
+      },
+    });
+    
+    await suiClient.waitForTransaction({
+      digest: resp.digest,
+    });
+    
+    if (resp.effects?.status.status !== "success") {
+      throw new Error("Transaction failed");
+    }
   }
 
   const handleDeleteUnfinishedGame = async (gameId: string) => {
     const tx = deleteUnfinishedGame(gameId);
     const keypair = await enokiFlow.getKeypair();
-    await suiClient
-      .signAndExecuteTransaction({
-        transaction: tx,
-        signer: keypair,
-        requestType: "WaitForLocalExecution",
-        options: {
-          showEffects: true,
-          showObjectChanges: true,
-        },
-      })
-      .then((resp) => {
-        if (resp.effects?.status.status !== "success") {
-          throw new Error("Game deletion failed");
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        throw new Error("Game deletion failed");
-      });
+    const resp = await suiClient.signAndExecuteTransaction({
+      transaction: tx,
+      signer: keypair,
+      options: {
+        showEffects: true,
+        showObjectChanges: true,
+      },
+    });
+    
+    await suiClient.waitForTransaction({
+      digest: resp.digest,
+    });
+    
+    if (resp.effects?.status.status !== "success") {
+      throw new Error("Game deletion failed");
+    }
   }
 
   async function execute(
     transactionBlock: Transaction,
     keypair: EnokiKeypair
   ) {
-    const res = await suiClient.signAndExecuteTransaction({
+    const resp = await suiClient.signAndExecuteTransaction({
       signer: keypair,
       transaction: transactionBlock,
       options: {
@@ -288,7 +279,17 @@ export const useSolitaireActions = () => {
         showObjectChanges: true,
       },
     });
-    return res;
+    
+    const finalResp = await suiClient.waitForTransaction({
+      digest: resp.digest,
+      options: {
+        showEffects: true,
+        showEvents: true,
+        showObjectChanges: true,
+      },
+    });
+    
+    return finalResp;
   }
 
   async function getGameObjectDetails(
