@@ -39,7 +39,7 @@ This project is using the [NextJS App Router](https://nextjs.org/docs/app), and 
   - [Radix UI](https://www.radix-ui.com/)
   - [Shadcn](https://ui.shadcn.com/)
 - Sui integration:
-  - [Mysten Sui js](https://www.npmjs.com/package/@mysten/sui.js)
+  - [Mysten Sui js](https://www.npmjs.com/package/@mysten/sui)
   - [Mysten Enoki SDK](https://www.npmjs.com/package/@mysten/enoki)
 - Forms:
   - [React hook form](https://react-hook-form.com/)
