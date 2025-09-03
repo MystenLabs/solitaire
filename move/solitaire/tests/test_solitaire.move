@@ -77,18 +77,14 @@ module solitaire::test_solitaire {
         scenario_val
     }
 
-    fun reveal_card_helper(num_cards: u64) {
-        let mut scenario_val = test_scenario::begin(SYSTEM_ADDRESS);
+    fun reveal_card_helper(num_cards: u64, random_state: random::Random) {
+        let mut scenario_val = test_scenario::begin(PLAYER);
         let scenario = &mut scenario_val;
-        random::create_for_testing(test_scenario::ctx(scenario));
-        scenario.next_tx(SYSTEM_ADDRESS);
-        let random_state = scenario.take_shared<random::Random>();
-        scenario.next_tx(PLAYER);
         {
             let mut available_cards = generate_cards(num_cards);
             solitaire::reveal_card_test(&mut available_cards, &random_state, test_scenario::ctx(scenario));
-            test_scenario::return_shared(random_state);
         };
+        test_scenario::return_shared(random_state);
         test_scenario::end(scenario_val);
     }
 
@@ -113,11 +109,19 @@ module solitaire::test_solitaire {
     public fun test_reveal_card_valid() {
         let mut inputs = vector<u64>[1, 52]; // reveal card from a deck of 1 and a deck of 52 cards
         let mut i = vector::length(&inputs);
-        while (i > 0) {
-            let num_cards = vector::pop_back(&mut inputs);
-            reveal_card_helper(num_cards);
-            i = i - 1;
+        let mut scenario_val = test_scenario::begin(SYSTEM_ADDRESS);
+        let scenario = &mut scenario_val;
+        random::create_for_testing(test_scenario::ctx(scenario));
+        {
+            while (i > 0) {
+                scenario.next_tx(SYSTEM_ADDRESS);
+                let random_state = scenario.take_shared<random::Random>();
+                let num_cards = vector::pop_back(&mut inputs);
+                reveal_card_helper(num_cards, random_state);
+                i = i - 1;
+            };
         };
+        test_scenario::end(scenario_val);
     }
 
     #[test]
@@ -147,21 +151,22 @@ module solitaire::test_solitaire {
     public fun test_from_deck_to_column_valid_spades_8_on_hearts_9(){
         let mut scenario_val = init_normal_game_scenario_helper();
         let scenario = &mut scenario_val;
-        test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
-        random::create_for_testing(test_scenario::ctx(scenario));
-        let random_state = scenario.take_shared<random::Random>();  
         test_scenario::next_tx(scenario, PLAYER);
         {   
             // Open a deck card and move it to a column
             let mut game = test_scenario::take_from_sender<Game>(scenario);
-            solitaire::cheat_open_card_to_deck(&mut game, 29);
+        
+            // Place Hearts 9 (index 34) on column 0 first
+            solitaire::cheat_place_card_to_column(&mut game, 34, 0);
+            
+            // Add Spades 8 (index 20) to deck - this is a black card that can be placed on red Hearts 9
+            solitaire::cheat_open_card_to_deck(&mut game, 20);
 
             // Placing {index= 20, suit: "Spades", name-on-card: "8"} on {index= 34, suit: "Hearts", name-on-card:"9"}
             solitaire::from_deck_to_column(
                 &mut game, 0, test_scenario::ctx(scenario)
             );
             test_scenario::return_to_sender(scenario, game);
-            test_scenario::return_shared(random_state);
         };
 
         test_scenario::end(scenario_val);
@@ -199,9 +204,10 @@ module solitaire::test_solitaire {
         let scenario = &mut scenario_val;
         test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
         random::create_for_testing(test_scenario::ctx(scenario));
-        let random_state = scenario.take_shared<random::Random>();  
+        random::create_for_testing(test_scenario::ctx(scenario));
         test_scenario::next_tx(scenario, PLAYER);
         {
+            let random_state = scenario.take_shared<random::Random>(); 
             let mut game = test_scenario::take_from_sender<Game>(scenario);
             // Open all the cards in the deck
             let mut i = 0;
@@ -404,9 +410,10 @@ module solitaire::test_solitaire {
         let scenario = &mut scenario_val;
         test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
         random::create_for_testing(test_scenario::ctx(scenario));
-        let random_state = scenario.take_shared<random::Random>();  
+        random::create_for_testing(test_scenario::ctx(scenario));
         test_scenario::next_tx(scenario, PLAYER);
         {
+            let random_state = scenario.take_shared<random::Random>(); 
             let mut game = test_scenario::take_from_sender<Game>(scenario);
 
             solitaire::cheat_place_card_to_column(&mut game, 26, 0);
@@ -427,9 +434,10 @@ module solitaire::test_solitaire {
         let scenario = &mut scenario_val;
         test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
         random::create_for_testing(test_scenario::ctx(scenario));
-        let random_state = scenario.take_shared<random::Random>();  
+        random::create_for_testing(test_scenario::ctx(scenario));
         test_scenario::next_tx(scenario, PLAYER);
         {
+            let random_state = scenario.take_shared<random::Random>(); 
             let mut game = test_scenario::take_from_sender<Game>(scenario);
 
             solitaire::cheat_place_card_to_column(&mut game, 27, 0);
@@ -452,9 +460,10 @@ module solitaire::test_solitaire {
         let scenario = &mut scenario_val;
         test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
         random::create_for_testing(test_scenario::ctx(scenario));
-        let random_state = scenario.take_shared<random::Random>();  
+        random::create_for_testing(test_scenario::ctx(scenario));
         test_scenario::next_tx(scenario, PLAYER);
         {
+            let random_state = scenario.take_shared<random::Random>(); 
             let mut game = test_scenario::take_from_sender<Game>(scenario);
             solitaire::cheat_place_card_to_column(&mut game, 45, 0);
 
@@ -475,9 +484,10 @@ module solitaire::test_solitaire {
         let scenario = &mut scenario_val;
         test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
         random::create_for_testing(test_scenario::ctx(scenario));
-        let random_state = scenario.take_shared<random::Random>();  
+        random::create_for_testing(test_scenario::ctx(scenario));
         test_scenario::next_tx(scenario, PLAYER);
         {
+            let random_state = scenario.take_shared<random::Random>(); 
             let mut game = test_scenario::take_from_sender<Game>(scenario);
              solitaire::cheat_place_card_to_column(&mut game, 41, 0);
 
@@ -497,9 +507,10 @@ module solitaire::test_solitaire {
         let scenario = &mut scenario_val;
         test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
         random::create_for_testing(test_scenario::ctx(scenario));
-        let random_state = scenario.take_shared<random::Random>();  
+        random::create_for_testing(test_scenario::ctx(scenario));
         test_scenario::next_tx(scenario, PLAYER);
         {
+            let random_state = scenario.take_shared<random::Random>(); 
             let mut game = test_scenario::take_from_sender<Game>(scenario);
             solitaire::cheat_place_card_to_column(&mut game, 1, 0);
 
@@ -519,9 +530,10 @@ module solitaire::test_solitaire {
         let scenario = &mut scenario_val;
         test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
         random::create_for_testing(test_scenario::ctx(scenario));
-        let random_state = scenario.take_shared<random::Random>();  
+        random::create_for_testing(test_scenario::ctx(scenario));
         test_scenario::next_tx(scenario, PLAYER);
         {
+            let random_state = scenario.take_shared<random::Random>(); 
             let mut game = test_scenario::take_from_sender<Game>(scenario);
             solitaire::from_column_to_pile(&mut game, 7, 2, &random_state, test_scenario::ctx(scenario));
 
@@ -539,9 +551,10 @@ module solitaire::test_solitaire {
         let scenario = &mut scenario_val;
         test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
         random::create_for_testing(test_scenario::ctx(scenario));
-        let random_state = scenario.take_shared<random::Random>();  
+        random::create_for_testing(test_scenario::ctx(scenario));
         test_scenario::next_tx(scenario, PLAYER);
         {
+            let random_state = scenario.take_shared<random::Random>(); 
             let mut game = test_scenario::take_from_sender<Game>(scenario);
 
             solitaire::from_column_to_pile(&mut game, 1, 4, &random_state, test_scenario::ctx(scenario));
@@ -560,9 +573,10 @@ module solitaire::test_solitaire {
         let scenario = &mut scenario_val;
         test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
         random::create_for_testing(test_scenario::ctx(scenario));
-        let random_state = scenario.take_shared<random::Random>();  
+        random::create_for_testing(test_scenario::ctx(scenario));
         test_scenario::next_tx(scenario, PLAYER);
         {
+            let random_state = scenario.take_shared<random::Random>(); 
             let mut game = test_scenario::take_from_sender<Game>(scenario);
 
             solitaire::remove_all_from_column(&mut game, 5);
@@ -582,9 +596,10 @@ module solitaire::test_solitaire {
         let scenario = &mut scenario_val;
         test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
         random::create_for_testing(test_scenario::ctx(scenario));
-        let random_state = scenario.take_shared<random::Random>();  
+        random::create_for_testing(test_scenario::ctx(scenario));
         test_scenario::next_tx(scenario, PLAYER);
         {
+            let random_state = scenario.take_shared<random::Random>(); 
             let mut game = test_scenario::take_from_sender<Game>(scenario);
             let ace_of_hearts = 26;
             solitaire::cheat_place_card_to_column(
@@ -613,9 +628,10 @@ module solitaire::test_solitaire {
         let scenario = &mut scenario_val;
         test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
         random::create_for_testing(test_scenario::ctx(scenario));
-        let random_state = scenario.take_shared<random::Random>();  
+        random::create_for_testing(test_scenario::ctx(scenario));
         test_scenario::next_tx(scenario, PLAYER);
         {
+            let random_state = scenario.take_shared<random::Random>(); 
             let mut game = test_scenario::take_from_sender<Game>(scenario);
             solitaire::cheat_place_card_to_column(
                 &mut game, 36, 0
@@ -642,9 +658,10 @@ module solitaire::test_solitaire {
         let scenario = &mut scenario_val;
         test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
         random::create_for_testing(test_scenario::ctx(scenario));
-        let random_state = scenario.take_shared<random::Random>();  
+        random::create_for_testing(test_scenario::ctx(scenario));
         test_scenario::next_tx(scenario, PLAYER);
         {
+            let random_state = scenario.take_shared<random::Random>(); 
             let mut game = test_scenario::take_from_sender<Game>(scenario);
             // Setup -- place 8 of spades on column 0 and 9 of hearts on column 1
             solitaire::cheat_place_card_to_column(&mut game, 20, 0); // 8 of spades
@@ -668,9 +685,10 @@ module solitaire::test_solitaire {
         let scenario = &mut scenario_val;
         test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
         random::create_for_testing(test_scenario::ctx(scenario));
-        let random_state = scenario.take_shared<random::Random>();  
+        random::create_for_testing(test_scenario::ctx(scenario));
         test_scenario::next_tx(scenario, PLAYER);
         {
+            let random_state = scenario.take_shared<random::Random>(); 
             let mut game = test_scenario::take_from_sender<Game>(scenario);
             solitaire::from_column_to_column(
                 &mut game, 7, 20, 1, &random_state, test_scenario::ctx(scenario)
@@ -690,9 +708,10 @@ module solitaire::test_solitaire {
         let scenario = &mut scenario_val;
         test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
         random::create_for_testing(test_scenario::ctx(scenario));
-        let random_state = scenario.take_shared<random::Random>();  
+        random::create_for_testing(test_scenario::ctx(scenario));
         test_scenario::next_tx(scenario, PLAYER);
         {
+            let random_state = scenario.take_shared<random::Random>(); 
             let mut game = test_scenario::take_from_sender<Game>(scenario);
             solitaire::from_column_to_column(
                 &mut game, 0, 20, 7, &random_state, test_scenario::ctx(scenario)
@@ -711,9 +730,10 @@ module solitaire::test_solitaire {
         let scenario = &mut scenario_val;
         test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
         random::create_for_testing(test_scenario::ctx(scenario));
-        let random_state = scenario.take_shared<random::Random>();  
+        random::create_for_testing(test_scenario::ctx(scenario));
         test_scenario::next_tx(scenario, PLAYER);
         {
+            let random_state = scenario.take_shared<random::Random>(); 
             let mut game = test_scenario::take_from_sender<Game>(scenario);
             // Put 2 cards on column 0. It's ok to cheat here, just don't tell anyone.
             solitaire::cheat_place_card_to_column(&mut game, 38, 0);
@@ -747,9 +767,10 @@ module solitaire::test_solitaire {
         let scenario = &mut scenario_val;
         test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
         random::create_for_testing(test_scenario::ctx(scenario));
-        let random_state = scenario.take_shared<random::Random>();  
+        random::create_for_testing(test_scenario::ctx(scenario));
         test_scenario::next_tx(scenario, PLAYER);
         {
+            let random_state = scenario.take_shared<random::Random>(); 
             let mut game = test_scenario::take_from_sender<Game>(scenario);
             solitaire::remove_all_from_column(&mut game, 0);
 
@@ -781,9 +802,10 @@ module solitaire::test_solitaire {
         let scenario = &mut scenario_val;
         test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
         random::create_for_testing(test_scenario::ctx(scenario));
-        let random_state = scenario.take_shared<random::Random>();  
+        random::create_for_testing(test_scenario::ctx(scenario));
         test_scenario::next_tx(scenario, PLAYER);
         {
+            let random_state = scenario.take_shared<random::Random>(); 
             let mut game = test_scenario::take_from_sender<Game>(scenario);
             solitaire::from_column_to_column(
                 &mut game, 0, 70, 1, &random_state, test_scenario::ctx(scenario)
@@ -803,9 +825,10 @@ module solitaire::test_solitaire {
         let scenario = &mut scenario_val;
         test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
         random::create_for_testing(test_scenario::ctx(scenario));
-        let random_state = scenario.take_shared<random::Random>();  
+        random::create_for_testing(test_scenario::ctx(scenario));
         test_scenario::next_tx(scenario, PLAYER);
         {
+            let random_state = scenario.take_shared<random::Random>(); 
             let mut game = test_scenario::take_from_sender<Game>(scenario);
             solitaire::cheat_place_card_to_column(&mut game, 4, 0);
             solitaire::remove_all_from_column(&mut game, 1);
@@ -826,9 +849,10 @@ module solitaire::test_solitaire {
         let scenario = &mut scenario_val;
         test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
         random::create_for_testing(test_scenario::ctx(scenario));
-        let random_state = scenario.take_shared<random::Random>();  
+        random::create_for_testing(test_scenario::ctx(scenario));
         test_scenario::next_tx(scenario, PLAYER);
         {
+            let random_state = scenario.take_shared<random::Random>(); 
             let mut game = test_scenario::take_from_sender<Game>(scenario);
             solitaire::cheat_place_card_to_column(&mut game, 12, 0);
 
@@ -956,9 +980,10 @@ module solitaire::test_solitaire {
         let scenario = &mut scenario_val;
         test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
         random::create_for_testing(test_scenario::ctx(scenario));
-        let random_state = scenario.take_shared<random::Random>();  
+        random::create_for_testing(test_scenario::ctx(scenario));
         test_scenario::next_tx(scenario, PLAYER);
         {
+            let random_state = scenario.take_shared<random::Random>(); 
             let mut game = test_scenario::take_from_sender<Game>(scenario);
             let mut i = 0;
             while (i < 24) {
@@ -984,9 +1009,9 @@ module solitaire::test_solitaire {
         let scenario = &mut scenario_val;
         test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
         random::create_for_testing(test_scenario::ctx(scenario));
-        let random_state = scenario.take_shared<random::Random>();  
         test_scenario::next_tx(scenario, PLAYER);
         {
+            let random_state = scenario.take_shared<random::Random>(); 
             let mut game = test_scenario::take_from_sender<Game>(scenario);
             solitaire::open_deck_card(&mut game, &random_state, test_scenario::ctx(scenario));
             solitaire::rotate_open_deck_cards(&mut game, test_scenario::ctx(scenario));
@@ -1003,9 +1028,10 @@ module solitaire::test_solitaire {
         let scenario = &mut scenario_val;
         test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
         random::create_for_testing(test_scenario::ctx(scenario));
-        let random_state = scenario.take_shared<random::Random>();  
+        random::create_for_testing(test_scenario::ctx(scenario));
         test_scenario::next_tx(scenario, PLAYER);
         {
+            let random_state = scenario.take_shared<random::Random>(); 
             let mut game = test_scenario::take_from_sender<Game>(scenario);
             let mut clock = clock::create_for_testing(test_scenario::ctx(scenario));
             solitaire::cheat_fill_all_piles(&mut game);

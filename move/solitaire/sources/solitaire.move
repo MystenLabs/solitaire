@@ -437,7 +437,7 @@ module solitaire::solitaire {
         vector::remove(available_cards, cardToRemove)
     }
 
- 
+
 
     #[test_only]
     public fun reveal_card_test (available_cards: &mut vector<u64>, random: &Random, ctx: &mut TxContext): u64 {
