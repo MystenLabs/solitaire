@@ -2,7 +2,7 @@
 import { ModeVisual } from "@/components/difficultySelection/difficultyModes/modeVisual";
 import easy_mode_visual from "../../../public/assets/difficultyModesVisuals/easy_mode_visual.svg";
 import normal_mode_visual from "../../../public/assets/difficultyModesVisuals/normal_mode_visual.svg";
-import { useAuthentication } from "@/contexts/Authentication";
+import { useCurrentAccount } from "@mysten/dapp-kit";
 import { useEffect, useState } from "react";
 import BigNumber from "bignumber.js";
 import { getBalance } from "@/helpers/getBalance";
@@ -15,7 +15,7 @@ export const DifficultySelection = ({
 }: {
   onGameCreation: (mode: "easy" | "normal") => void;
 }) => {
-  const { user } = useAuthentication();
+  const account = useCurrentAccount();
   const [isLoading, setIsLoading] = useState(false);
   const [enoughBalance, setEnoughBalance] = useState<boolean>(true);
   const hasEnoughBalance = (balance: BigNumber) => {
@@ -25,12 +25,12 @@ export const DifficultySelection = ({
   };
   useEffect(() => {
     const fetchBalance = async () => {
-      const balance = await getBalance(user.address);
+      const balance = await getBalance(account?.address!);
       setEnoughBalance(hasEnoughBalance(balance));
     };
 
     fetchBalance();
-  }, [user.address]);
+  }, [account?.address]);
 
   const handleClickTopUp = async () => {
     document.body.style.cursor = "wait";
@@ -54,7 +54,7 @@ export const DifficultySelection = ({
         digest: body.txDigest,
       });
       toast.success("Top up successful!");
-      setEnoughBalance(hasEnoughBalance(await getBalance(user.address)));
+      setEnoughBalance(hasEnoughBalance(await getBalance(account?.address!)));
     } else {
       toast.error(`Top up failed: ${body.error}`);
     }

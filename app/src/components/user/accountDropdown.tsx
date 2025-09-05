@@ -1,7 +1,6 @@
 import Image from "next/image";
 import google from "../../../public/assets/logos/google_email.svg";
 import React from "react";
-import {UserProps} from "@/types/Authentication";
 import {
     DropdownMenu,
     DropdownMenuTrigger,
@@ -9,17 +8,24 @@ import {
     DropdownMenuContent,
 } from "@radix-ui/react-dropdown-menu";
 import { CaretDownIcon } from "@radix-ui/react-icons";
-import {EnokiFlow} from "@mysten/enoki";
-import toast from "react-hot-toast";
+import {useCurrentAccount, useDisconnectWallet} from "@mysten/dapp-kit";
 
-export const AccountDropdown = ({user, enokiFlow}: { user: UserProps, enokiFlow: EnokiFlow }) => {
+import toast from "react-hot-toast";
+import { getSession } from "@mysten/enoki";
+
+export const AccountDropdown = () => {
+    const currentAccount = useCurrentAccount();
+    // TODO: Fix call of the session and remove comments
+    // const session = getSession(currentAccount as WalletAccount);
+    const {mutate: disconnect} = useDisconnectWallet();
     const logout = async () => {
-        await enokiFlow.logout();
+        disconnect();
         localStorage.clear();
         window.location.replace("/");
     };
+
     const copyAddress = () => {
-        navigator.clipboard.writeText(user.address);
+        navigator.clipboard.writeText(currentAccount?.address || "");
         toast.success("Address copied to clipboard");
     }
 
@@ -34,7 +40,7 @@ export const AccountDropdown = ({user, enokiFlow}: { user: UserProps, enokiFlow:
                         </div>
                         <div
                             className="text-center text-white text-base font-normal font-['Mysten Walter Alte'] leading-tight">
-                            {user?.email}
+                            {/* {currentAccount?.email} */}
                         </div>
                         <CaretDownIcon color={"white"}/>
                     </div>
@@ -45,7 +51,7 @@ export const AccountDropdown = ({user, enokiFlow}: { user: UserProps, enokiFlow:
                     👋 Logout
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={copyAddress} className={"select-none rounded-[36px] border border-white px-14 py-1 text-center text-white bg-white bg-opacity-10 text-base leading-tight cursor-pointer"}>
-                    {user?.address.slice(0, 10)+'...'}
+                    {/* {user?.address.slice(0, 10)+'...'} */}
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

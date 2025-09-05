@@ -1,9 +1,9 @@
 "use client";
 import React, { useContext, useState } from "react";
 import { DifficultySelection } from "@/components/difficultySelection/DifficultySelection";
-import { useAuthentication } from "@/contexts/Authentication";
 import { Spinner } from "@/components/general/Spinner";
 import GameBoard from "@/components/gameBoard/GameBoard";
+
 import { Game } from "@/models/game";
 import { useSolitaireActions } from "@/hooks/useSolitaireActions";
 import { AccountDropdown } from "@/components/user/accountDropdown";
@@ -11,7 +11,6 @@ import { LoadingContext } from "@/contexts/LoadingProvider";
 
 const GamePage = () => {
   const [spinning, setSpinning] = useState<boolean>(false);
-  const { user, isLoading, enokiFlow } = useAuthentication();
   const [game, setGame] = useState<Game | null>(null);
   const [moves, setMoves] = useState<number>(0);
   const {
@@ -25,9 +24,9 @@ const GamePage = () => {
     setSpinning(true);
     let game: Game | undefined = undefined;
     if (mode === "easy") {
-      game = await handleExecuteInitEasyGame();
+      // game = await handleExecuteInitEasyGame();
     } else if (mode === "normal") {
-      game = await handleExecuteInitNormalGame();
+      // game = await handleExecuteInitNormalGame();
     } else {
       throw new Error("Invalid difficulty mode");
     }
@@ -38,7 +37,7 @@ const GamePage = () => {
     setGame(game);
   };
 
-  if (isLoading || spinning) {
+  if (spinning) {
     return <Spinner fullHeight />;
   }
 
@@ -77,7 +76,7 @@ const GamePage = () => {
             </button>
           </div>
         )}
-        <AccountDropdown user={user} enokiFlow={enokiFlow} />
+        <AccountDropdown/>
       </div>
       {!game ? (
         <div className="flex flex-col justify-center items-center mt-32">

@@ -1,63 +1,46 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { useAuthentication } from "@/contexts/Authentication";
-import { useRouter } from "next/navigation";
-import { Spinner } from "../general/Spinner";
-import Link from "next/link";
+import React from "react";
+import {
+  useConnectWallet,
+  useCurrentAccount,
+  useWallets,
+} from "@mysten/dapp-kit";
+import { isEnokiWallet, EnokiWallet, AuthProvider } from "@mysten/enoki";
 import Image from "next/image";
 
 export const LoginForm = () => {
-  const router = useRouter();
-  const [authURL, setAuthURL] = React.useState<string | null>(
-    null
+  const currentAccount = useCurrentAccount();
+  const { mutate: connect } = useConnectWallet();
+
+  const wallets = useWallets().filter(isEnokiWallet);
+  const walletsByProvider = wallets.reduce(
+    (map, wallet) => map.set(wallet.provider, wallet),
+    new Map<AuthProvider, EnokiWallet>()
   );
-  const { user, isLoading: isAuthLoading, enokiFlow } = useAuthentication();
 
-  useEffect(() => {
-    generateAuthURLs();
-  }, [enokiFlow]);
+  const googleWallet = walletsByProvider.get("google");
 
-  const generateAuthURLs = async () => {
-    const protocol = window.location.protocol;
-    const host = window.location.host;
-    const customRedirectUri = `${protocol}//${host}/auth`;
-    if (!!sessionStorage.getItem(`@enoki/flow/session/${process.env.NEXT_PUBLIC_ENOKI_API_KEY!}`)) return;
-    const authURL = await enokiFlow.createAuthorizationURL({
-      provider: "google",
-      clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
-      redirectUrl: customRedirectUri,
-      extraParams: {
-        scope: ["openid", "email", "profile"],
-      },
-    });
-    setAuthURL(authURL);
-    return authURL;
-  };
-
-  useEffect(() => {
-    if (user.role == "player" && !isAuthLoading) {
-      router.push(`/game`);
-    }
-  }, [user, isAuthLoading]);
-
-  if (isAuthLoading || user.role !== 'anonymous') {
-    return <Spinner />;
+  if (currentAccount) {
+    return (
+      <div className="flex flex-col items-center space-y-2">
+        <div className="text-sm">Current address:</div>
+        <code className="text-xs break-all">{currentAccount.address}</code>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-5">
-      {!!authURL && (
-        <div className="flex flex-col md:flex-row space-x-3 items-center justify-center">
-          <Link
-            href={authURL}
-            className="flex justify-center items-center space-x-2 px-3 py-2 bg-gray-100 text-black w-[200px] rounded-lg"
-          >
-            <Image src="/google.svg" alt="Google" width={20} height={20} />
-            <div>Sign In</div>
-          </Link>
-        </div>
-      )}
+      <div className="flex flex-col md:flex-row space-x-3 items-center justify-center">
+        <button
+          onClick={() => connect({ wallet: googleWallet! })}
+          className="flex justify-center items-center space-x-2 px-3 py-2 bg-gray-100 text-black w-[200px] rounded-lg"
+        >
+          <Image src="/google.svg" alt="Google" width={20} height={20} />
+          <div>Sign In</div>
+        </button>
+      </div>
     </div>
   );
 };
