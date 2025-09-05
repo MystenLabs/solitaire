@@ -75,7 +75,8 @@ export const DifficultySelection = ({
           onClick={async () => {
             onGameCreation("easy");
           }}
-          disabled={!enoughBalance}
+          // TODO: instead of disabling we should show a toast message
+          // disabled={!enoughBalance}
         >
           <ModeVisual
             level={"Easy"}
@@ -87,7 +88,8 @@ export const DifficultySelection = ({
           onClick={async () => {
             onGameCreation("normal");
           }}
-          disabled={!enoughBalance}
+          // TODO: instead of disabling we should show a toast message
+          // disabled={!enoughBalance}
         >
           <ModeVisual
             level={"Normal"}

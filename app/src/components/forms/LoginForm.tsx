@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
   useConnectWallet,
   useCurrentAccount,
@@ -8,16 +8,23 @@ import {
 } from "@mysten/dapp-kit";
 import { isEnokiWallet, EnokiWallet, AuthProvider } from "@mysten/enoki";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export const LoginForm = () => {
   const currentAccount = useCurrentAccount();
   const { mutate: connect } = useConnectWallet();
-
+  const router = useRouter();
   const wallets = useWallets().filter(isEnokiWallet);
   const walletsByProvider = wallets.reduce(
     (map, wallet) => map.set(wallet.provider, wallet),
     new Map<AuthProvider, EnokiWallet>()
   );
+
+  useEffect(() => {
+    if (currentAccount) {
+      router.push(`/game`);
+    }
+  }, [currentAccount]);
 
   const googleWallet = walletsByProvider.get("google");
 

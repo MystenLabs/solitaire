@@ -15,8 +15,8 @@ import {
 import { Game } from "@/models/game";
 import { Transaction } from "@mysten/sui/transactions";
 import { EnokiKeypair } from "@mysten/enoki";
-import { useCurrentAccount } from "@mysten/dapp-kit";
-import { toBase64 } from "@mysten/sui/dist/cjs/utils";
+import { useCurrentAccount, useSignTransaction } from "@mysten/dapp-kit";
+import { toBase64 } from "@mysten/sui/utils";
 
 interface CardRevealedEvent {
   card: string;
@@ -25,6 +25,7 @@ interface CardRevealedEvent {
 export const useSolitaireActions = () => {
   const { suiClient } = useSui();
   const currentAccount = useCurrentAccount();
+  const { mutateAsync: signTransaction } = useSignTransaction();
 
   const handleFromDeckToColumn = async (
     gameId: string,
@@ -36,7 +37,7 @@ export const useSolitaireActions = () => {
       onlyTransactionKind: true,
     });
 
-    const sponsorResp = await fetch(`/sponsor`, {
+    const sponsorResp = await fetch(`api/sponsor`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -55,10 +56,16 @@ export const useSolitaireActions = () => {
       digest: string;
     };
 
-    const execResp = await fetch(`/execute`, {
+    //sign here
+
+    const { signature } = await signTransaction({
+      transaction: sponsoredBytes,
+    });
+
+    const execResp = await fetch(`api/execute`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ digest: sponsoredDigest, sponsoredBytes }),
+      body: JSON.stringify({ digest: sponsoredDigest, signature }),
     });
 
     if (!execResp.ok) {
@@ -102,7 +109,7 @@ export const useSolitaireActions = () => {
       onlyTransactionKind: true,
     });
 
-    const sponsorResp = await fetch(`/sponsor`, {
+    const sponsorResp = await fetch(`api/sponsor`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -121,10 +128,14 @@ export const useSolitaireActions = () => {
       digest: string;
     };
 
-    const execResp = await fetch(`/execute`, {
+    const { signature } = await signTransaction({
+      transaction: sponsoredBytes,
+    });
+
+    const execResp = await fetch(`api/execute`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ digest: sponsoredDigest, sponsoredBytes }),
+      body: JSON.stringify({ digest: sponsoredDigest, signature }),
     });
 
     if (!execResp.ok) {
@@ -172,7 +183,7 @@ export const useSolitaireActions = () => {
       onlyTransactionKind: true,
     });
 
-    const sponsorResp = await fetch(`/sponsor`, {
+    const sponsorResp = await fetch(`api/sponsor`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -191,10 +202,14 @@ export const useSolitaireActions = () => {
       digest: string;
     };
 
-    const execResp = await fetch(`/execute`, {
+    const { signature } = await signTransaction({
+      transaction: sponsoredBytes,
+    });
+
+    const execResp = await fetch(`api/execute`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ digest: sponsoredDigest, sponsoredBytes }),
+      body: JSON.stringify({ digest: sponsoredDigest, signature }),
     });
 
     if (!execResp.ok) {
@@ -250,7 +265,7 @@ export const useSolitaireActions = () => {
       onlyTransactionKind: true,
     });
 
-    const sponsorResp = await fetch(`/sponsor`, {
+    const sponsorResp = await fetch(`api/sponsor`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -269,10 +284,14 @@ export const useSolitaireActions = () => {
       digest: string;
     };
 
-    const execResp = await fetch(`/execute`, {
+    const { signature } = await signTransaction({
+      transaction: sponsoredBytes,
+    });
+
+    const execResp = await fetch(`api/execute`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ digest: sponsoredDigest, sponsoredBytes }),
+      body: JSON.stringify({ digest: sponsoredDigest, signature }),
     });
 
     if (!execResp.ok) {
@@ -327,7 +346,7 @@ export const useSolitaireActions = () => {
       onlyTransactionKind: true,
     });
 
-    const sponsorResp = await fetch(`/sponsor`, {
+    const sponsorResp = await fetch(`api/sponsor`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -346,10 +365,14 @@ export const useSolitaireActions = () => {
       digest: string;
     };
 
-    const execResp = await fetch(`/execute`, {
+    const { signature } = await  signTransaction({
+      transaction: sponsoredBytes,
+    });
+
+    const execResp = await fetch(`api/execute`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ digest: sponsoredDigest, sponsoredBytes }),
+      body: JSON.stringify({ digest: sponsoredDigest, signature }),
     });
 
     if (!execResp.ok) {
@@ -393,7 +416,7 @@ export const useSolitaireActions = () => {
       onlyTransactionKind: true,
     });
 
-    const sponsorResp = await fetch(`/sponsor`, {
+    const sponsorResp = await fetch(`api/sponsor`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -412,10 +435,14 @@ export const useSolitaireActions = () => {
       digest: string;
     };
 
-    const execResp = await fetch(`/execute`, {
+    const { signature } = await signTransaction({
+      transaction: sponsoredBytes,
+    });
+
+    const execResp = await fetch(`api/execute`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ digest: sponsoredDigest, sponsoredBytes }),
+      body: JSON.stringify({ digest: sponsoredDigest, signature }),
     });
 
     if (!execResp.ok) {
@@ -466,7 +493,7 @@ export const useSolitaireActions = () => {
       onlyTransactionKind: true,
     });
 
-    const sponsorResp = await fetch(`/sponsor`, {
+    const sponsorResp = await fetch(`api/sponsor`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -485,10 +512,14 @@ export const useSolitaireActions = () => {
       digest: string;
     };
 
-    const execResp = await fetch(`/execute`, {
+    const { signature } = await signTransaction({
+      transaction: sponsoredBytes,
+    });
+
+    const execResp = await fetch(`api/execute`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ digest: sponsoredDigest, sponsoredBytes }),
+      body: JSON.stringify({ digest: sponsoredDigest, signature }),
     });
 
     if (!execResp.ok) {
@@ -532,7 +563,7 @@ export const useSolitaireActions = () => {
       onlyTransactionKind: true,
     });
 
-    const sponsorResp = await fetch(`/sponsor`, {
+    const sponsorResp = await fetch(`api/sponsor`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -551,10 +582,14 @@ export const useSolitaireActions = () => {
       digest: string;
     };
 
-    const execResp = await fetch(`/execute`, {
+    const { signature } = await signTransaction({
+      transaction: sponsoredBytes,
+    });
+
+    const execResp = await fetch(`api/execute`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ digest: sponsoredDigest, sponsoredBytes }),
+      body: JSON.stringify({ digest: sponsoredDigest, signature }),
     });
 
     if (!execResp.ok) {
@@ -598,7 +633,7 @@ export const useSolitaireActions = () => {
       onlyTransactionKind: true,
     });
 
-    const sponsorResp = await fetch(`/sponsor`, {
+    const sponsorResp = await fetch(`api/sponsor`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -617,10 +652,14 @@ export const useSolitaireActions = () => {
       digest: string;
     };
 
-    const execResp = await fetch(`/execute`, {
+    const { signature } = await signTransaction({
+      transaction: sponsoredBytes,
+    });
+
+    const execResp = await fetch(`api/execute`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ digest: sponsoredDigest, sponsoredBytes }),
+      body: JSON.stringify({ digest: sponsoredDigest, signature }),
     });
 
     if (!execResp.ok) {
@@ -695,7 +734,7 @@ export const useSolitaireActions = () => {
       onlyTransactionKind: true,
     });
 
-    const sponsorResp = await fetch(`/sponsor`, {
+    const sponsorResp = await fetch(`api/sponsor`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -714,10 +753,14 @@ export const useSolitaireActions = () => {
       digest: string;
     };
 
-    const execResp = await fetch(`/execute`, {
+    const { signature } = await signTransaction({
+      transaction: sponsoredBytes,
+    });
+
+    const execResp = await fetch(`api/execute`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ digest: sponsoredDigest, sponsoredBytes }),
+      body: JSON.stringify({ digest: sponsoredDigest, signature }),
     });
 
     if (!execResp.ok) {
@@ -765,7 +808,7 @@ export const useSolitaireActions = () => {
       onlyTransactionKind: true,
     });
 
-    const sponsorResp = await fetch(`/sponsor`, {
+    const sponsorResp = await fetch(`api/sponsor`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -779,15 +822,19 @@ export const useSolitaireActions = () => {
     }
 
     const { bytes: sponsoredBytes, digest: sponsoredDigest } =
-    (await sponsorResp.json()) as {
-      bytes: string;
-      digest: string;
-    };
+      (await sponsorResp.json()) as {
+        bytes: string;
+        digest: string;
+      };
 
-    const execResp = await fetch(`/execute`, {
+    const { signature } = await signTransaction({
+      transaction: sponsoredBytes,
+    });
+
+    const execResp = await fetch(`api/execute`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ digest: sponsoredDigest, sponsoredBytes }),
+        body: JSON.stringify({ digest: sponsoredDigest, signature }),
     });
 
     if (!execResp.ok) {
