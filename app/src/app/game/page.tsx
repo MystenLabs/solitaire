@@ -24,9 +24,9 @@ const GamePage = () => {
     setSpinning(true);
     let game: Game | undefined = undefined;
     if (mode === "easy") {
-      // game = await handleExecuteInitEasyGame();
+      game = await handleExecuteInitEasyGame();
     } else if (mode === "normal") {
-      // game = await handleExecuteInitNormalGame();
+      game = await handleExecuteInitNormalGame();
     } else {
       throw new Error("Invalid difficulty mode");
     }

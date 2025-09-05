@@ -41,3 +41,5 @@ app/.env
 app/.env.local*
 app/.env.test*
 app/.env.main*
+
+move/solitaire/package_summaries
