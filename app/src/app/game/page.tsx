@@ -1,3 +1,5 @@
+// Copyright (c) Mysten Labs, Inc.
+// SPDX-License-Identifier: Apache-2.0
 "use client";
 import React, { useContext, useState } from "react";
 import { DifficultySelection } from "@/components/difficultySelection/DifficultySelection";

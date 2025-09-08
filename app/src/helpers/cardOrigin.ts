@@ -1,3 +1,5 @@
+// Copyright (c) Mysten Labs, Inc.
+// SPDX-License-Identifier: Apache-2.0
 import {Pile as PileProps} from "../../../app/src/models/pile";
 import {Column as ColumnProps} from "../../../app/src/models/column";
 import {Deck as DeckProps} from "../../../app/src/models/deck";

@@ -1,3 +1,5 @@
+// Copyright (c) Mysten Labs, Inc.
+// SPDX-License-Identifier: Apache-2.0
 import card_back from './cards/card_back.svg';
 
 import clubs_ace from './cards/clubs_ace.svg';

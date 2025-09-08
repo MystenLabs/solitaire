@@ -1,3 +1,5 @@
+// Copyright (c) Mysten Labs, Inc.
+// SPDX-License-Identifier: Apache-2.0
 import React, {ReactNode, useContext} from 'react';
 import { cardIdToSvg } from "@/helpers/cardMappings";
 import Image from "next/image";

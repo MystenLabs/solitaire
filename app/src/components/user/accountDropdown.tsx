@@ -1,3 +1,5 @@
+// Copyright (c) Mysten Labs, Inc.
+// SPDX-License-Identifier: Apache-2.0
 import Image from "next/image";
 import google from "../../../public/assets/logos/google_email.svg";
 import React from "react";

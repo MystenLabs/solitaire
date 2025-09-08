@@ -1,3 +1,5 @@
+// Copyright (c) Mysten Labs, Inc.
+// SPDX-License-Identifier: Apache-2.0
 "use client";
 import { ModeVisual } from "@/components/difficultySelection/difficultyModes/modeVisual";
 import easy_mode_visual from "../../../public/assets/difficultyModesVisuals/easy_mode_visual.svg";

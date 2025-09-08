@@ -1,3 +1,5 @@
+// Copyright (c) Mysten Labs, Inc.
+// SPDX-License-Identifier: Apache-2.0
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { executeTransactionBlock, setupSuiClient, TestToolbox } from "./setup";

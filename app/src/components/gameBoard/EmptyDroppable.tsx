@@ -1,3 +1,5 @@
+// Copyright (c) Mysten Labs, Inc.
+// SPDX-License-Identifier: Apache-2.0
 import {useDroppable} from "@dnd-kit/core";
 
 export function EmptyDroppable(props: any) {

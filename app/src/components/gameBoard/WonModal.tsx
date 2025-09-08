@@ -1,3 +1,5 @@
+// Copyright (c) Mysten Labs, Inc.
+// SPDX-License-Identifier: Apache-2.0
 import ReactDOM from "react-dom";
 import Image from "next/image";
 import arrowIcon from "../../../public/iconRight.svg";

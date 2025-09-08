@@ -1,3 +1,5 @@
+// Copyright (c) Mysten Labs, Inc.
+// SPDX-License-Identifier: Apache-2.0
 export function formatTimestamp(timestamp: number): string {
     const date = new Date(
       typeof timestamp === "string" ? Number(timestamp) : timestamp
