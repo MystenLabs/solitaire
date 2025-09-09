@@ -35,9 +35,9 @@ module solitaire::test_solitaire {
     // ----------------- Helper functions -----------------
     fun generate_cards(num_cards: u64): vector<u64>{
         let mut i: u64 = 0;
-        let mut available_cards = vector::empty<u64>();
+        let mut available_cards = vector[];
         while (i < num_cards) {
-            vector::push_back(&mut available_cards, i);
+            available_cards.push_back(i);
             i = i + 1;
         };
         available_cards
@@ -108,7 +108,7 @@ module solitaire::test_solitaire {
     /// Test that the reveal_card function works as expected
     public fun test_reveal_card_valid() {
         let mut inputs = vector<u64>[1, 52]; // reveal card from a deck of 1 and a deck of 52 cards
-        let mut i = vector::length(&inputs);
+        let mut i = inputs.length();
         let mut scenario_val = test_scenario::begin(SYSTEM_ADDRESS);
         let scenario = &mut scenario_val;
         random::create_for_testing(test_scenario::ctx(scenario));
@@ -116,7 +116,7 @@ module solitaire::test_solitaire {
             while (i > 0) {
                 scenario.next_tx(SYSTEM_ADDRESS);
                 let random_state = scenario.take_shared<random::Random>();
-                let num_cards = vector::pop_back(&mut inputs);
+                let num_cards = inputs.pop_back();
                 reveal_card_helper(num_cards, random_state);
                 i = i - 1;
             };
