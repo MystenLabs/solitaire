@@ -141,10 +141,8 @@ module solitaire::test_solitaire {
                 solitaire::open_deck_card(&mut game, &random_state, test_scenario::ctx(scenario));
                 i = i + 1;
             };
-            test_scenario::return_to_sender(scenario, game);
-            test_scenario::return_shared(random_state);
-        };
-        test_scenario::end(scenario_val);
+            abort 
+        }
     }
 
     #[test]
@@ -190,11 +188,8 @@ module solitaire::test_solitaire {
             solitaire::from_deck_to_column(
                 &mut game, 0, test_scenario::ctx(scenario)
             );
-            test_scenario::return_to_sender(scenario, game);
-            test_scenario::return_shared(random_state);
-        };
-
-        test_scenario::end(scenario_val);
+            abort
+        }
     }
 
     #[test]
@@ -222,10 +217,8 @@ module solitaire::test_solitaire {
                 &mut game, 0, test_scenario::ctx(scenario)
             );
 
-            test_scenario::return_to_sender(scenario, game);
-            test_scenario::return_shared(random_state);
-        };
-        test_scenario::end(scenario_val);
+            abort
+        }
     }
 
     #[test]
@@ -243,10 +236,8 @@ module solitaire::test_solitaire {
             solitaire::from_deck_to_column(
                 &mut game, 4, test_scenario::ctx(scenario)
             );
-            test_scenario::return_to_sender(scenario, game);
-        };
-
-        test_scenario::end(scenario_val);
+            abort
+        }
     }
 
     #[test]
@@ -285,9 +276,8 @@ module solitaire::test_solitaire {
             solitaire::from_deck_to_column(
                 &mut game, 0, test_scenario::ctx(scenario)
             );
-            test_scenario::return_to_sender(scenario, game);
-        };
-        test_scenario::end(scenario_val);
+            abort
+        }
     }
 
     #[test]
@@ -340,10 +330,8 @@ module solitaire::test_solitaire {
             solitaire::from_deck_to_pile(
                 &mut game, 0, test_scenario::ctx(scenario)
             );
-
-            test_scenario::return_to_sender(scenario, game);
-        };
-        test_scenario::end(scenario_val);
+            abort
+        }
     }
 
     #[test]
@@ -360,9 +348,8 @@ module solitaire::test_solitaire {
             solitaire::from_deck_to_pile(
                 &mut game, 0, test_scenario::ctx(scenario)
             );
-            test_scenario::return_to_sender(scenario, game);
-        };
-        test_scenario::end(scenario_val);
+            abort
+        }
     }
 
 
@@ -380,9 +367,8 @@ module solitaire::test_solitaire {
             solitaire::from_deck_to_pile(
                 &mut game, 2, test_scenario::ctx(scenario)
             );
-            test_scenario::return_to_sender(scenario, game);
-        };
-        test_scenario::end(scenario_val);
+            abort
+        }
     }
 
     #[test]
@@ -399,9 +385,8 @@ module solitaire::test_solitaire {
             solitaire::from_deck_to_pile(
                 &mut game, 2, test_scenario::ctx(scenario)
             );
-            test_scenario::return_to_sender(scenario, game);
-        };
-        test_scenario::end(scenario_val);
+            abort
+        }
     }
 
     #[test]
@@ -469,11 +454,8 @@ module solitaire::test_solitaire {
 
             solitaire::from_column_to_pile(&mut game, 0, 2, &random_state, test_scenario::ctx(scenario));
 
-            // Teardown
-            test_scenario::return_to_sender(scenario, game);
-            test_scenario::return_shared(random_state);
-        };
-        test_scenario::end(scenario_val);
+            abort
+        }
     }
 
 
@@ -489,15 +471,11 @@ module solitaire::test_solitaire {
         {
             let random_state = scenario.take_shared<random::Random>(); 
             let mut game = test_scenario::take_from_sender<Game>(scenario);
-             solitaire::cheat_place_card_to_column(&mut game, 41, 0);
-
+            solitaire::cheat_place_card_to_column(&mut game, 41, 0);
             solitaire::from_column_to_pile(&mut game, 0, 2, &random_state, test_scenario::ctx(scenario));
 
-            // Teardown
-            test_scenario::return_to_sender(scenario, game);
-            test_scenario::return_shared(random_state);
-        };
-        test_scenario::end(scenario_val);
+            abort
+        }
     }
 
     #[test]
@@ -516,11 +494,8 @@ module solitaire::test_solitaire {
 
             solitaire::from_column_to_pile(&mut game, 0, 2, &random_state, test_scenario::ctx(scenario));
 
-            // Teardown
-            test_scenario::return_to_sender(scenario, game);
-            test_scenario::return_shared(random_state);
-        };
-        test_scenario::end(scenario_val);
+            abort
+        }
     }
 
     #[test]
@@ -537,11 +512,8 @@ module solitaire::test_solitaire {
             let mut game = test_scenario::take_from_sender<Game>(scenario);
             solitaire::from_column_to_pile(&mut game, 7, 2, &random_state, test_scenario::ctx(scenario));
 
-            // Teardown
-            test_scenario::return_to_sender(scenario, game);
-            test_scenario::return_shared(random_state);
-        };
-        test_scenario::end(scenario_val);
+            abort
+        }
     }
 
     #[test]
@@ -559,11 +531,8 @@ module solitaire::test_solitaire {
 
             solitaire::from_column_to_pile(&mut game, 1, 4, &random_state, test_scenario::ctx(scenario));
 
-            // Teardown
-            test_scenario::return_to_sender(scenario, game);
-            test_scenario::return_shared(random_state);
-        };
-        test_scenario::end(scenario_val);
+            abort
+        }
     }
 
     #[test]
@@ -582,11 +551,8 @@ module solitaire::test_solitaire {
             solitaire::remove_all_from_column(&mut game, 5);
             solitaire::from_column_to_pile(&mut game, 5, 3, &random_state, test_scenario::ctx(scenario));
 
-            // Teardown
-            test_scenario::return_to_sender(scenario, game);
-            test_scenario::return_shared(random_state);
-        };
-        test_scenario::end(scenario_val);
+            abort
+        }
     }
 
     #[test]
@@ -615,11 +581,8 @@ module solitaire::test_solitaire {
 
             solitaire::from_column_to_pile(&mut game, 0, 3, &random_state, test_scenario::ctx(scenario));
 
-            // Teardown
-            test_scenario::return_to_sender(scenario, game);
-            test_scenario::return_shared(random_state);
-        };
-        test_scenario::end(scenario_val);
+            abort
+        }
     }
 
     #[test]
@@ -671,11 +634,8 @@ module solitaire::test_solitaire {
                 &mut game, 0, 20, 1, &random_state, test_scenario::ctx(scenario)
             );
 
-            // Teardown
-            test_scenario::return_to_sender(scenario, game);
-            test_scenario::return_shared(random_state);
-        };
-        test_scenario::end(scenario_val);
+            abort
+        }
     }
 
     #[test]
@@ -694,11 +654,8 @@ module solitaire::test_solitaire {
                 &mut game, 7, 20, 1, &random_state, test_scenario::ctx(scenario)
             );
 
-            // Teardown
-            test_scenario::return_to_sender(scenario, game);
-            test_scenario::return_shared(random_state);
-        };
-        test_scenario::end(scenario_val);
+            abort
+        }
     }
 
     #[test]
@@ -717,11 +674,8 @@ module solitaire::test_solitaire {
                 &mut game, 0, 20, 7, &random_state, test_scenario::ctx(scenario)
             );
 
-            // Teardown
-            test_scenario::return_to_sender(scenario, game);
-            test_scenario::return_shared(random_state);
-        };
-        test_scenario::end(scenario_val);
+            abort
+        }
     }
 
     #[test]
@@ -811,11 +765,8 @@ module solitaire::test_solitaire {
                 &mut game, 0, 70, 1, &random_state, test_scenario::ctx(scenario)
             );
 
-            // Teardown
-            test_scenario::return_to_sender(scenario, game);
-            test_scenario::return_shared(random_state);
-        };
-        test_scenario::end(scenario_val);
+            abort
+        }
     }
 
     #[test]
@@ -836,11 +787,8 @@ module solitaire::test_solitaire {
                 &mut game, 0, 4, 1, &random_state, test_scenario::ctx(scenario)
             );
 
-            // Teardown
-            test_scenario::return_to_sender(scenario, game);
-            test_scenario::return_shared(random_state);
-        };
-        test_scenario::end(scenario_val);
+            abort
+        }
     }
 
     #[test]
@@ -884,9 +832,8 @@ module solitaire::test_solitaire {
                 &mut game, 4, 4, test_scenario::ctx(scenario)
             );
 
-            test_scenario::return_to_sender(scenario, game);
-        };
-        test_scenario::end(scenario_val);
+            abort
+        }
     }
 
     #[test]
@@ -904,9 +851,8 @@ module solitaire::test_solitaire {
                 &mut game, 0, 7, test_scenario::ctx(scenario)
             );
 
-            test_scenario::return_to_sender(scenario, game);
-        };
-        test_scenario::end(scenario_val);
+            abort
+        }
     }
 
     #[test]
@@ -945,9 +891,8 @@ module solitaire::test_solitaire {
                 &mut game, 3, 4, test_scenario::ctx(scenario)
             );
 
-            test_scenario::return_to_sender(scenario, game);
-        };
-        test_scenario::end(scenario_val);
+            abort
+        }
     }
 
     #[test]
@@ -967,11 +912,8 @@ module solitaire::test_solitaire {
             solitaire::finish_game(&mut game, &clock, test_scenario::ctx(scenario));
             solitaire::from_pile_to_column(&mut game, 0, 1, test_scenario::ctx(scenario));
 
-            // Teardown
-            clock::destroy_for_testing(clock);
-            test_scenario::return_to_sender(scenario, game);
-        };
-        test_scenario::end(scenario_val);
+            abort
+        }
     }
 
     #[test]
@@ -1016,10 +958,8 @@ module solitaire::test_solitaire {
             solitaire::open_deck_card(&mut game, &random_state, test_scenario::ctx(scenario));
             solitaire::rotate_open_deck_cards(&mut game, test_scenario::ctx(scenario));
 
-            test_scenario::return_to_sender(scenario, game);
-            test_scenario::return_shared(random_state);
-        };
-        test_scenario::end(scenario_val);    
+            abort
+        }
     }
 
     #[test]
@@ -1058,9 +998,7 @@ module solitaire::test_solitaire {
             let mut game = test_scenario::take_from_sender<Game>(scenario);
             let clock = clock::create_for_testing(test_scenario::ctx(scenario));
             solitaire::finish_game(&mut game, &clock, test_scenario::ctx(scenario));
-            clock::destroy_for_testing(clock);
-            test_scenario::return_to_sender(scenario, game);
-        };
-        test_scenario::end(scenario_val);
+            abort
+        }
     }
 }
