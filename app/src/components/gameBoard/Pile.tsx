@@ -1,7 +1,7 @@
 "use client";
 
-import {Card} from "../cards/Card";
-import {Pile as PileProps} from "../../models/pile";
+import {Card} from "@/components/cards/Card";
+import {Pile as PileProps} from "@/models/pile";
 
 
 export default function Pile({pile}: { pile: PileProps }) {
