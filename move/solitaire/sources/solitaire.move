@@ -1,7 +1,7 @@
 module solitaire::solitaire;
 
 use sui::clock::{Clock};
-use std::string::{String, utf8};
+use std::string::{String};
 use sui::random::Random;
 use sui::event;
 
@@ -104,7 +104,7 @@ entry fun init_normal_game(clock: &Clock, random: &Random, ctx: &mut TxContext) 
         player_moves: 0,
         start_time: clock.timestamp_ms(),
         end_time: 0,
-        difficulty: utf8(b"NORMAL"),
+        difficulty: b"NORMAL".to_string(),
     };
 
     transfer::transfer(game, ctx.sender());
@@ -142,7 +142,7 @@ entry fun init_easy_game(clock: &Clock, random: &Random, ctx: &mut TxContext) {
         player_moves: 0,
         start_time: clock.timestamp_ms(),
         end_time: 0,
-        difficulty: utf8(b"EASY"),
+        difficulty: b"EASY".to_string(),
     };
 
     transfer::transfer(game, ctx.sender());
@@ -397,7 +397,7 @@ public fun delete_unfinished_game(game: Game, _ctx: &mut TxContext) {
     };
     columns.destroy_empty();
 
-    object::delete(id);
+    id.delete();
 }
 
 /// Internal function that sets up the 7 columns of cards.

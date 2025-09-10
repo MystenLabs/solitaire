@@ -124,8 +124,7 @@ public fun test_reveal_card_valid() {
     test_scenario::end(scenario_val);
 }
 
-#[test]
-#[expected_failure(abort_code = ENoMoreHiddenCards)]
+#[test, expected_failure(abort_code = ENoMoreHiddenCards)]
 public fun test_open_deck_card_invalid_out_of_cards() {
     let mut scenario_val = init_normal_game_scenario_helper();
     let scenario = &mut scenario_val;
@@ -170,8 +169,8 @@ public fun test_from_deck_to_column_valid_spades_8_on_hearts_9(){
     test_scenario::end(scenario_val);
 }
 
-#[test]
-#[expected_failure(abort_code = EInvalidPlacement)]
+
+#[test, expected_failure(abort_code = EInvalidPlacement)]
 public fun test_from_deck_to_column_invalid_order_spades_8_on_hearts_5(){
     let mut scenario_val = init_normal_game_scenario_helper();
     let scenario = &mut scenario_val;
@@ -192,8 +191,7 @@ public fun test_from_deck_to_column_invalid_order_spades_8_on_hearts_5(){
     }
 }
 
-#[test]
-#[expected_failure(abort_code = ENoAvailableDeckCard)]
+#[test, expected_failure(abort_code = ENoAvailableDeckCard)]
 public fun test_from_deck_to_column_no_available_card() {
     let mut scenario_val = init_normal_game_scenario_helper();
     let scenario = &mut scenario_val;
@@ -221,8 +219,7 @@ public fun test_from_deck_to_column_no_available_card() {
     }
 }
 
-#[test]
-#[expected_failure(abort_code = EInvalidPlacement)]
+#[test, expected_failure(abort_code = EInvalidPlacement)]
 public fun test_from_deck_to_column_invalid_color_hearts_4_on_hearts_5() {
     let mut scenario_val = init_normal_game_scenario_helper();
     let scenario = &mut scenario_val;
@@ -260,8 +257,7 @@ public fun test_from_deck_to_column_valid_diamonds_K_on_empty() {
     test_scenario::end(scenario_val);
 }
 
-#[test]
-#[expected_failure(abort_code = ENotKingCard)]
+#[test, expected_failure(abort_code = ENotKingCard)]
 public fun test_from_deck_to_column_invalid_order_diamonds_Q_on_empty() {
     let mut scenario_val = init_normal_game_scenario_helper();
     let scenario = &mut scenario_val;
@@ -318,8 +314,7 @@ public fun test_from_deck_to_pile_valid_hearts_2_on_hearts_A() {
     test_scenario::end(scenario_val);
 }
 
-#[test]
-#[expected_failure(abort_code = ENoAvailableDeckCard)]
+#[test, expected_failure(abort_code = ENoAvailableDeckCard)]
 public fun test_from_deck_to_pile_no_available_card() {
     let mut scenario_val = init_normal_game_scenario_helper();
     let scenario = &mut scenario_val;
@@ -334,8 +329,7 @@ public fun test_from_deck_to_pile_no_available_card() {
     }
 }
 
-#[test]
-#[expected_failure(abort_code = ENotAceCard)]
+#[test, expected_failure(abort_code = ENotAceCard)]
 public fun test_from_deck_to_pile_invalid_order_diamonds_7_on_empty() {
     let mut scenario_val = init_normal_game_scenario_helper();
     let scenario = &mut scenario_val;
@@ -353,8 +347,7 @@ public fun test_from_deck_to_pile_invalid_order_diamonds_7_on_empty() {
 }
 
 
-#[test]
-#[expected_failure(abort_code = EInvalidPlacement)]
+#[test, expected_failure(abort_code = EInvalidPlacement)]
 public fun test_from_deck_to_pile_invalid_order_hearts_3_on_hearts_A() {
     let mut scenario_val = init_easy_game_scenario_helper();
     let scenario = &mut scenario_val;
@@ -371,8 +364,7 @@ public fun test_from_deck_to_pile_invalid_order_hearts_3_on_hearts_A() {
     }
 }
 
-#[test]
-#[expected_failure(abort_code = EInvalidPlacement)]
+#[test, expected_failure(abort_code = EInvalidPlacement)]
 public fun test_from_deck_to_pile_invalid_class_clubs_2_on_hearts_A() {
     let mut scenario_val = init_easy_game_scenario_helper();
     let scenario = &mut scenario_val;
@@ -438,8 +430,7 @@ public fun test_from_column_to_pile_valid_hearts_2_on_hearts_A() {
     test_scenario::end(scenario_val);
 }
 
-#[test]
-#[expected_failure(abort_code = ENotAceCard)]
+#[test, expected_failure(abort_code = ENotAceCard)]
 public fun test_from_column_to_pile_invalid_order_diamonds_7_on_empty() {
     let mut scenario_val = init_normal_game_scenario_helper();
     let scenario = &mut scenario_val;
@@ -478,8 +469,7 @@ public fun test_from_column_to_pile_invalid_order_hearts_3_on_hearts_A() {
     }
 }
 
-#[test]
-#[expected_failure(abort_code = EInvalidPlacement)]
+#[test, expected_failure(abort_code = EInvalidPlacement)]
 public fun test_from_column_to_pile_invalid_class_clubs_2_on_hearts_A() {
     let mut scenario_val = init_easy_game_scenario_helper();
     let scenario = &mut scenario_val;
@@ -498,8 +488,7 @@ public fun test_from_column_to_pile_invalid_class_clubs_2_on_hearts_A() {
     }
 }
 
-#[test]
-#[expected_failure(abort_code = EInvalidColumnIndex)]
+#[test, expected_failure(abort_code = EInvalidColumnIndex)]
 public fun test_from_column_to_pile_invalid_column_index() {
     let mut scenario_val = init_easy_game_scenario_helper();
     let scenario = &mut scenario_val;
@@ -516,8 +505,7 @@ public fun test_from_column_to_pile_invalid_column_index() {
     }
 }
 
-#[test]
-#[expected_failure(abort_code = EInvalidPileIndex)]
+#[test, expected_failure(abort_code = EInvalidPileIndex)]
 public fun test_from_column_to_pile_invalid_pile_index() {
     let mut scenario_val = init_easy_game_scenario_helper();
     let scenario = &mut scenario_val;
@@ -535,8 +523,7 @@ public fun test_from_column_to_pile_invalid_pile_index() {
     }
 }
 
-#[test]
-#[expected_failure(abort_code = EColumnIsEmpty)]
+#[test, expected_failure(abort_code = EColumnIsEmpty)]
 public fun test_from_column_to_pile_column_is_empty() {
     let mut scenario_val = init_easy_game_scenario_helper();
     let scenario = &mut scenario_val;
@@ -555,8 +542,7 @@ public fun test_from_column_to_pile_column_is_empty() {
     }
 }
 
-#[test]
-#[expected_failure(abort_code = ECannotPlaceOnKing)]
+#[test, expected_failure(abort_code = ECannotPlaceOnKing)]
 public fun test_from_column_to_pile_invalid_place_on_king() {
     let mut scenario_val = init_normal_game_scenario_helper();
     let scenario = &mut scenario_val;
@@ -614,8 +600,7 @@ public fun test_from_column_to_column_valid_hearts_J_on_clubs_Q() {
     test_scenario::end(scenario_val);
 }
 
-#[test]
-#[expected_failure(abort_code = EInvalidPlacement)]
+#[test, expected_failure(abort_code = EInvalidPlacement)]
 public fun test_from_column_to_column_invalid_order_spades_8_on_hearts_10() {
     let mut scenario_val = init_normal_game_scenario_helper();
     let scenario = &mut scenario_val;
@@ -638,8 +623,7 @@ public fun test_from_column_to_column_invalid_order_spades_8_on_hearts_10() {
     }
 }
 
-#[test]
-#[expected_failure(abort_code = EInvalidColumnIndex)]
+#[test, expected_failure(abort_code = EInvalidColumnIndex)]
 public fun test_from_column_to_column_invalid_src_column_index() {
     let mut scenario_val = init_normal_game_scenario_helper();
     let scenario = &mut scenario_val;
@@ -658,8 +642,7 @@ public fun test_from_column_to_column_invalid_src_column_index() {
     }
 }
 
-#[test]
-#[expected_failure(abort_code = EInvalidColumnIndex)]
+#[test, expected_failure(abort_code = EInvalidColumnIndex)]
 public fun test_from_column_to_column_invalid_dest_column_index() {
     let mut scenario_val = init_normal_game_scenario_helper();
     let scenario = &mut scenario_val;
@@ -749,8 +732,7 @@ public fun test_from_column_to_column_valid_to_same_column() {
     test_scenario::end(scenario_val);
 }
 
-#[test]
-#[expected_failure(abort_code = ECardNotInColumn)]
+#[test, expected_failure(abort_code = ECardNotInColumn)]
 public fun test_from_column_to_column_invalid_card_not_in_column() {
     let mut scenario_val = init_normal_game_scenario_helper();
     let scenario = &mut scenario_val;
@@ -769,8 +751,7 @@ public fun test_from_column_to_column_invalid_card_not_in_column() {
     }
 }
 
-#[test]
-#[expected_failure(abort_code = ENotKingCard)]
+#[test, expected_failure(abort_code = ENotKingCard)]
 public fun test_from_column_to_column_invalid_clubs_3_on_empty() {
     let mut scenario_val = init_normal_game_scenario_helper();
     let scenario = &mut scenario_val;
@@ -817,8 +798,7 @@ public fun test_from_column_to_column_valid_clubs_K_on_empty() {
     test_scenario::end(scenario_val);
 }
 
-#[test]
-#[expected_failure(abort_code = EInvalidPileIndex)]
+#[test, expected_failure(abort_code = EInvalidPileIndex)]
 public fun test_from_pile_to_column_invalid_pile_index() {
     let mut scenario_val = init_easy_game_scenario_helper();
     let scenario = &mut scenario_val;
@@ -836,8 +816,7 @@ public fun test_from_pile_to_column_invalid_pile_index() {
     }
 }
 
-#[test]
-#[expected_failure(abort_code = EInvalidColumnIndex)]
+#[test, expected_failure(abort_code = EInvalidColumnIndex)]
 public fun test_from_pile_to_column_invalid_column_index() {
     let mut scenario_val = init_easy_game_scenario_helper();
     let scenario = &mut scenario_val;
@@ -875,8 +854,7 @@ public fun test_from_pile_to_column_valid_clubs_2_on_diamonds_3() {
     test_scenario::end(scenario_val);
 }
 
-#[test]
-#[expected_failure(abort_code = ECannotPlaceOnAce)]
+#[test, expected_failure(abort_code = ECannotPlaceOnAce)]
 public fun test_from_pile_to_column_invalid_spades_K_on_hearts_A(){
     let mut scenario_val = init_easy_game_scenario_helper();
     let scenario = &mut scenario_val;
@@ -895,8 +873,7 @@ public fun test_from_pile_to_column_invalid_spades_K_on_hearts_A(){
     }
 }
 
-#[test]
-#[expected_failure(abort_code = EGameHasFinished)]
+#[test, expected_failure(abort_code = EGameHasFinished)]
 public fun test_pile_to_column_invalid_has_finished() {
     let mut scenario_val = init_normal_game_scenario_helper();
     let scenario = &mut scenario_val;
@@ -944,8 +921,7 @@ public fun test_turn_deck_card_valid_reveal_all_and_iterate_2_times() {
     test_scenario::end(scenario_val);
 }
 
-#[test]
-#[expected_failure(abort_code = EInvalidTurnDeckCard)]
+#[test, expected_failure(abort_code = EInvalidTurnDeckCard)]
 public fun test_invalid_turn_deck_card() {
     let mut scenario_val = init_normal_game_scenario_helper();
     let scenario = &mut scenario_val;
@@ -988,8 +964,7 @@ public fun test_finish_game_valid_finished() {
     test_scenario::end(scenario_val);
 }
 
-#[test]
-#[expected_failure(abort_code = EGameNotFinished)]
+#[test, expected_failure(abort_code = EGameNotFinished)]
 public fun test_finish_game_invalid_not_finished() {
     let mut scenario_val = init_easy_game_scenario_helper();
     let scenario = &mut scenario_val;
