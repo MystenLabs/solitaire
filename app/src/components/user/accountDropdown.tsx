@@ -40,7 +40,7 @@ export const AccountDropdown = () => {
             <div className={"shrink-0"}>
               <Image src={google} alt={"Logo of google"} />
             </div>
-            <div className="text-center text-white text-base font-normal font-['Mysten Walter Alte'] leading-tight">
+            <div className="text-center text-white text-sm md:text-base font-normal font-['Mysten Walter Alte'] leading-tight">
                 {
                     // TODO: Check if the email can be added
                 }

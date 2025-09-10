@@ -50,7 +50,7 @@ const GamePage = () => {
       }`}
     >
       <div className="mt-[80px] md:mt-16 flex pt-4 px-4 md:px-20 justify-between items-center">
-        <div className="logo text-white text-[20px] md:text-[28px] font-bold font-['Mysten Walter Alte']">
+        <div className="logo text-white text-[14px] md:text-[28px] font-bold font-['Mysten Walter Alte']">
           Mysten Solitaire
         </div>
         {game && (
