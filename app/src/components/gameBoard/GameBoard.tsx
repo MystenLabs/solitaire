@@ -386,13 +386,13 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
     return (
       <div className="relative">
         <div
-          className="aboslute top-0 h-[166px] min-w-[120px]"
+          className="aboslute top-0 h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]"
           style={{ rotate: "-5deg" }}
         >
           <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} />
         </div>
         <div
-          className="absolute top-0 h-[166px] min-w-[120px]"
+          className="absolute top-0 h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]"
           style={{ rotate: "3deg" }}
         >
           <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} />
@@ -400,7 +400,7 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
         <div
           className={`${
             isMoveLoading ? "cursor-wait" : "cursor-pointer"
-          } absolute top-0 h-[166px] min-w-[120px]`}
+          } absolute top-0 h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]`}
           style={{ rotate: "none" }}
         >
           <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} />
@@ -411,7 +411,7 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
 
   return (
     <DndContext onDragEnd={handleDragEnd} autoScroll={false}>
-      <div className="px-60 h-full w-full flex flex-col items-center space-y-7 pt-14 gap-y-36">
+      <div className="px-10 md:px-60 h-full w-full flex flex-col items-center space-y-7 pt-14 gap-y-36">
         <ul className="w-full h-200 flex justify-between items-center">
           {/* Set up card deck */}
           <button
@@ -423,7 +423,7 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
             {!!deck.hidden_cards || deck.open_cards !== deck.cards.length ? (
               deckRotated()
             ) : deck.cards.length !== 0 ? (
-              <button className="flex justify-center items-center w-[120px] h-[166px]">
+              <button className="flex justify-center items-center w-[80px] md:w-[120px] h-[110px] md:h-[166px]">
                 <Image
                   src={circleArrow}
                   alt={"circle-arrow"}
@@ -432,17 +432,17 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
                 />
               </button>
             ) : (
-              <div className="w-[120px] h-[166px]"></div>
+              <div className="w-[80px] md:w-[120px] h-[110px] md:h-[166px]"></div>
             )}
           </button>
 
           {/* Place where the open deck cards are being displayed */}
-          <li className="min-w-[120px] h-[166px]" key={"openCard"}>
+          <li className="min-w-[80px] md:min-w-[120px] h-[110px] md:h-[166px]" key={"openCard"}>
             {openCards()}
           </li>
 
           {/* Empty placeholder */}
-          <li className="w-[120px] h-[166px] flex-shrink-0"></li>
+          <li className="w-[80px] md:w-[120px] h-[110px] md:h-[166px] flex-shrink-0"></li>
 
           {/* Set up piles */}
           {piles.map((pile, index) => (

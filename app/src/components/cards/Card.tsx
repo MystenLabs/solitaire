@@ -25,8 +25,6 @@ export const Card = ({ id, children, marginTop, draggable = true }: { id: number
 
     const style = {
         transform: isDragging ? `translate3d(${transform?.x}px, ${transform?.y}px, 0) rotate(10deg)` : 'none',
-        height: "166px",
-        minWidth: "120px",
         marginTop: marginTop,
         cursor: (isMoveLoading ? 'wait' : (id === -1 ? 'default' : (isDragging ? 'grabbing' : 'grab'))),
     };
@@ -37,9 +35,10 @@ export const Card = ({ id, children, marginTop, draggable = true }: { id: number
     };
 
     return (
-        <div className={`card`} style={style} ref={setNodeRef} {...listeners} {...attributes}>
+        <div className={`card h-[110px] md:h-[166px] min-w[80px] md:min-h-[120px]`} style={style} ref={setNodeRef} {...listeners} {...attributes}>
             <Image src={cardIdToSvg(id)}
-                   alt={id != -1 ? `Card ${id}` : `Hidden Card: ${idOfHiddenCard}`}/>
+                   alt={id != -1 ? `Card ${id}` : `Hidden Card: ${idOfHiddenCard}`}
+                   className="w-full h-full object-contain"/>
             {children}
         </div>
     )

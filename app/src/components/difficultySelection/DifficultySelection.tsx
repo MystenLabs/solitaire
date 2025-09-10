@@ -15,7 +15,7 @@ export const DifficultySelection = ({
   };
 
   return (
-    <div className="flex flex-col items-center justify-center rounded-3xl bg-white px-10 backdrop-blur-2xl">
+    <div className="flex flex-col items-center justify-center rounded-3xl bg-white px-4 md:px-10 backdrop-blur-2xl">
       <p
         className={
           "title font-inter mb-10 pt-14 text-center text-2xl font-bold text-black"

@@ -17,7 +17,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen space-y-20">
-      <div className="flex flex-col justify-center gap-10 items-center max-w-[600px] mx-auto md:p-14 min-w-[200px] shadow-xl rounded-xl"
+      <div className="flex flex-col justify-center gap-4 md:gap-10 items-center max-w-[600px] mx-auto md:p-14 min-w-[200px] shadow-xl rounded-xl p-4"
         style={{
           backgroundImage: `url(${cardGray.src})`,
           backgroundSize: "cover", 

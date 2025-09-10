@@ -45,17 +45,17 @@ const GamePage = () => {
 
   return (
     <div
-      className={`py-5 min-h-screen overflow-x-auto overflow-hidden ${
+      className={`min-h-screen flex flex-col overflow-x-auto overflow-hidden ${
         isMoveLoading ? "cursor-wait" : "cursor-default"
       }`}
     >
-      <div className="flex align-bottom pt-10 px-20 justify-between">
-        <div className="logo text-white text-[28px] font-bold font-['Mysten Walter Alte']">
+      <div className="mt-[80px] md:mt-16 flex pt-4 px-4 md:px-20 justify-between items-center">
+        <div className="logo text-white text-[20px] md:text-[28px] font-bold font-['Mysten Walter Alte']">
           Mysten Solitaire
         </div>
         {game && (
-          <div className="flex justify-center items-center gap-x-10 pl-4 pr-1 bg-black bg-opacity-10 rounded-[40px] border border-black border-opacity-10">
-            <div className="text-stone-100 text-base font-normal">
+          <div className="flex justify-center items-center gap-x-2 md:gap-x-10 pl-4 pr-1 bg-black bg-opacity-10 rounded-[40px] border border-black border-opacity-10">
+            <div className="text-stone-100 text-sm md:text-base font-normal">
               Moves: {moves}
             </div>
             <button
@@ -78,14 +78,16 @@ const GamePage = () => {
             </button>
           </div>
         )}
-        <AccountDropdown/>
+        <AccountDropdown />
       </div>
       {!game ? (
-        <div className="flex flex-col justify-center items-center mt-32">
+        <div className="flex flex-col justify-center items-center flex-1 px-4 md:px-0">
           <DifficultySelection onGameCreation={onGameCreation} />
         </div>
       ) : (
-        <GameBoard game={game.elements} move={{ moves, setMoves }} />
+        <div className="flex-1">
+          <GameBoard game={game.elements} move={{ moves, setMoves }} />
+        </div>
       )}
     </div>
   );
