@@ -45,11 +45,11 @@ const GamePage = () => {
 
   return (
     <div
-      className={`min-h-screen flex flex-col overflow-x-auto overflow-hidden ${
+      className={`min-h-screen flex flex-col ${
         isMoveLoading ? "cursor-wait" : "cursor-default"
       }`}
     >
-      <div className="mt-[80px] md:mt-16 flex pt-4 px-4 md:px-20 justify-between items-center">
+      <div className="fixed top-[80px] md:relative md:top-0 left-0 right-0 z-10 flex pt-4 px-4 md:px-20 justify-between items-center bg-transparent md:mt-16">
         <div className="logo text-white text-[14px] md:text-[28px] font-bold font-['Mysten Walter Alte']">
           Mysten Solitaire
         </div>
@@ -72,7 +72,7 @@ const GamePage = () => {
               }}
               className={`${
                 isMoveLoading ? "cursor-wait" : ""
-              } text-white text-base font-bold bg-black rounded-[40px] p-2`}
+              } text-white text-sm md:text-base font-bold bg-black rounded-[40px] p-2`}
             >
               End game
             </button>
@@ -80,15 +80,17 @@ const GamePage = () => {
         )}
         <AccountDropdown />
       </div>
-      {!game ? (
-        <div className="flex flex-col justify-center items-center flex-1 px-4 md:px-0">
-          <DifficultySelection onGameCreation={onGameCreation} />
-        </div>
-      ) : (
-        <div className="flex-1">
-          <GameBoard game={game.elements} move={{ moves, setMoves }} />
-        </div>
-      )}
+      <div className="flex-1 overflow-x-auto overflow-hidden pt-[200px] md:pt-12 xl:pt-20">
+        {!game ? (
+          <div className="flex flex-col justify-center items-center flex-1 px-4 md:px-0">
+            <DifficultySelection onGameCreation={onGameCreation} />
+          </div>
+        ) : (
+          <div className="flex-1">
+            <GameBoard game={game.elements} move={{ moves, setMoves }} />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

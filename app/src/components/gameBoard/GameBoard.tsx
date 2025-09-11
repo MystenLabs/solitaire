@@ -386,16 +386,16 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
     return (
       <div className="relative">
         <div
-          className="aboslute top-0 h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]"
+          className="aboslute top-0"
           style={{ rotate: "-5deg" }}
         >
-          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} />
+          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} className="h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]"/>
         </div>
         <div
           className="absolute top-0 h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]"
           style={{ rotate: "3deg" }}
         >
-          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} />
+          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} className="h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]"/>
         </div>
         <div
           className={`${
@@ -403,7 +403,7 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
           } absolute top-0 h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]`}
           style={{ rotate: "none" }}
         >
-          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} />
+          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} className="h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]"/>
         </div>
       </div>
     );
