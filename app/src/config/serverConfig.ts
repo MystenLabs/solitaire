@@ -16,14 +16,25 @@ const serverConfigSchema = z.object({
   ADMIN_SECRET_KEY: z.string(),
 });
 
+// Provide fallback values during build time
 const serverConfig = serverConfigSchema.safeParse({
-  ENOKI_SECRET_KEY: process.env.ENOKI_SECRET_KEY,
-  ADMIN_SECRET_KEY: process.env.ADMIN_SECRET_KEY,
+  ENOKI_SECRET_KEY: process.env.ENOKI_SECRET_KEY || 'build-time-placeholder',
+  ADMIN_SECRET_KEY: process.env.ADMIN_SECRET_KEY || 'build-time-placeholder',
 });
 
 if (!serverConfig.success) {
   console.error("Invalid environment variables:", serverConfig.error.format());
   throw new Error("Invalid environment variables");
+}
+
+// Runtime validation - throw if we're using placeholder values in production
+// But skip validation during build time (when NEXT_PHASE is set)
+if (serverConfig.data.ENOKI_SECRET_KEY === 'build-time-placeholder' || 
+    serverConfig.data.ADMIN_SECRET_KEY === 'build-time-placeholder') {
+  if (process.env.NODE_ENV === 'production' && !process.env.NEXT_PHASE) {
+    console.error("Production environment requires valid ENOKI_SECRET_KEY and ADMIN_SECRET_KEY");
+    throw new Error("Missing required environment variables in production");
+  }
 }
 
 export default serverConfig.data;
