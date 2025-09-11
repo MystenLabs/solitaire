@@ -15,8 +15,6 @@ import {
   deleteUnfinishedGame,
 } from "@/helpers/moveCalls";
 import { Game } from "@/models/game";
-import { Transaction } from "@mysten/sui/transactions";
-import { EnokiKeypair } from "@mysten/enoki";
 import { useCurrentAccount, useSignTransaction } from "@mysten/dapp-kit";
 import { toBase64 } from "@mysten/sui/utils";
 
@@ -697,29 +695,6 @@ export const useSolitaireActions = () => {
     }
     return new Game(txResult);
   };
-
-  async function execute(transactionBlock: Transaction, keypair: EnokiKeypair) {
-    const resp = await suiClient.signAndExecuteTransaction({
-      signer: keypair,
-      transaction: transactionBlock,
-      options: {
-        showEffects: true,
-        showEvents: true,
-        showObjectChanges: true,
-      },
-    });
-
-    const finalResp = await suiClient.waitForTransaction({
-      digest: resp.digest,
-      options: {
-        showEffects: true,
-        showEvents: true,
-        showObjectChanges: true,
-      },
-    });
-
-    return finalResp;
-  }
 
   async function getGameObjectDetails(objectId: string | undefined) {
     let res = await suiClient.getObject({
