@@ -15,18 +15,18 @@ import { useRouter } from "next/navigation";
 export const LoginForm = () => {
   const currentAccount = useCurrentAccount();
   const { mutate: connect } = useConnectWallet();
-  const router = useRouter();
+  // const router = useRouter();
   const wallets = useWallets().filter(isEnokiWallet);
   const walletsByProvider = wallets.reduce(
     (map, wallet) => map.set(wallet.provider, wallet),
     new Map<AuthProvider, EnokiWallet>()
   );
 
-  useEffect(() => {
-    if (currentAccount) {
-      router.push(`/game`);
-    }
-  }, [currentAccount]);
+  // useEffect(() => {
+  //   if (currentAccount) {
+  //     router.push(`/game`);
+  //   }
+  // }, [currentAccount]);
 
   const googleWallet = walletsByProvider.get("google");
 
