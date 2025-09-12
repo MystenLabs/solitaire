@@ -1,9 +1,9 @@
 module solitaire::solitaire;
 
-use sui::clock::{Clock};
-use std::string::{String};
-use sui::random::Random;
+use std::string::String;
+use sui::clock::Clock;
 use sui::event;
+use sui::random::Random;
 
 // =================== Error Codes ===================
 const ENoMoreHiddenCards: u64 = 0;
@@ -21,6 +21,7 @@ const EGameNotFinished: u64 = 11;
 const EGameHasFinished: u64 = 12;
 const EInvalidTurnDeckCard: u64 = 13;
 const EGameHasNotFinished: u64 = 14;
+const EUnauthorizedPlayer: u64 = 15;
 
 // =================== Constants ===================
 const CARD_COUNT: u64 = 52;
@@ -30,7 +31,6 @@ const CLUBS_INDEX: u64 = 0;
 const SPADES_INDEX: u64 = 13;
 const HEARTS_INDEX: u64 = 26;
 const DIAMONDS_INDEX: u64 = 39;
-
 
 // =================== Structs ===================
 
@@ -52,26 +52,26 @@ public struct Game has key {
 /// All 24 cards in the Deck are initially hidden.
 public struct Deck has store {
     hidden_cards: u64,
-    cards: vector<u64>
+    cards: vector<u64>,
 }
 
 /// This is a Pile of cards that should be ordered from Ace to King of the same suit.
 public struct Pile has store {
-    cards: vector<u64>
+    cards: vector<u64>,
 }
 
 /// This is a Column of cards. Initially the game starts with 7 Columns of cards
 /// and only the first card of each Column is visible.
 public struct Column has store {
     hidden_cards: u64,
-    cards: vector<u64>
+    cards: vector<u64>,
 }
 
 // =================== Events ===================
 
 /// This event is emitted when a new card is revealed from the deck or column.
 public struct CardRevealed has copy, drop {
-    card: u64
+    card: u64,
 }
 
 // =================== Public Functions ===================
@@ -79,7 +79,7 @@ public struct CardRevealed has copy, drop {
 entry fun init_normal_game(clock: &Clock, random: &Random, ctx: &mut TxContext) {
     // Initialize the stack with all the available cards.
     let mut available_cards = vector::tabulate!(CARD_COUNT, |i| i);
-    
+
     // Initialize the Deck with 24 hidden cards and an empty vector of cards.
     let deck = Deck {
         hidden_cards: 24,
@@ -87,10 +87,10 @@ entry fun init_normal_game(clock: &Clock, random: &Random, ctx: &mut TxContext) 
     };
 
     // Initialize the Piles with an empty vector of cards.
-    let mut piles = vector[Pile {cards: vector[]}];
-    piles.push_back( Pile {cards: vector[]});
-    piles.push_back( Pile {cards: vector[]});
-    piles.push_back( Pile {cards: vector[]});
+    let mut piles = vector[Pile { cards: vector[] }];
+    piles.push_back(Pile { cards: vector[] });
+    piles.push_back(Pile { cards: vector[] });
+    piles.push_back(Pile { cards: vector[] });
 
     let columns = set_up_columns(&mut available_cards, random, ctx);
 
@@ -118,17 +118,17 @@ entry fun init_easy_game(clock: &Clock, random: &Random, ctx: &mut TxContext) {
         available_cards.push_back(i);
         i = i + 1;
     };
-    
+
     let deck = Deck {
         hidden_cards: 20,
         cards: vector[],
     };
 
-   let piles = vector[
-        Pile { cards: vector[available_cards.remove(CLUBS_INDEX)],},
-        Pile { cards: vector[available_cards.remove(SPADES_INDEX-1)], },
-        Pile { cards: vector[available_cards.remove(HEARTS_INDEX-2)], },
-        Pile { cards: vector[available_cards.remove(DIAMONDS_INDEX-3)], },
+    let piles = vector[
+        Pile { cards: vector[available_cards.remove(CLUBS_INDEX)] },
+        Pile { cards: vector[available_cards.remove(SPADES_INDEX-1)] },
+        Pile { cards: vector[available_cards.remove(HEARTS_INDEX-2)] },
+        Pile { cards: vector[available_cards.remove(DIAMONDS_INDEX-3)] },
     ];
     let columns = set_up_columns(&mut available_cards, random, ctx);
 
@@ -148,7 +148,9 @@ entry fun init_easy_game(clock: &Clock, random: &Random, ctx: &mut TxContext) {
     transfer::transfer(game, ctx.sender());
 }
 
-entry fun from_deck_to_column(game: &mut Game, column_index: u64, _ctx: &mut TxContext) {
+entry fun from_deck_to_column(game: &mut Game, column_index: u64, ctx: &mut TxContext) {
+    assert!(game.player == ctx.sender(), EUnauthorizedPlayer);
+    assert!(game.end_time == 0, EGameHasFinished);
     assert!(column_index < COLUMN_COUNT, EInvalidColumnIndex);
     assert!(game.deck.cards.length() > 0, ENoAvailableDeckCard);
     let column = game.columns.borrow_mut(column_index);
@@ -164,18 +166,28 @@ entry fun from_deck_to_column(game: &mut Game, column_index: u64, _ctx: &mut TxC
         // edge case where the column card is an ace
         assert!(*column_card % 13 != 0, ECannotPlaceOnAce);
         let card_mod = deck_card % 13;
-        if (deck_card >= HEARTS_INDEX) { // check if card deck card is red
-            assert!((*column_card >= SPADES_INDEX && card_mod == *column_card - SPADES_INDEX - 1) || (card_mod == *column_card - CLUBS_INDEX - 1), EInvalidPlacement);
+        if (deck_card >= HEARTS_INDEX) {
+            // check if card deck card is red
+            assert!(
+                (*column_card >= SPADES_INDEX && card_mod == *column_card - SPADES_INDEX - 1) || (card_mod == *column_card - CLUBS_INDEX - 1),
+                EInvalidPlacement,
+            );
             column.cards.push_back(deck_card);
-        } else { // else, if it is black
-            assert!((card_mod == *column_card - HEARTS_INDEX - 1) || (*column_card >= DIAMONDS_INDEX && card_mod == *column_card - DIAMONDS_INDEX - 1), EInvalidPlacement);
+        } else {
+            // else, if it is black
+            assert!(
+                (card_mod == *column_card - HEARTS_INDEX - 1) || (*column_card >= DIAMONDS_INDEX && card_mod == *column_card - DIAMONDS_INDEX - 1),
+                EInvalidPlacement,
+            );
             column.cards.push_back(deck_card);
         };
     };
     game.player_moves = game.player_moves + 1;
 }
 
-entry fun from_deck_to_pile(game: &mut Game, pile_index: u64, _ctx: &mut TxContext) {
+entry fun from_deck_to_pile(game: &mut Game, pile_index: u64, ctx: &mut TxContext) {
+    assert!(game.player == ctx.sender(), EUnauthorizedPlayer);
+    assert!(game.end_time == 0, EGameHasFinished);
     assert!(pile_index < PILE_COUNT, EInvalidPileIndex);
     assert!(game.deck.cards.length() > 0, ENoAvailableDeckCard);
     let deck_card = game.deck.cards.pop_back();
@@ -196,7 +208,15 @@ entry fun from_deck_to_pile(game: &mut Game, pile_index: u64, _ctx: &mut TxConte
     game.player_moves = game.player_moves + 1;
 }
 
-entry fun from_column_to_pile(game: &mut Game, column_index: u64, pile_index: u64, random: &Random, ctx: &mut TxContext) {
+entry fun from_column_to_pile(
+    game: &mut Game,
+    column_index: u64,
+    pile_index: u64,
+    random: &Random,
+    ctx: &mut TxContext,
+) {
+    assert!(game.player == ctx.sender(), EUnauthorizedPlayer);
+    assert!(game.end_time == 0, EGameHasFinished);
     assert!(column_index < COLUMN_COUNT, EInvalidColumnIndex);
     assert!(pile_index < PILE_COUNT, EInvalidPileIndex);
     let column = game.columns.borrow_mut(column_index);
@@ -211,7 +231,7 @@ entry fun from_column_to_pile(game: &mut Game, column_index: u64, pile_index: u6
             column.hidden_cards = column.hidden_cards - 1;
             let card = reveal_card(&mut game.available_cards, random, ctx);
             column.cards.push_back(card);
-            event::emit(CardRevealed {card});
+            event::emit(CardRevealed { card });
         };
     } else {
         let last_card_index = pile.cards.length() - 1;
@@ -224,13 +244,22 @@ entry fun from_column_to_pile(game: &mut Game, column_index: u64, pile_index: u6
             column.hidden_cards = column.hidden_cards - 1;
             let card = reveal_card(&mut game.available_cards, random, ctx);
             column.cards.push_back(card);
-            event::emit(CardRevealed {card});
+            event::emit(CardRevealed { card });
         };
     };
     game.player_moves = game.player_moves + 1;
 }
 
-entry fun from_column_to_column(game: &mut Game, mut src_column_index: u64, card: u64, dest_column_index: u64, random: &Random, ctx: &mut TxContext) {
+entry fun from_column_to_column(
+    game: &mut Game,
+    mut src_column_index: u64,
+    card: u64,
+    dest_column_index: u64,
+    random: &Random,
+    ctx: &mut TxContext,
+) {
+    assert!(game.player == ctx.sender(), EUnauthorizedPlayer);
+    assert!(game.end_time == 0, EGameHasFinished);
     assert!(src_column_index < COLUMN_COUNT, EInvalidColumnIndex);
     assert!(dest_column_index < COLUMN_COUNT, EInvalidColumnIndex);
     if (src_column_index == dest_column_index) {
@@ -259,7 +288,7 @@ entry fun from_column_to_column(game: &mut Game, mut src_column_index: u64, card
             src_column.hidden_cards = src_column.hidden_cards - 1;
             let card = reveal_card(&mut game.available_cards, random, ctx);
             src_column.cards.push_back(card);
-            event::emit(CardRevealed {card});
+            event::emit(CardRevealed { card });
         };
     } else {
         let last_card_index = dest_column.cards.length() - 1;
@@ -267,7 +296,10 @@ entry fun from_column_to_column(game: &mut Game, mut src_column_index: u64, card
         assert!(*dest_column_card % 13 != 0, ECannotPlaceOnAce);
         let card_mod = card % 13;
         if (card >= HEARTS_INDEX) {
-            assert!((card_mod == *dest_column_card - CLUBS_INDEX - 1) || (*dest_column_card >= SPADES_INDEX && card_mod == *dest_column_card - SPADES_INDEX - 1), EInvalidPlacement);
+            assert!(
+                (card_mod == *dest_column_card - CLUBS_INDEX - 1) || (*dest_column_card >= SPADES_INDEX && card_mod == *dest_column_card - SPADES_INDEX - 1),
+                EInvalidPlacement,
+            );
             while (src_column.cards.length() > index) {
                 let card_to_move = src_column.cards.remove(index);
                 dest_column.cards.push_back(card_to_move);
@@ -276,19 +308,22 @@ entry fun from_column_to_column(game: &mut Game, mut src_column_index: u64, card
                 src_column.hidden_cards = src_column.hidden_cards - 1;
                 let card = reveal_card(&mut game.available_cards, random, ctx);
                 src_column.cards.push_back(card);
-                event::emit(CardRevealed {card});
+                event::emit(CardRevealed { card });
             };
         } else {
-            assert!((card_mod == *dest_column_card - HEARTS_INDEX - 1) || (*dest_column_card >= DIAMONDS_INDEX && card_mod == *dest_column_card - DIAMONDS_INDEX - 1), EInvalidPlacement);
+            assert!(
+                (card_mod == *dest_column_card - HEARTS_INDEX - 1) || (*dest_column_card >= DIAMONDS_INDEX && card_mod == *dest_column_card - DIAMONDS_INDEX - 1),
+                EInvalidPlacement,
+            );
             while (src_column.cards.length() > index) {
                 let card_to_move = src_column.cards.remove(index);
                 dest_column.cards.push_back(card_to_move);
             };
             if (src_column.hidden_cards > 0 && src_column.cards.is_empty()) {
                 src_column.hidden_cards = src_column.hidden_cards - 1;
-                let card = reveal_card( &mut game.available_cards, random, ctx);
+                let card = reveal_card(&mut game.available_cards, random, ctx);
                 src_column.cards.push_back(card);
-                event::emit(CardRevealed {card});
+                event::emit(CardRevealed { card });
             };
         };
     };
@@ -296,10 +331,16 @@ entry fun from_column_to_column(game: &mut Game, mut src_column_index: u64, card
     game.columns.insert(dest_column, dest_column_index);
 }
 
-entry fun from_pile_to_column(game: &mut Game, pile_index: u64, column_index: u64, _ctx: &mut TxContext) {
+entry fun from_pile_to_column(
+    game: &mut Game,
+    pile_index: u64,
+    column_index: u64,
+    ctx: &mut TxContext,
+) {
+    assert!(game.player == ctx.sender(), EUnauthorizedPlayer);
+    assert!(game.end_time == 0, EGameHasFinished);
     assert!(pile_index < PILE_COUNT, EInvalidPileIndex);
     assert!(column_index < COLUMN_COUNT, EInvalidColumnIndex);
-    assert!(game.end_time == 0, EGameHasFinished);
     let pile = game.piles.borrow_mut(pile_index);
     let column = game.columns.borrow_mut(column_index);
     let pile_card = pile.cards.pop_back();
@@ -314,10 +355,16 @@ entry fun from_pile_to_column(game: &mut Game, pile_index: u64, column_index: u6
         assert!(*column_card % 13 != 0, ECannotPlaceOnAce);
         let pile_card_mod = pile_card % 13;
         if (pile_card >= HEARTS_INDEX) {
-            assert!((pile_card_mod == *column_card - CLUBS_INDEX - 1) || (*column_card >= SPADES_INDEX && pile_card_mod  == *column_card - SPADES_INDEX - 1), EInvalidPlacement);
+            assert!(
+                (pile_card_mod == *column_card - CLUBS_INDEX - 1) || (*column_card >= SPADES_INDEX && pile_card_mod  == *column_card - SPADES_INDEX - 1),
+                EInvalidPlacement,
+            );
             column.cards.push_back(pile_card);
         } else {
-            assert!((pile_card_mod == *column_card - HEARTS_INDEX - 1) || (*column_card >= DIAMONDS_INDEX && pile_card_mod == *column_card - DIAMONDS_INDEX - 1), EInvalidPlacement);
+            assert!(
+                (pile_card_mod == *column_card - HEARTS_INDEX - 1) || (*column_card >= DIAMONDS_INDEX && pile_card_mod == *column_card - DIAMONDS_INDEX - 1),
+                EInvalidPlacement,
+            );
             column.cards.push_back(pile_card);
         };
     };
@@ -326,17 +373,21 @@ entry fun from_pile_to_column(game: &mut Game, pile_index: u64, column_index: u6
 
 /// This function is used to reveal a card from the deck if there are still hidden cards.
 entry fun open_deck_card(game: &mut Game, random: &Random, ctx: &mut TxContext) {
+    assert!(game.player == ctx.sender(), EUnauthorizedPlayer);
+    assert!(game.end_time == 0, EGameHasFinished);
     assert!(game.deck.hidden_cards > 0, ENoMoreHiddenCards);
     game.deck.hidden_cards = game.deck.hidden_cards - 1;
-    let card = reveal_card( &mut game.available_cards, random, ctx);
+    let card = reveal_card(&mut game.available_cards, random, ctx);
     game.deck.cards.push_back(card);
     game.player_moves = game.player_moves + 1;
-    event::emit(CardRevealed {card});
+    event::emit(CardRevealed { card });
 }
 
-/// This function is used to cycle through the open deck cards and rotate their order, one at a time. 
+/// This function is used to cycle through the open deck cards and rotate their order, one at a time.
 /// The top card is placed at the bottom which makes the next card in the deck `top card`
-public fun rotate_open_deck_cards(game: &mut Game, _ctx: &mut TxContext) {
+public fun rotate_open_deck_cards(game: &mut Game, ctx: &mut TxContext) {
+    assert!(game.player == ctx.sender(), EUnauthorizedPlayer);
+    assert!(game.end_time == 0, EGameHasFinished);
     assert!(game.deck.hidden_cards == 0, EInvalidTurnDeckCard);
     assert!(game.deck.cards.length() > 0, ENoAvailableDeckCard);
     let card = game.deck.cards.remove(0);
@@ -363,25 +414,15 @@ public fun delete_unfinished_game(game: Game, _ctx: &mut TxContext) {
         deck,
         mut piles,
         mut columns,
-        available_cards: _,
-        player: _,
-        start_time: _,
-        end_time: _,
-        player_moves: _,
-        difficulty: _,
+        ..,
     } = game;
 
-    let Deck {
-        hidden_cards: _,
-        cards: _,
-    } = deck;
+    let Deck { .. } = deck;
 
     let mut i = 0;
     while (i < PILE_COUNT) {
         let pile = piles.pop_back();
-        let Pile {
-            cards: _,
-        } = pile;
+        let Pile { .. } = pile;
         i = i + 1;
     };
     piles.destroy_empty();
@@ -403,14 +444,18 @@ public fun delete_unfinished_game(game: Game, _ctx: &mut TxContext) {
 /// Internal function that sets up the 7 columns of cards.
 /// Each column has the top card revealed and the a number of hidden cards that is equal to the
 /// index of the column, starting from 0.
-fun set_up_columns(available_cards: &mut vector<u64>, random: &Random, ctx: &mut TxContext): vector<Column> {
-    let mut columns = vector::empty<Column>();
+fun set_up_columns(
+    available_cards: &mut vector<u64>,
+    random: &Random,
+    ctx: &mut TxContext,
+): vector<Column> {
+    let mut columns = vector[];
     let mut i: u64 = 0;
-    while(i < COLUMN_COUNT) {
+    while (i < COLUMN_COUNT) {
         let card = reveal_card(available_cards, random, ctx);
         let column = Column {
             hidden_cards: i,
-            cards: vector::singleton<u64>(card)
+            cards: vector::singleton<u64>(card),
         };
         columns.push_back(column);
         i = i + 1;
@@ -418,7 +463,7 @@ fun set_up_columns(available_cards: &mut vector<u64>, random: &Random, ctx: &mut
     columns
 }
 
-fun reveal_card (available_cards: &mut vector<u64>, random: &Random, ctx: &mut TxContext): u64 {
+fun reveal_card(available_cards: &mut vector<u64>, random: &Random, ctx: &mut TxContext): u64 {
     // Initialize random generator and variables
     let mut random_generator = random.new_generator(ctx);
 
@@ -430,10 +475,12 @@ fun reveal_card (available_cards: &mut vector<u64>, random: &Random, ctx: &mut T
     available_cards.remove(cardToRemove)
 }
 
-
-
 #[test_only]
-public fun reveal_card_test (available_cards: &mut vector<u64>, random: &Random, ctx: &mut TxContext): u64 {
+public fun reveal_card_test(
+    available_cards: &mut vector<u64>,
+    random: &Random,
+    ctx: &mut TxContext,
+): u64 {
     reveal_card(available_cards, random, ctx)
 }
 
@@ -493,12 +540,7 @@ public fun cheat_place_card_to_pile(game: &mut Game, card: u64, pile_index: u64)
 #[test_only]
 public fun cheat_fill_all_piles(game: &mut Game) {
     let mut i: u64 = 0;
-    let indexes = vector<u64>[
-        CLUBS_INDEX,
-        SPADES_INDEX,
-        HEARTS_INDEX,
-        DIAMONDS_INDEX
-    ];
+    let indexes = vector<u64>[CLUBS_INDEX, SPADES_INDEX, HEARTS_INDEX, DIAMONDS_INDEX];
     while (i < PILE_COUNT) {
         let pile = game.piles.borrow_mut(i);
         while (pile.cards.length() < 13) {
@@ -517,58 +559,58 @@ public fun check_time_end_greater_than_time_start(game: &Game): bool {
 
 // We consider the following mapping between Move Contract and Application:
 //
-// index= 0,  suit: "Clubs", name-on-card: "A", 
-// index= 1,  suit: "Clubs", name-on-card: "2",  
-// index= 2,  suit: "Clubs", name-on-card: "3",  
-// index= 3,  suit: "Clubs", name-on-card: "4",  
-// index= 4,  suit: "Clubs", name-on-card: "5",  
-// index= 5,  suit: "Clubs", name-on-card: "6",  
-// index= 6,  suit: "Clubs", name-on-card: "7",  
+// index= 0,  suit: "Clubs", name-on-card: "A",
+// index= 1,  suit: "Clubs", name-on-card: "2",
+// index= 2,  suit: "Clubs", name-on-card: "3",
+// index= 3,  suit: "Clubs", name-on-card: "4",
+// index= 4,  suit: "Clubs", name-on-card: "5",
+// index= 5,  suit: "Clubs", name-on-card: "6",
+// index= 6,  suit: "Clubs", name-on-card: "7",
 // index= 7,  suit: "Clubs", name-on-card: "8",
-// index= 8,  suit: "Clubs", name-on-card: "9",  
-// index= 9,  suit: "Clubs", name-on-card: "10", 
-// index= 10, suit: "Clubs", name-on-card: "J",  
-// index= 11, suit: "Clubs", name-on-card: "Q",  
-// index= 12, suit: "Clubs", name-on-card: "K",  
+// index= 8,  suit: "Clubs", name-on-card: "9",
+// index= 9,  suit: "Clubs", name-on-card: "10",
+// index= 10, suit: "Clubs", name-on-card: "J",
+// index= 11, suit: "Clubs", name-on-card: "Q",
+// index= 12, suit: "Clubs", name-on-card: "K",
 //
-// index= 13, suit: "Spades", name-on-card: "A",  
-// index= 14, suit: "Spades", name-on-card: "2",  
-// index= 15, suit: "Spades", name-on-card: "3",  
-// index= 16, suit: "Spades", name-on-card: "4",  
-// index= 17, suit: "Spades", name-on-card: "5",  
-// index= 18, suit: "Spades", name-on-card: "6",  
-// index= 19, suit: "Spades", name-on-card: "7",  
-// index= 20, suit: "Spades", name-on-card: "8",  
-// index= 21, suit: "Spades", name-on-card: "9",  
-// index= 22, suit: "Spades", name-on-card: "10", 
-// index= 23, suit: "Spades", name-on-card: "J",  
-// index= 24, suit: "Spades", name-on-card: "Q",  
-// index= 25, suit: "Spades", name-on-card: "K",  
+// index= 13, suit: "Spades", name-on-card: "A",
+// index= 14, suit: "Spades", name-on-card: "2",
+// index= 15, suit: "Spades", name-on-card: "3",
+// index= 16, suit: "Spades", name-on-card: "4",
+// index= 17, suit: "Spades", name-on-card: "5",
+// index= 18, suit: "Spades", name-on-card: "6",
+// index= 19, suit: "Spades", name-on-card: "7",
+// index= 20, suit: "Spades", name-on-card: "8",
+// index= 21, suit: "Spades", name-on-card: "9",
+// index= 22, suit: "Spades", name-on-card: "10",
+// index= 23, suit: "Spades", name-on-card: "J",
+// index= 24, suit: "Spades", name-on-card: "Q",
+// index= 25, suit: "Spades", name-on-card: "K",
 //
-// index= 26, suit: "Hearts", name-on-card:"A",  
-// index= 27, suit: "Hearts", name-on-card:"2",  
-// index= 28, suit: "Hearts", name-on-card:"3",  
-// index= 29, suit: "Hearts", name-on-card:"4",  
-// index= 30, suit: "Hearts", name-on-card:"5",  
-// index= 31, suit: "Hearts", name-on-card:"6",  
-// index= 32, suit: "Hearts", name-on-card:"7",  
-// index= 33, suit: "Hearts", name-on-card:"8",  
-// index= 34, suit: "Hearts", name-on-card:"9",  
-// index= 35, suit: "Hearts", name-on-card:"10", 
-// index= 36, suit: "Hearts", name-on-card:"J",  
-// index= 37, suit: "Hearts", name-on-card:"Q",  
-// index= 38, suit: "Hearts", name-on-card:"K",  
+// index= 26, suit: "Hearts", name-on-card:"A",
+// index= 27, suit: "Hearts", name-on-card:"2",
+// index= 28, suit: "Hearts", name-on-card:"3",
+// index= 29, suit: "Hearts", name-on-card:"4",
+// index= 30, suit: "Hearts", name-on-card:"5",
+// index= 31, suit: "Hearts", name-on-card:"6",
+// index= 32, suit: "Hearts", name-on-card:"7",
+// index= 33, suit: "Hearts", name-on-card:"8",
+// index= 34, suit: "Hearts", name-on-card:"9",
+// index= 35, suit: "Hearts", name-on-card:"10",
+// index= 36, suit: "Hearts", name-on-card:"J",
+// index= 37, suit: "Hearts", name-on-card:"Q",
+// index= 38, suit: "Hearts", name-on-card:"K",
 //
-// index= 39, suit: "Diamonds", name-on-card: "A",  
-// index= 40, suit: "Diamonds", name-on-card: "2",  
-// index= 41, suit: "Diamonds", name-on-card: "3",  
-// index= 42, suit: "Diamonds", name-on-card: "4",  
-// index= 43, suit: "Diamonds", name-on-card: "5",  
-// index= 44, suit: "Diamonds", name-on-card: "6",  
-// index= 45, suit: "Diamonds", name-on-card: "7",  
-// index= 46, suit: "Diamonds", name-on-card: "8",  
-// index= 47, suit: "Diamonds", name-on-card: "9",  
-// index= 48, suit: "Diamonds", name-on-card: "10", 
-// index= 49, suit: "Diamonds", name-on-card: "J",  
-// index= 50, suit: "Diamonds", name-on-card: "Q",  
-// index= 51, suit: "Diamonds", name-on-card: "K",  
+// index= 39, suit: "Diamonds", name-on-card: "A",
+// index= 40, suit: "Diamonds", name-on-card: "2",
+// index= 41, suit: "Diamonds", name-on-card: "3",
+// index= 42, suit: "Diamonds", name-on-card: "4",
+// index= 43, suit: "Diamonds", name-on-card: "5",
+// index= 44, suit: "Diamonds", name-on-card: "6",
+// index= 45, suit: "Diamonds", name-on-card: "7",
+// index= 46, suit: "Diamonds", name-on-card: "8",
+// index= 47, suit: "Diamonds", name-on-card: "9",
+// index= 48, suit: "Diamonds", name-on-card: "10",
+// index= 49, suit: "Diamonds", name-on-card: "J",
+// index= 50, suit: "Diamonds", name-on-card: "Q",
+// index= 51, suit: "Diamonds", name-on-card: "K",

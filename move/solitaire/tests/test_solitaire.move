@@ -1,9 +1,6 @@
 #[test_only]
 #[allow(unused_use)]
 module solitaire::test_solitaire;
-use sui::test_scenario::{Self, Scenario};
-use sui::clock;
-use sui::random;
 
 use solitaire::solitaire::{
     Self,
@@ -21,19 +18,22 @@ use solitaire::solitaire::{
     EInvalidPileIndex,
     EGameNotFinished,
     EGameHasFinished,
-    EInvalidTurnDeckCard,
+    EInvalidTurnDeckCard
 };
+use sui::clock;
+use sui::random;
+use sui::test_scenario::{Self, Scenario};
 
 // Test error codes
 const ETestColumnNotEmpty: u64 = 901;
 const ETestIncorrectNumberOfCardsInColumnAfterMove: u64 = 902;
-const ETestTimeEndNotGreaterThanTimeStart : u64 = 903;
+const ETestTimeEndNotGreaterThanTimeStart: u64 = 903;
 
 const PLAYER: address = @0xCAFE;
 const SYSTEM_ADDRESS: address = @0x0;
 
 // ----------------- Helper functions -----------------
-fun generate_cards(num_cards: u64): vector<u64>{
+fun generate_cards(num_cards: u64): vector<u64> {
     let mut i: u64 = 0;
     let mut available_cards = vector[];
     while (i < num_cards) {
@@ -82,10 +82,14 @@ fun reveal_card_helper(num_cards: u64, random_state: random::Random) {
     let scenario = &mut scenario_val;
     {
         let mut available_cards = generate_cards(num_cards);
-        solitaire::reveal_card_test(&mut available_cards, &random_state, test_scenario::ctx(scenario));
+        solitaire::reveal_card_test(
+            &mut available_cards,
+            &random_state,
+            test_scenario::ctx(scenario),
+        );
     };
     test_scenario::return_shared(random_state);
-    test_scenario::end(scenario_val);
+    scenario_val.end();
 }
 
 // ----------------- Tests -----------------
@@ -94,14 +98,14 @@ fun reveal_card_helper(num_cards: u64, random_state: random::Random) {
 /// Sanity check that the normal game can be initialized
 public fun init_normal_game_valid() {
     let scenario_val = init_normal_game_scenario_helper();
-    test_scenario::end(scenario_val);
+    scenario_val.end();
 }
 
 #[test]
 /// Sanity check that the easy game can be initialized
 public fun init_easy_game_valid() {
     let scenario_val = init_easy_game_scenario_helper();
-    test_scenario::end(scenario_val);
+    scenario_val.end();
 }
 
 #[test]
@@ -121,7 +125,7 @@ public fun reveal_card_valid() {
             i = i - 1;
         };
     };
-    test_scenario::end(scenario_val);
+    scenario_val.end();
 }
 
 #[test, expected_failure(abort_code = ENoMoreHiddenCards)]
@@ -130,7 +134,7 @@ public fun open_deck_card_invalid_out_of_cards() {
     let scenario = &mut scenario_val;
     test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
     random::create_for_testing(test_scenario::ctx(scenario));
-    let random_state = scenario.take_shared<random::Random>();  
+    let random_state = scenario.take_shared<random::Random>();
     test_scenario::next_tx(scenario, PLAYER);
     // Open all the cards in the deck
     {
@@ -140,52 +144,56 @@ public fun open_deck_card_invalid_out_of_cards() {
             solitaire::open_deck_card(&mut game, &random_state, test_scenario::ctx(scenario));
             i = i + 1;
         };
-        abort 
+        abort
     }
 }
 
 #[test]
-public fun from_deck_to_column_valid_spades_8_on_hearts_9(){
+public fun from_deck_to_column_valid_spades_8_on_hearts_9() {
     let mut scenario_val = init_normal_game_scenario_helper();
     let scenario = &mut scenario_val;
     test_scenario::next_tx(scenario, PLAYER);
-    {   
+    {
         // Open a deck card and move it to a column
         let mut game = test_scenario::take_from_sender<Game>(scenario);
-    
+
         // Place Hearts 9 (index 34) on column 0 first
         solitaire::cheat_place_card_to_column(&mut game, 34, 0);
-        
+
         // Add Spades 8 (index 20) to deck - this is a black card that can be placed on red Hearts 9
         solitaire::cheat_open_card_to_deck(&mut game, 20);
 
         // Placing {index= 20, suit: "Spades", name-on-card: "8"} on {index= 34, suit: "Hearts", name-on-card:"9"}
         solitaire::from_deck_to_column(
-            &mut game, 0, test_scenario::ctx(scenario)
+            &mut game,
+            0,
+            test_scenario::ctx(scenario),
         );
         test_scenario::return_to_sender(scenario, game);
     };
 
-    test_scenario::end(scenario_val);
+    scenario_val.end();
 }
 
-
 #[test, expected_failure(abort_code = EInvalidPlacement)]
-public fun from_deck_to_column_invalid_order_spades_8_on_hearts_5(){
+public fun from_deck_to_column_invalid_order_spades_8_on_hearts_5() {
     let mut scenario_val = init_normal_game_scenario_helper();
     let scenario = &mut scenario_val;
     test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
     random::create_for_testing(test_scenario::ctx(scenario));
-    let random_state = scenario.take_shared<random::Random>();  
+    let random_state = scenario.take_shared<random::Random>();
     test_scenario::next_tx(scenario, PLAYER);
-    {   // Open a deck card and move it to a column
+    {
+        // Open a deck card and move it to a column
         let mut game = test_scenario::take_from_sender<Game>(scenario);
 
         solitaire::open_deck_card(&mut game, &random_state, test_scenario::ctx(scenario));
 
         // Placing {index= 20, suit: "Spades", name-on-card: "8"} on {index= 30, suit: "Hearts", name-on-card:"5"}
         solitaire::from_deck_to_column(
-            &mut game, 0, test_scenario::ctx(scenario)
+            &mut game,
+            0,
+            test_scenario::ctx(scenario),
         );
         abort
     }
@@ -200,7 +208,7 @@ public fun from_deck_to_column_no_available_card() {
     random::create_for_testing(test_scenario::ctx(scenario));
     test_scenario::next_tx(scenario, PLAYER);
     {
-        let random_state = scenario.take_shared<random::Random>(); 
+        let random_state = scenario.take_shared<random::Random>();
         let mut game = test_scenario::take_from_sender<Game>(scenario);
         // Open all the cards in the deck
         let mut i = 0;
@@ -212,7 +220,9 @@ public fun from_deck_to_column_no_available_card() {
 
         solitaire::remove_all_from_deck(&mut game);
         solitaire::from_deck_to_column(
-            &mut game, 0, test_scenario::ctx(scenario)
+            &mut game,
+            0,
+            test_scenario::ctx(scenario),
         );
 
         abort
@@ -224,14 +234,17 @@ public fun from_deck_to_column_invalid_color_hearts_4_on_hearts_5() {
     let mut scenario_val = init_normal_game_scenario_helper();
     let scenario = &mut scenario_val;
     test_scenario::next_tx(scenario, PLAYER);
-    {   // Open a deck card and move it to a column
+    {
+        // Open a deck card and move it to a column
         let mut game = test_scenario::take_from_sender<Game>(scenario);
         // Get {hearts 4} with a cheat function:
         solitaire::cheat_open_card_to_deck(&mut game, 29);
 
         // Placing {index= 20, suit: "Spades", name-on-card: "8"} on {index= 30, suit: "Hearts", name-on-card:"5"}
         solitaire::from_deck_to_column(
-            &mut game, 4, test_scenario::ctx(scenario)
+            &mut game,
+            4,
+            test_scenario::ctx(scenario),
         );
         abort
     }
@@ -250,11 +263,13 @@ public fun from_deck_to_column_valid_diamonds_K_on_empty() {
         solitaire::cheat_open_card_to_deck(&mut game, 51);
         // Use the king of diamonds to place it on the empty column
         solitaire::from_deck_to_column(
-            &mut game, 0, test_scenario::ctx(scenario)
+            &mut game,
+            0,
+            test_scenario::ctx(scenario),
         );
         test_scenario::return_to_sender(scenario, game);
     };
-    test_scenario::end(scenario_val);
+    scenario_val.end();
 }
 
 #[test, expected_failure(abort_code = ENotKingCard)]
@@ -270,7 +285,9 @@ public fun from_deck_to_column_invalid_order_diamonds_Q_on_empty() {
         solitaire::cheat_open_card_to_deck(&mut game, 50);
         // Use the queen of diamonds to try to place it on the empty column
         solitaire::from_deck_to_column(
-            &mut game, 0, test_scenario::ctx(scenario)
+            &mut game,
+            0,
+            test_scenario::ctx(scenario),
         );
         abort
     }
@@ -287,11 +304,13 @@ public fun from_deck_to_pile_valid_hearts_A_on_empty() {
         solitaire::cheat_open_card_to_deck(&mut game, 26);
         // Use the ace of hearts to place it on the empty pile
         solitaire::from_deck_to_pile(
-            &mut game, 0, test_scenario::ctx(scenario)
+            &mut game,
+            0,
+            test_scenario::ctx(scenario),
         );
         test_scenario::return_to_sender(scenario, game);
     };
-    test_scenario::end(scenario_val);
+    scenario_val.end();
 }
 
 #[test]
@@ -307,11 +326,13 @@ public fun from_deck_to_pile_valid_hearts_2_on_hearts_A() {
 
         // Use the 2 of hearts to place it on the hearts pile
         solitaire::from_deck_to_pile(
-            &mut game, 2, test_scenario::ctx(scenario)
+            &mut game,
+            2,
+            test_scenario::ctx(scenario),
         );
         test_scenario::return_to_sender(scenario, game);
     };
-    test_scenario::end(scenario_val);
+    scenario_val.end();
 }
 
 #[test, expected_failure(abort_code = ENoAvailableDeckCard)]
@@ -323,7 +344,9 @@ public fun from_deck_to_pile_no_available_card() {
         let mut game = test_scenario::take_from_sender<Game>(scenario);
 
         solitaire::from_deck_to_pile(
-            &mut game, 0, test_scenario::ctx(scenario)
+            &mut game,
+            0,
+            test_scenario::ctx(scenario),
         );
         abort
     }
@@ -340,12 +363,13 @@ public fun from_deck_to_pile_invalid_order_diamonds_7_on_empty() {
         solitaire::cheat_open_card_to_deck(&mut game, 45);
         // Use the 7 of diamonds to place it on the empty pile
         solitaire::from_deck_to_pile(
-            &mut game, 0, test_scenario::ctx(scenario)
+            &mut game,
+            0,
+            test_scenario::ctx(scenario),
         );
         abort
     }
 }
-
 
 #[test, expected_failure(abort_code = EInvalidPlacement)]
 public fun from_deck_to_pile_invalid_order_hearts_3_on_hearts_A() {
@@ -358,7 +382,9 @@ public fun from_deck_to_pile_invalid_order_hearts_3_on_hearts_A() {
         solitaire::cheat_open_card_to_deck(&mut game, 28);
         // Use the 3 of hearts to place it on the hearts pile
         solitaire::from_deck_to_pile(
-            &mut game, 2, test_scenario::ctx(scenario)
+            &mut game,
+            2,
+            test_scenario::ctx(scenario),
         );
         abort
     }
@@ -375,7 +401,9 @@ public fun from_deck_to_pile_invalid_class_clubs_2_on_hearts_A() {
         solitaire::cheat_open_card_to_deck(&mut game, 1);
         // Use the 3 of hearts to place it on the hearts pile
         solitaire::from_deck_to_pile(
-            &mut game, 2, test_scenario::ctx(scenario)
+            &mut game,
+            2,
+            test_scenario::ctx(scenario),
         );
         abort
     }
@@ -390,19 +418,25 @@ public fun from_column_to_pile_valid_hearts_A_on_empty() {
     random::create_for_testing(test_scenario::ctx(scenario));
     test_scenario::next_tx(scenario, PLAYER);
     {
-        let random_state = scenario.take_shared<random::Random>(); 
+        let random_state = scenario.take_shared<random::Random>();
         let mut game = test_scenario::take_from_sender<Game>(scenario);
 
         solitaire::cheat_place_card_to_column(&mut game, 26, 0);
 
         // Move ace of hearts to an empty pile (e.g. pile 0)
-        solitaire::from_column_to_pile(&mut game, 0, 0, &random_state, test_scenario::ctx(scenario));
+        solitaire::from_column_to_pile(
+            &mut game,
+            0,
+            0,
+            &random_state,
+            test_scenario::ctx(scenario),
+        );
 
         // Teardown
         test_scenario::return_to_sender(scenario, game);
         test_scenario::return_shared(random_state);
     };
-    test_scenario::end(scenario_val);
+    scenario_val.end();
 }
 
 #[test]
@@ -414,20 +448,26 @@ public fun from_column_to_pile_valid_hearts_2_on_hearts_A() {
     random::create_for_testing(test_scenario::ctx(scenario));
     test_scenario::next_tx(scenario, PLAYER);
     {
-        let random_state = scenario.take_shared<random::Random>(); 
+        let random_state = scenario.take_shared<random::Random>();
         let mut game = test_scenario::take_from_sender<Game>(scenario);
 
         solitaire::cheat_place_card_to_column(&mut game, 27, 0);
 
         // Move ace of hearts to the hearts pile that already contains an ace due to
         // an easy game start
-        solitaire::from_column_to_pile(&mut game, 0, 2, &random_state, test_scenario::ctx(scenario));
+        solitaire::from_column_to_pile(
+            &mut game,
+            0,
+            2,
+            &random_state,
+            test_scenario::ctx(scenario),
+        );
 
         // Teardown
         test_scenario::return_to_sender(scenario, game);
         test_scenario::return_shared(random_state);
     };
-    test_scenario::end(scenario_val);
+    scenario_val.end();
 }
 
 #[test, expected_failure(abort_code = ENotAceCard)]
@@ -439,16 +479,21 @@ public fun from_column_to_pile_invalid_order_diamonds_7_on_empty() {
     random::create_for_testing(test_scenario::ctx(scenario));
     test_scenario::next_tx(scenario, PLAYER);
     {
-        let random_state = scenario.take_shared<random::Random>(); 
+        let random_state = scenario.take_shared<random::Random>();
         let mut game = test_scenario::take_from_sender<Game>(scenario);
         solitaire::cheat_place_card_to_column(&mut game, 45, 0);
 
-        solitaire::from_column_to_pile(&mut game, 0, 2, &random_state, test_scenario::ctx(scenario));
+        solitaire::from_column_to_pile(
+            &mut game,
+            0,
+            2,
+            &random_state,
+            test_scenario::ctx(scenario),
+        );
 
         abort
     }
 }
-
 
 #[test]
 #[expected_failure(abort_code = EInvalidPlacement)]
@@ -460,10 +505,16 @@ public fun from_column_to_pile_invalid_order_hearts_3_on_hearts_A() {
     random::create_for_testing(test_scenario::ctx(scenario));
     test_scenario::next_tx(scenario, PLAYER);
     {
-        let random_state = scenario.take_shared<random::Random>(); 
+        let random_state = scenario.take_shared<random::Random>();
         let mut game = test_scenario::take_from_sender<Game>(scenario);
         solitaire::cheat_place_card_to_column(&mut game, 41, 0);
-        solitaire::from_column_to_pile(&mut game, 0, 2, &random_state, test_scenario::ctx(scenario));
+        solitaire::from_column_to_pile(
+            &mut game,
+            0,
+            2,
+            &random_state,
+            test_scenario::ctx(scenario),
+        );
 
         abort
     }
@@ -478,11 +529,17 @@ public fun from_column_to_pile_invalid_class_clubs_2_on_hearts_A() {
     random::create_for_testing(test_scenario::ctx(scenario));
     test_scenario::next_tx(scenario, PLAYER);
     {
-        let random_state = scenario.take_shared<random::Random>(); 
+        let random_state = scenario.take_shared<random::Random>();
         let mut game = test_scenario::take_from_sender<Game>(scenario);
         solitaire::cheat_place_card_to_column(&mut game, 1, 0);
 
-        solitaire::from_column_to_pile(&mut game, 0, 2, &random_state, test_scenario::ctx(scenario));
+        solitaire::from_column_to_pile(
+            &mut game,
+            0,
+            2,
+            &random_state,
+            test_scenario::ctx(scenario),
+        );
 
         abort
     }
@@ -497,9 +554,15 @@ public fun from_column_to_pile_invalid_column_index() {
     random::create_for_testing(test_scenario::ctx(scenario));
     test_scenario::next_tx(scenario, PLAYER);
     {
-        let random_state = scenario.take_shared<random::Random>(); 
+        let random_state = scenario.take_shared<random::Random>();
         let mut game = test_scenario::take_from_sender<Game>(scenario);
-        solitaire::from_column_to_pile(&mut game, 7, 2, &random_state, test_scenario::ctx(scenario));
+        solitaire::from_column_to_pile(
+            &mut game,
+            7,
+            2,
+            &random_state,
+            test_scenario::ctx(scenario),
+        );
 
         abort
     }
@@ -514,10 +577,16 @@ public fun from_column_to_pile_invalid_pile_index() {
     random::create_for_testing(test_scenario::ctx(scenario));
     test_scenario::next_tx(scenario, PLAYER);
     {
-        let random_state = scenario.take_shared<random::Random>(); 
+        let random_state = scenario.take_shared<random::Random>();
         let mut game = test_scenario::take_from_sender<Game>(scenario);
 
-        solitaire::from_column_to_pile(&mut game, 1, 4, &random_state, test_scenario::ctx(scenario));
+        solitaire::from_column_to_pile(
+            &mut game,
+            1,
+            4,
+            &random_state,
+            test_scenario::ctx(scenario),
+        );
 
         abort
     }
@@ -532,11 +601,17 @@ public fun from_column_to_pile_column_is_empty() {
     random::create_for_testing(test_scenario::ctx(scenario));
     test_scenario::next_tx(scenario, PLAYER);
     {
-        let random_state = scenario.take_shared<random::Random>(); 
+        let random_state = scenario.take_shared<random::Random>();
         let mut game = test_scenario::take_from_sender<Game>(scenario);
 
         solitaire::remove_all_from_column(&mut game, 5);
-        solitaire::from_column_to_pile(&mut game, 5, 3, &random_state, test_scenario::ctx(scenario));
+        solitaire::from_column_to_pile(
+            &mut game,
+            5,
+            3,
+            &random_state,
+            test_scenario::ctx(scenario),
+        );
 
         abort
     }
@@ -551,21 +626,29 @@ public fun from_column_to_pile_invalid_place_on_king() {
     random::create_for_testing(test_scenario::ctx(scenario));
     test_scenario::next_tx(scenario, PLAYER);
     {
-        let random_state = scenario.take_shared<random::Random>(); 
+        let random_state = scenario.take_shared<random::Random>();
         let mut game = test_scenario::take_from_sender<Game>(scenario);
         let ace_of_hearts = 26;
         solitaire::cheat_place_card_to_column(
             &mut game,
             ace_of_hearts,
-            0);
+            0,
+        );
 
         let king_of_spades = 25;
         solitaire::cheat_place_card_to_pile(
             &mut game,
             king_of_spades,
-            3);
+            3,
+        );
 
-        solitaire::from_column_to_pile(&mut game, 0, 3, &random_state, test_scenario::ctx(scenario));
+        solitaire::from_column_to_pile(
+            &mut game,
+            0,
+            3,
+            &random_state,
+            test_scenario::ctx(scenario),
+        );
 
         abort
     }
@@ -580,24 +663,33 @@ public fun from_column_to_column_valid_hearts_J_on_clubs_Q() {
     random::create_for_testing(test_scenario::ctx(scenario));
     test_scenario::next_tx(scenario, PLAYER);
     {
-        let random_state = scenario.take_shared<random::Random>(); 
+        let random_state = scenario.take_shared<random::Random>();
         let mut game = test_scenario::take_from_sender<Game>(scenario);
         solitaire::cheat_place_card_to_column(
-            &mut game, 36, 0
+            &mut game,
+            36,
+            0,
         ); // J of hearts
         solitaire::cheat_place_card_to_column(
-            &mut game, 11, 1
+            &mut game,
+            11,
+            1,
         ); // Q of clubs
 
         solitaire::from_column_to_column(
-            &mut game, 0, 36, 1, &random_state, test_scenario::ctx(scenario)
+            &mut game,
+            0,
+            36,
+            1,
+            &random_state,
+            test_scenario::ctx(scenario),
         );
 
         // Teardown
         test_scenario::return_to_sender(scenario, game);
         test_scenario::return_shared(random_state);
     };
-    test_scenario::end(scenario_val);
+    scenario_val.end();
 }
 
 #[test, expected_failure(abort_code = EInvalidPlacement)]
@@ -609,14 +701,19 @@ public fun from_column_to_column_invalid_order_spades_8_on_hearts_10() {
     random::create_for_testing(test_scenario::ctx(scenario));
     test_scenario::next_tx(scenario, PLAYER);
     {
-        let random_state = scenario.take_shared<random::Random>(); 
+        let random_state = scenario.take_shared<random::Random>();
         let mut game = test_scenario::take_from_sender<Game>(scenario);
         // Setup -- place 8 of spades on column 0 and 9 of hearts on column 1
         solitaire::cheat_place_card_to_column(&mut game, 20, 0); // 8 of spades
         solitaire::cheat_place_card_to_column(&mut game, 35, 1); // 9 of hearts
 
         solitaire::from_column_to_column(
-            &mut game, 0, 20, 1, &random_state, test_scenario::ctx(scenario)
+            &mut game,
+            0,
+            20,
+            1,
+            &random_state,
+            test_scenario::ctx(scenario),
         );
 
         abort
@@ -632,10 +729,15 @@ public fun from_column_to_column_invalid_src_column_index() {
     random::create_for_testing(test_scenario::ctx(scenario));
     test_scenario::next_tx(scenario, PLAYER);
     {
-        let random_state = scenario.take_shared<random::Random>(); 
+        let random_state = scenario.take_shared<random::Random>();
         let mut game = test_scenario::take_from_sender<Game>(scenario);
         solitaire::from_column_to_column(
-            &mut game, 7, 20, 1, &random_state, test_scenario::ctx(scenario)
+            &mut game,
+            7,
+            20,
+            1,
+            &random_state,
+            test_scenario::ctx(scenario),
         );
 
         abort
@@ -651,10 +753,15 @@ public fun from_column_to_column_invalid_dest_column_index() {
     random::create_for_testing(test_scenario::ctx(scenario));
     test_scenario::next_tx(scenario, PLAYER);
     {
-        let random_state = scenario.take_shared<random::Random>(); 
+        let random_state = scenario.take_shared<random::Random>();
         let mut game = test_scenario::take_from_sender<Game>(scenario);
         solitaire::from_column_to_column(
-            &mut game, 0, 20, 7, &random_state, test_scenario::ctx(scenario)
+            &mut game,
+            0,
+            20,
+            7,
+            &random_state,
+            test_scenario::ctx(scenario),
         );
 
         abort
@@ -670,7 +777,7 @@ public fun from_column_to_column_valid_multiple_cards() {
     random::create_for_testing(test_scenario::ctx(scenario));
     test_scenario::next_tx(scenario, PLAYER);
     {
-        let random_state = scenario.take_shared<random::Random>(); 
+        let random_state = scenario.take_shared<random::Random>();
         let mut game = test_scenario::take_from_sender<Game>(scenario);
         // Put 2 cards on column 0. It's ok to cheat here, just don't tell anyone.
         solitaire::cheat_place_card_to_column(&mut game, 38, 0);
@@ -680,22 +787,24 @@ public fun from_column_to_column_valid_multiple_cards() {
 
         // Both cheat-placed cards should be moved to column 1.
         solitaire::from_column_to_column(
-            &mut game, 0, 38, 1, &random_state, test_scenario::ctx(scenario)
+            &mut game,
+            0,
+            38,
+            1,
+            &random_state,
+            test_scenario::ctx(scenario),
         );
-        assert!(
-            solitaire::get_num_cards_in_column(&game, 0) == 1,
-            ETestColumnNotEmpty
-        );
+        assert!(solitaire::get_num_cards_in_column(&game, 0) == 1, ETestColumnNotEmpty);
         assert!(
             solitaire::get_num_cards_in_column(&game, 1) == 2,
-            ETestIncorrectNumberOfCardsInColumnAfterMove
+            ETestIncorrectNumberOfCardsInColumnAfterMove,
         );
 
         // Teardown
         test_scenario::return_to_sender(scenario, game);
         test_scenario::return_shared(random_state);
     };
-    test_scenario::end(scenario_val);
+    scenario_val.end();
 }
 
 #[test]
@@ -707,7 +816,7 @@ public fun from_column_to_column_valid_to_same_column() {
     random::create_for_testing(test_scenario::ctx(scenario));
     test_scenario::next_tx(scenario, PLAYER);
     {
-        let random_state = scenario.take_shared<random::Random>(); 
+        let random_state = scenario.take_shared<random::Random>();
         let mut game = test_scenario::take_from_sender<Game>(scenario);
         solitaire::remove_all_from_column(&mut game, 0);
 
@@ -717,19 +826,24 @@ public fun from_column_to_column_valid_to_same_column() {
 
         // Both cheat-placed cards should be moved to column 1.
         solitaire::from_column_to_column(
-            &mut game, 0, 38, 0, &random_state, test_scenario::ctx(scenario)
+            &mut game,
+            0,
+            38,
+            0,
+            &random_state,
+            test_scenario::ctx(scenario),
         );
 
         assert!(
             solitaire::get_num_cards_in_column(&game, 0) == 2,
-            ETestIncorrectNumberOfCardsInColumnAfterMove
+            ETestIncorrectNumberOfCardsInColumnAfterMove,
         );
 
         // Teardown
         test_scenario::return_to_sender(scenario, game);
         test_scenario::return_shared(random_state);
     };
-    test_scenario::end(scenario_val);
+    scenario_val.end();
 }
 
 #[test, expected_failure(abort_code = ECardNotInColumn)]
@@ -741,10 +855,15 @@ public fun from_column_to_column_invalid_card_not_in_column() {
     random::create_for_testing(test_scenario::ctx(scenario));
     test_scenario::next_tx(scenario, PLAYER);
     {
-        let random_state = scenario.take_shared<random::Random>(); 
+        let random_state = scenario.take_shared<random::Random>();
         let mut game = test_scenario::take_from_sender<Game>(scenario);
         solitaire::from_column_to_column(
-            &mut game, 0, 70, 1, &random_state, test_scenario::ctx(scenario)
+            &mut game,
+            0,
+            70,
+            1,
+            &random_state,
+            test_scenario::ctx(scenario),
         );
 
         abort
@@ -760,12 +879,17 @@ public fun from_column_to_column_invalid_clubs_3_on_empty() {
     random::create_for_testing(test_scenario::ctx(scenario));
     test_scenario::next_tx(scenario, PLAYER);
     {
-        let random_state = scenario.take_shared<random::Random>(); 
+        let random_state = scenario.take_shared<random::Random>();
         let mut game = test_scenario::take_from_sender<Game>(scenario);
         solitaire::cheat_place_card_to_column(&mut game, 4, 0);
         solitaire::remove_all_from_column(&mut game, 1);
         solitaire::from_column_to_column(
-            &mut game, 0, 4, 1, &random_state, test_scenario::ctx(scenario)
+            &mut game,
+            0,
+            4,
+            1,
+            &random_state,
+            test_scenario::ctx(scenario),
         );
 
         abort
@@ -781,21 +905,26 @@ public fun from_column_to_column_valid_clubs_K_on_empty() {
     random::create_for_testing(test_scenario::ctx(scenario));
     test_scenario::next_tx(scenario, PLAYER);
     {
-        let random_state = scenario.take_shared<random::Random>(); 
+        let random_state = scenario.take_shared<random::Random>();
         let mut game = test_scenario::take_from_sender<Game>(scenario);
         solitaire::cheat_place_card_to_column(&mut game, 12, 0);
 
         solitaire::remove_all_from_column(&mut game, 1);
 
         solitaire::from_column_to_column(
-            &mut game, 0, 12, 1, &random_state, test_scenario::ctx(scenario)
+            &mut game,
+            0,
+            12,
+            1,
+            &random_state,
+            test_scenario::ctx(scenario),
         );
 
         // Teardown
         test_scenario::return_to_sender(scenario, game);
         test_scenario::return_shared(random_state);
     };
-    test_scenario::end(scenario_val);
+    scenario_val.end();
 }
 
 #[test, expected_failure(abort_code = EInvalidPileIndex)]
@@ -809,7 +938,10 @@ public fun from_pile_to_column_invalid_pile_index() {
         solitaire::remove_all_from_column(&mut game, 4);
 
         solitaire::from_pile_to_column(
-            &mut game, 4, 4, test_scenario::ctx(scenario)
+            &mut game,
+            4,
+            4,
+            test_scenario::ctx(scenario),
         );
 
         abort
@@ -827,7 +959,10 @@ public fun from_pile_to_column_invalid_column_index() {
         solitaire::remove_all_from_column(&mut game, 4);
 
         solitaire::from_pile_to_column(
-            &mut game, 0, 7, test_scenario::ctx(scenario)
+            &mut game,
+            0,
+            7,
+            test_scenario::ctx(scenario),
         );
 
         abort
@@ -846,16 +981,19 @@ public fun from_pile_to_column_valid_clubs_2_on_diamonds_3() {
         solitaire::cheat_place_card_to_column(&mut game, 3, 4);
 
         solitaire::from_pile_to_column(
-            &mut game, 1, 4, test_scenario::ctx(scenario)
+            &mut game,
+            1,
+            4,
+            test_scenario::ctx(scenario),
         );
 
         test_scenario::return_to_sender(scenario, game);
     };
-    test_scenario::end(scenario_val);
+    scenario_val.end();
 }
 
 #[test, expected_failure(abort_code = ECannotPlaceOnAce)]
-public fun from_pile_to_column_invalid_spades_K_on_hearts_A(){
+public fun from_pile_to_column_invalid_spades_K_on_hearts_A() {
     let mut scenario_val = init_easy_game_scenario_helper();
     let scenario = &mut scenario_val;
     test_scenario::next_tx(scenario, PLAYER);
@@ -866,7 +1004,10 @@ public fun from_pile_to_column_invalid_spades_K_on_hearts_A(){
         solitaire::cheat_place_card_to_pile(&mut game, 25, 3);
 
         solitaire::from_pile_to_column(
-            &mut game, 3, 4, test_scenario::ctx(scenario)
+            &mut game,
+            3,
+            4,
+            test_scenario::ctx(scenario),
         );
 
         abort
@@ -902,7 +1043,7 @@ public fun turn_deck_card_valid_reveal_all_and_iterate_2_times() {
     random::create_for_testing(test_scenario::ctx(scenario));
     test_scenario::next_tx(scenario, PLAYER);
     {
-        let random_state = scenario.take_shared<random::Random>(); 
+        let random_state = scenario.take_shared<random::Random>();
         let mut game = test_scenario::take_from_sender<Game>(scenario);
         let mut i = 0;
         while (i < 24) {
@@ -918,7 +1059,7 @@ public fun turn_deck_card_valid_reveal_all_and_iterate_2_times() {
         test_scenario::return_to_sender(scenario, game);
         test_scenario::return_shared(random_state);
     };
-    test_scenario::end(scenario_val);
+    scenario_val.end();
 }
 
 #[test, expected_failure(abort_code = EInvalidTurnDeckCard)]
@@ -929,7 +1070,7 @@ public fun invalid_turn_deck_card() {
     random::create_for_testing(test_scenario::ctx(scenario));
     test_scenario::next_tx(scenario, PLAYER);
     {
-        let random_state = scenario.take_shared<random::Random>(); 
+        let random_state = scenario.take_shared<random::Random>();
         let mut game = test_scenario::take_from_sender<Game>(scenario);
         solitaire::open_deck_card(&mut game, &random_state, test_scenario::ctx(scenario));
         solitaire::rotate_open_deck_cards(&mut game, test_scenario::ctx(scenario));
@@ -947,7 +1088,7 @@ public fun finish_game_valid_finished() {
     random::create_for_testing(test_scenario::ctx(scenario));
     test_scenario::next_tx(scenario, PLAYER);
     {
-        let random_state = scenario.take_shared<random::Random>(); 
+        let random_state = scenario.take_shared<random::Random>();
         let mut game = test_scenario::take_from_sender<Game>(scenario);
         let mut clock = clock::create_for_testing(test_scenario::ctx(scenario));
         solitaire::cheat_fill_all_piles(&mut game);
@@ -955,13 +1096,13 @@ public fun finish_game_valid_finished() {
         solitaire::finish_game(&mut game, &clock, test_scenario::ctx(scenario));
         assert!(
             solitaire::check_time_end_greater_than_time_start(&game),
-            ETestTimeEndNotGreaterThanTimeStart
+            ETestTimeEndNotGreaterThanTimeStart,
         );
         clock::destroy_for_testing(clock);
         test_scenario::return_to_sender(scenario, game);
         test_scenario::return_shared(random_state);
     };
-    test_scenario::end(scenario_val);
+    scenario_val.end();
 }
 
 #[test, expected_failure(abort_code = EGameNotFinished)]
