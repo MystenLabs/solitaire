@@ -20,14 +20,14 @@ import {
 // Create QueryClient instance outside component to prevent recreation on every render
 const queryClient = new QueryClient()
 
+const { networkConfig } = createNetworkConfig({
+  [process.env.NEXT_PUBLIC_SUI_NETWORK_NAME!]: {
+    url: process.env.NEXT_PUBLIC_SUI_NETWORK!,
+  },
+});
+
 export const ProvidersAndLayout = ({ children }: ChildrenProps) => {
   const _ = useRegisterServiceWorker();
-  const { networkConfig } = createNetworkConfig({
-    [process.env.NEXT_PUBLIC_SUI_NETWORK_NAME!]: {
-      url: process.env.NEXT_PUBLIC_SUI_NETWORK!,
-    },
-  });
-
   return (
     <QueryClientProvider client={queryClient}>
       <SuiClientProvider
