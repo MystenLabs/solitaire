@@ -29,6 +29,7 @@ build/
 move/solitaire/Move.lock
 move/solitaire/build
 move/solitaire/package_summaries
+move/solitaire/.trace
 
 # env files under the setup directory
 setup/*.env
