@@ -1,7 +1,7 @@
 // Copyright (c) Mysten Labs, Inc.
 // SPDX-License-Identifier: Apache-2.0
 "use client";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { DifficultySelection } from "@/components/difficultySelection/DifficultySelection";
 import { Spinner } from "@/components/general/Spinner";
 import GameBoard from "@/components/gameBoard/GameBoard";
@@ -10,6 +10,8 @@ import { Game } from "@/models/game";
 import { useSolitaireActions } from "@/hooks/useSolitaireActions";
 import { AccountDropdown } from "@/components/user/accountDropdown";
 import { LoadingContext } from "@/contexts/LoadingProvider";
+import { useRouter } from "next/navigation";
+import { useCurrentAccount } from "@mysten/dapp-kit";
 
 const GamePage = () => {
   const [spinning, setSpinning] = useState<boolean>(false);
@@ -21,6 +23,15 @@ const GamePage = () => {
     handleDeleteUnfinishedGame,
   } = useSolitaireActions();
   const { isMoveLoading } = useContext(LoadingContext);
+  const currentAccount = useCurrentAccount();
+  const router = useRouter();
+
+  useEffect(() => {
+    console.log("currentAccount", currentAccount);
+    if (!currentAccount) {
+      router.push(`/`);
+    }
+  }, [currentAccount]);
 
   const onGameCreation = async (mode: "easy" | "normal") => {
     setSpinning(true);
@@ -40,6 +51,7 @@ const GamePage = () => {
   };
 
   if (spinning) {
+    console.log("spinning", spinning);
     return <Spinner fullHeight />;
   }
 
