@@ -1,3 +1,5 @@
+// Copyright (c) Mysten Labs, Inc.
+// SPDX-License-Identifier: Apache-2.0
 import "server-only";
 import { LoginForm } from "@/components/forms/LoginForm";
 import { Metadata } from "next";

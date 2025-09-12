@@ -1,3 +1,5 @@
+// Copyright (c) Mysten Labs, Inc.
+// SPDX-License-Identifier: Apache-2.0
 import {CardDetails} from "@/helpers/cardDetails";
 import {Column as ColumnProps} from "../models/column";
 import {Pile as PileProps} from "../models/pile" ;

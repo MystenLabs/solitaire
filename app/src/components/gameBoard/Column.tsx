@@ -1,10 +1,12 @@
+// Copyright (c) Mysten Labs, Inc.
+// SPDX-License-Identifier: Apache-2.0
 "use client";
 
 import { Card } from "../cards/Card";
-import { Column } from "@/models/column";
+import { Column as ColumnProps } from "@/models/column";
 import { ReactNode } from "react";
 
-export default function Column({ column, index }: { column: Column, index: number}) {
+export default function Column({ column, index }: { column: ColumnProps, index: number}) {
     // Create an array containing all the cards in the column, both hidden and open cards.
     // `Undefined` represent hidden cards.
     const allCards: (ReactNode | undefined)[] = Array.from(

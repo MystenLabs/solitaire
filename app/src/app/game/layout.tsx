@@ -1,20 +1,20 @@
+// Copyright (c) Mysten Labs, Inc.
+// SPDX-License-Identifier: Apache-2.0
 "use client";
 
 import { ChildrenProps } from "@/types/ChildrenProps";
-import { useAuthentication } from "@/contexts/Authentication";
 import { Spinner } from "@/components/general/Spinner";
-import google from "../../../../app/public/assets/logos/google_email.svg";
-import Image from "next/image";
 import React from "react";
 import { LoadingProvider } from "@/contexts/LoadingProvider";
+import { useCurrentAccount } from "@mysten/dapp-kit";
 
 export default function MemberRootLayout({ children }: ChildrenProps) {
-  const { user, isLoading } = useAuthentication();
-  return isLoading ? (
-    <Spinner fullHeight />
-  ) : user?.role === "anonymous" ? (
-    "Not allowed"
-  ) : (
+  const currentAccount = useCurrentAccount();
+
+  // Show spinner while account is loading, show content when account is available
+  return currentAccount ? (
     <LoadingProvider>{children}</LoadingProvider>
+  ) : (
+    <Spinner fullHeight />
   );
 }

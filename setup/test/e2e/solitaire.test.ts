@@ -1,9 +1,11 @@
+// Copyright (c) Mysten Labs, Inc.
+// SPDX-License-Identifier: Apache-2.0
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { executeTransactionBlock, setupSuiClient, TestToolbox } from "./setup";
 import { PACKAGE_ADDRESS } from "../../src/config";
 import { initEasyGame, initNormalGame, openDeckCard, rotateOpenDeckCards } from "../../../app/src/helpers/moveCalls";
-import { ObjectOwner } from "@mysten/sui.js/client";
+import { ObjectOwner } from "@mysten/sui/client";
 
 interface ObjectCreated {
   digest: string;

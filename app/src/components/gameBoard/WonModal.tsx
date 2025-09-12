@@ -1,10 +1,12 @@
+// Copyright (c) Mysten Labs, Inc.
+// SPDX-License-Identifier: Apache-2.0
 import ReactDOM from "react-dom";
 import Image from "next/image";
 import arrowIcon from "../../../public/iconRight.svg";
 import { CaretDownIcon, CaretUpIcon } from "@radix-ui/react-icons";
 import { useEffect, useState } from "react";
 import { useSui } from "@/hooks/useSui";
-import { useAuthentication } from "@/contexts/Authentication";
+import { useCurrentAccount } from "@mysten/dapp-kit";
 import GameHistory from "./GameHistory";
 
 
@@ -29,9 +31,7 @@ export default function WonModal({ gameId, moves }: Props) {
   const [showHistory, setShowHistory] = useState(false);
   const [games, setGames] = useState<Game[]>([]);
   const { suiClient } = useSui();
-  const {
-    user: { address },
-  } = useAuthentication();
+  const account = useCurrentAccount();
 
   useEffect(() => {
     const getGame = async () => {
@@ -39,7 +39,7 @@ export default function WonModal({ gameId, moves }: Props) {
       try {
         let { nextCursor, hasNextPage, data } = await suiClient.getOwnedObjects(
           {
-            owner: address,
+            owner: account?.address!,
             filter: {
               StructType: `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::Game`,
             },
@@ -53,7 +53,7 @@ export default function WonModal({ gameId, moves }: Props) {
 
         while (!!hasNextPage) {
           const resp = await suiClient.getOwnedObjects({
-            owner: address,
+            owner: account?.address!,
             filter: {
               StructType: `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::Game`,
             },
@@ -87,7 +87,7 @@ export default function WonModal({ gameId, moves }: Props) {
       }
     };
     getGame();
-  }, [address]);
+  }, [account?.address]);
 
   return ReactDOM.createPortal(
     <div className="fixed inset-0 h-screen w-screen bg-black bg-opacity-60 flex flex-col items-center justify-center z-100">

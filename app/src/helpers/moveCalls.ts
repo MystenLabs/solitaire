@@ -1,3 +1,5 @@
+// Copyright (c) Mysten Labs, Inc.
+// SPDX-License-Identifier: Apache-2.0
 import { Transaction } from "@mysten/sui/transactions";
 
 const CLOCK = "0x0000000000000000000000000000000000000000000000000000000000000006";

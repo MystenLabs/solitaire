@@ -1,3 +1,5 @@
+// Copyright (c) Mysten Labs, Inc.
+// SPDX-License-Identifier: Apache-2.0
 // @ts-ignore
 import { SuiTransactionBlockResponse } from "@mysten/sui/transactions";
 import { Column } from './column';

@@ -1,3 +1,5 @@
+// Copyright (c) Mysten Labs, Inc.
+// SPDX-License-Identifier: Apache-2.0
 type CardColor = 'red' | 'black';
 export class CardDetails {
     id: String;

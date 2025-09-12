@@ -1,3 +1,5 @@
+// Copyright (c) Mysten Labs, Inc.
+// SPDX-License-Identifier: Apache-2.0
 import Image from "next/image";
 import React from "react";
 import {StaticImport} from "next/dist/shared/lib/get-img-props";

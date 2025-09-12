@@ -1,13 +1,16 @@
+// Copyright (c) Mysten Labs, Inc.
+// SPDX-License-Identifier: Apache-2.0
 import type {
 	SuiTransactionBlockResponse,
-} from '@mysten/sui.js/client';
-import { SuiClient } from '@mysten/sui.js/client';
-import { Ed25519Keypair } from '@mysten/sui.js/keypairs/ed25519';
-import { TransactionBlock } from '@mysten/sui.js/transactions';
+} from '@mysten/sui/client';
+import { SuiClient } from '@mysten/sui/client';
+import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
+import { Transaction } from '@mysten/sui/transactions';
 import { expect } from 'vitest';
 
-import { ADMIN_SECRET_KEY, SUI_NETWORK } from '../../src/config.ts';
-import { fromB64 } from '@mysten/sui.js/utils';
+import { ADMIN_SECRET_KEY, SUI_NETWORK } from '../../src/config';
+import { fromBase64 } from '@mysten/sui/utils';
+
 
 const DEFAULT_FULLNODE_URL = SUI_NETWORK;
 
@@ -37,7 +40,7 @@ export function getClient(): SuiClient {
 
 export async function setupSuiClient() {
 	const keypair = Ed25519Keypair.fromSecretKey(
-		fromB64(ADMIN_SECRET_KEY).slice(1)
+		fromBase64(ADMIN_SECRET_KEY).slice(1)
 	  );
 	const client = getClient();
 	return new TestToolbox(keypair, client);
@@ -46,11 +49,11 @@ export async function setupSuiClient() {
 
 export async function executeTransactionBlock(
 	toolbox: TestToolbox,
-	txb: TransactionBlock,
+	txb: Transaction,
 ): Promise<SuiTransactionBlockResponse> {
-	const resp = await toolbox.client.signAndExecuteTransactionBlock({
+	const resp = await toolbox.client.signAndExecuteTransaction({
 		signer: toolbox.keypair,
-		transactionBlock: txb,
+		transaction: txb,
 		options: {
 			showEffects: true,
 			showEvents: true,
