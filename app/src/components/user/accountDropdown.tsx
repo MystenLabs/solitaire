@@ -18,11 +18,13 @@ import {
 
 import toast from "react-hot-toast";
 import { formatString } from "@/helpers/formatString";
+import { useRouter } from "next/navigation";
 
 export const AccountDropdown = () => {
   const currentAccount = useCurrentAccount();
   const address = currentAccount?.address;
   const { mutate: disconnect } = useDisconnectWallet();
+  const router = useRouter();
 
   const copyAddress = () => {
     if (!address) return;
@@ -50,7 +52,10 @@ export const AccountDropdown = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem
-          onSelect={() => disconnect()}
+          onSelect={() => {
+             disconnect()
+             router.push("/") 
+          }}
           className={
             "select-none rounded-[36px] border border-white px-14 py-1 text-center text-white bg-white bg-opacity-10 text-base leading-tight cursor-pointer"
           }
