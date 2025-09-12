@@ -1000,7 +1000,6 @@ public fun from_pile_to_column_invalid_spades_K_on_hearts_A() {
     }
 }
 
-
 #[test]
 public fun turn_deck_card_valid_reveal_all_and_iterate_2_times() {
     let mut scenario_val = init_normal_game_scenario_helper();
@@ -1251,7 +1250,14 @@ public fun from_column_to_column_invalid_place_on_ace() {
         // Place a 2 in column 1
         solitaire::cheat_place_card_to_column(&mut game, 1, 1); // Clubs 2
         // Try to move 2 onto Ace - should fail
-        solitaire::from_column_to_column(&mut game, 1, 1, 0, &random_state, test_scenario::ctx(scenario));
+        solitaire::from_column_to_column(
+            &mut game,
+            1,
+            1,
+            0,
+            &random_state,
+            test_scenario::ctx(scenario),
+        );
         abort
     }
 }
@@ -1269,10 +1275,16 @@ public fun test_hidden_card_reveal_from_column_to_pile() {
         // Set up column 0 with a single visible card and some hidden cards
         solitaire::remove_all_from_column(&mut game, 0);
         solitaire::cheat_place_card_to_column(&mut game, 26, 0); // Hearts A
-        
+
         // Move the visible card to pile, which should reveal a hidden card
-        solitaire::from_column_to_pile(&mut game, 0, 0, &random_state, test_scenario::ctx(scenario));
-        
+        solitaire::from_column_to_pile(
+            &mut game,
+            0,
+            0,
+            &random_state,
+            test_scenario::ctx(scenario),
+        );
+
         test_scenario::return_to_sender(scenario, game);
         test_scenario::return_shared(random_state);
     };
@@ -1294,10 +1306,17 @@ public fun test_hidden_card_reveal_from_column_to_column() {
         solitaire::cheat_place_card_to_column(&mut game, 25, 0); // Spades K
         // Set up empty destination column
         solitaire::remove_all_from_column(&mut game, 1);
-        
+
         // Move King to empty column, should reveal hidden card in source
-        solitaire::from_column_to_column(&mut game, 0, 25, 1, &random_state, test_scenario::ctx(scenario));
-        
+        solitaire::from_column_to_column(
+            &mut game,
+            0,
+            25,
+            1,
+            &random_state,
+            test_scenario::ctx(scenario),
+        );
+
         test_scenario::return_to_sender(scenario, game);
         test_scenario::return_shared(random_state);
     };
