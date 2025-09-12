@@ -34,13 +34,7 @@ const SYSTEM_ADDRESS: address = @0x0;
 
 // ----------------- Helper functions -----------------
 fun generate_cards(num_cards: u64): vector<u64> {
-    let mut i: u64 = 0;
-    let mut available_cards = vector[];
-    while (i < num_cards) {
-        available_cards.push_back(i);
-        i = i + 1;
-    };
-    available_cards
+    vector::tabulate!(num_cards, |i| i)
 }
 
 fun init_normal_game_scenario_helper(): Scenario {
@@ -111,19 +105,16 @@ public fun init_easy_game_valid() {
 #[test]
 /// Test that the reveal_card function works as expected
 public fun reveal_card_valid() {
-    let mut inputs = vector<u64>[1, 52]; // reveal card from a deck of 1 and a deck of 52 cards
-    let mut i = inputs.length();
+    let inputs = vector<u64>[1, 52]; // reveal card from a deck of 1 and a deck of 52 cards
     let mut scenario_val = test_scenario::begin(SYSTEM_ADDRESS);
     let scenario = &mut scenario_val;
     random::create_for_testing(test_scenario::ctx(scenario));
     {
-        while (i > 0) {
+        inputs.do!(|num_cards| {
             scenario.next_tx(SYSTEM_ADDRESS);
             let random_state = scenario.take_shared<random::Random>();
-            let num_cards = inputs.pop_back();
             reveal_card_helper(num_cards, random_state);
-            i = i - 1;
-        };
+        });
     };
     scenario_val.end();
 }
@@ -139,11 +130,9 @@ public fun open_deck_card_invalid_out_of_cards() {
     // Open all the cards in the deck
     {
         let mut game = test_scenario::take_from_sender<Game>(scenario);
-        let mut i = 0;
-        while (i <= 25) {
+        26u64.do!(|_| {
             solitaire::open_deck_card(&mut game, &random_state, test_scenario::ctx(scenario));
-            i = i + 1;
-        };
+        });
         abort
     }
 }
@@ -211,12 +200,9 @@ public fun from_deck_to_column_no_available_card() {
         let random_state = scenario.take_shared<random::Random>();
         let mut game = test_scenario::take_from_sender<Game>(scenario);
         // Open all the cards in the deck
-        let mut i = 0;
-
-        while (i < 24) {
+        24u64.do!(|_| {
             solitaire::open_deck_card(&mut game, &random_state, test_scenario::ctx(scenario));
-            i = i + 1;
-        };
+        });
 
         solitaire::remove_all_from_deck(&mut game);
         solitaire::from_deck_to_column(
@@ -1026,17 +1012,13 @@ public fun turn_deck_card_valid_reveal_all_and_iterate_2_times() {
     {
         let random_state = scenario.take_shared<random::Random>();
         let mut game = test_scenario::take_from_sender<Game>(scenario);
-        let mut i = 0;
-        while (i < 24) {
+        24u64.do!(|_| {
             solitaire::open_deck_card(&mut game, &random_state, test_scenario::ctx(scenario));
-            i = i + 1;
-        };
+        });
         // iterate the whole deck 2 times
-        i = 0;
-        while (i < 48) {
+        48u64.do!(|_| {
             solitaire::rotate_open_deck_cards(&mut game, test_scenario::ctx(scenario));
-            i = i + 1;
-        };
+        });
         test_scenario::return_to_sender(scenario, game);
         test_scenario::return_shared(random_state);
     };
@@ -1362,11 +1344,9 @@ public fun rotate_open_deck_cards_invalid_unauthorized_player() {
     scenario.next_tx(PLAYER);
     {
         let mut game = test_scenario::take_from_sender<Game>(scenario);
-        let mut i = 0;
-        while (i < 24) {
+        24u64.do!(|_| {
             solitaire::open_deck_card(&mut game, &random_state, test_scenario::ctx(scenario));
-            i = i + 1;
-        };
+        });
         test_scenario::return_to_sender(scenario, game);
     };
     scenario.next_tx(@0xBAD); // Different player tries to access
