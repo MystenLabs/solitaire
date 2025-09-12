@@ -145,32 +145,17 @@ entry fun from_deck_to_column(game: &mut Game, column_index: u64, ctx: &TxContex
     assert!(game.deck.cards.length() > 0, ENoAvailableDeckCard);
     let column = game.columns.borrow_mut(column_index);
     let deck_card = game.deck.cards.pop_back();
-    // if the column is empty, the card must be a king
+
     if (column.cards.is_empty()) {
-        assert!(deck_card % 13 == 12, ENotKingCard);
+        // Only Kings can be placed on empty columns
+        assert!(is_king(deck_card), ENotKingCard);
         column.cards.push_back(deck_card);
     } else {
-        // Get the card at the top of the column
-        let last_card_index = column.cards.length() - 1;
-        let column_card = column.cards.borrow(last_card_index);
-        // edge case where the column card is an ace
-        assert!(*column_card % 13 != 0, ECannotPlaceOnAce);
-        let card_mod = deck_card % 13;
-        if (deck_card >= HEARTS_INDEX) {
-            // check if card deck card is red
-            assert!(
-                (*column_card >= SPADES_INDEX && card_mod == *column_card - SPADES_INDEX - 1) || (card_mod == *column_card - CLUBS_INDEX - 1),
-                EInvalidPlacement,
-            );
-            column.cards.push_back(deck_card);
-        } else {
-            // else, if it is black
-            assert!(
-                (card_mod == *column_card - HEARTS_INDEX - 1) || (*column_card >= DIAMONDS_INDEX && card_mod == *column_card - DIAMONDS_INDEX - 1),
-                EInvalidPlacement,
-            );
-            column.cards.push_back(deck_card);
-        };
+        // Get the top card of the column
+        let column_top = *column.cards.borrow(column.cards.length() - 1);
+        assert!(!is_ace(column_top), ECannotPlaceOnAce);
+        assert!(can_place_on_column(deck_card, column_top), EInvalidPlacement);
+        column.cards.push_back(deck_card);
     };
     game.player_moves = game.player_moves + 1;
 }
@@ -181,17 +166,14 @@ entry fun from_deck_to_pile(game: &mut Game, pile_index: u64, ctx: &TxContext) {
     assert!(game.deck.cards.length() > 0, ENoAvailableDeckCard);
     let deck_card = game.deck.cards.pop_back();
     let pile = game.piles.borrow_mut(pile_index);
-    // if the pile is empty, only Ace is allowed to be placed
+
     if (pile.cards.is_empty()) {
-        assert!(deck_card % 13 == 0, ENotAceCard);
+        assert!(is_ace(deck_card), ENotAceCard);
         pile.cards.push_back(deck_card);
     } else {
-        let last_card_index = pile.cards.length() - 1;
-        let pile_card = pile.cards.borrow(last_card_index);
-        // edge case where the pile card is a king
-        assert!(*pile_card % 13 != 12, ECannotPlaceOnKing);
-        // the card to place must be the next card in the pile and of the same suit
-        assert!(deck_card == *pile_card + 1, EInvalidPlacement);
+        let pile_top = *pile.cards.borrow(pile.cards.length() - 1);
+        assert!(!is_king(pile_top), ECannotPlaceOnKing);
+        assert!(can_place_on_pile(deck_card, &pile.cards), EInvalidPlacement);
         pile.cards.push_back(deck_card);
     };
     game.player_moves = game.player_moves + 1;
@@ -211,29 +193,24 @@ entry fun from_column_to_pile(
     assert!(!column.cards.is_empty(), EColumnIsEmpty);
     let pile = game.piles.borrow_mut(pile_index);
     let column_card = column.cards.pop_back();
+
+    // Check if card can be placed on pile
     if (pile.cards.is_empty()) {
-        assert!(column_card % 13 == 0, ENotAceCard);
-        pile.cards.push_back(column_card);
-        // Check if there are hidden cards in the column and reveal one if needed
-        if (column.hidden_cards > 0 && column.cards.is_empty()) {
-            column.hidden_cards = column.hidden_cards - 1;
-            let card = reveal_card(&mut game.available_cards, random, ctx);
-            column.cards.push_back(card);
-            event::emit(CardRevealed { card });
-        };
+        assert!(is_ace(column_card), ENotAceCard);
     } else {
-        let last_card_index = pile.cards.length() - 1;
-        let pile_card = pile.cards.borrow(last_card_index);
-        assert!(*pile_card % 13 != 12, ECannotPlaceOnKing);
-        assert!(column_card == *pile_card + 1, EInvalidPlacement);
-        pile.cards.push_back(column_card);
-        // Check if there are hidden cards in the column and reveal one if needed
-        if (column.hidden_cards > 0 && column.cards.is_empty()) {
-            column.hidden_cards = column.hidden_cards - 1;
-            let card = reveal_card(&mut game.available_cards, random, ctx);
-            column.cards.push_back(card);
-            event::emit(CardRevealed { card });
-        };
+        let pile_top = *pile.cards.borrow(pile.cards.length() - 1);
+        assert!(!is_king(pile_top), ECannotPlaceOnKing);
+        assert!(can_place_on_pile(column_card, &pile.cards), EInvalidPlacement);
+    };
+
+    pile.cards.push_back(column_card);
+
+    // Check if there are hidden cards in the column and reveal one if needed
+    if (column.hidden_cards > 0 && column.cards.is_empty()) {
+        column.hidden_cards = column.hidden_cards - 1;
+        let card = reveal_card(&mut game.available_cards, random, ctx);
+        column.cards.push_back(card);
+        event::emit(CardRevealed { card });
     };
     game.player_moves = game.player_moves + 1;
 }
@@ -263,56 +240,27 @@ entry fun from_column_to_column(
     let src_column = game.columns.borrow_mut(src_column_index);
     let (exist, index) = src_column.cards.index_of(&card);
     assert!(exist, ECardNotInColumn);
+    // Check placement validity
     if (dest_column.cards.is_empty()) {
-        assert!(card % 13 == 12, ENotKingCard);
-        // Because more than one card can be moved at once, we need to iterate over the vector with starting point
-        // the index of the card to move.
-        while (src_column.cards.length() > index) {
-            let card_to_move = src_column.cards.remove(index);
-            dest_column.cards.push_back(card_to_move);
-        };
-        if (src_column.hidden_cards > 0 && src_column.cards.is_empty()) {
-            src_column.hidden_cards = src_column.hidden_cards - 1;
-            let card = reveal_card(&mut game.available_cards, random, ctx);
-            src_column.cards.push_back(card);
-            event::emit(CardRevealed { card });
-        };
+        assert!(is_king(card), ENotKingCard);
     } else {
-        let last_card_index = dest_column.cards.length() - 1;
-        let dest_column_card = dest_column.cards.borrow(last_card_index);
-        assert!(*dest_column_card % 13 != 0, ECannotPlaceOnAce);
-        let card_mod = card % 13;
-        if (card >= HEARTS_INDEX) {
-            assert!(
-                (card_mod == *dest_column_card - CLUBS_INDEX - 1) || (*dest_column_card >= SPADES_INDEX && card_mod == *dest_column_card - SPADES_INDEX - 1),
-                EInvalidPlacement,
-            );
-            while (src_column.cards.length() > index) {
-                let card_to_move = src_column.cards.remove(index);
-                dest_column.cards.push_back(card_to_move);
-            };
-            if (src_column.hidden_cards > 0 && src_column.cards.is_empty()) {
-                src_column.hidden_cards = src_column.hidden_cards - 1;
-                let card = reveal_card(&mut game.available_cards, random, ctx);
-                src_column.cards.push_back(card);
-                event::emit(CardRevealed { card });
-            };
-        } else {
-            assert!(
-                (card_mod == *dest_column_card - HEARTS_INDEX - 1) || (*dest_column_card >= DIAMONDS_INDEX && card_mod == *dest_column_card - DIAMONDS_INDEX - 1),
-                EInvalidPlacement,
-            );
-            while (src_column.cards.length() > index) {
-                let card_to_move = src_column.cards.remove(index);
-                dest_column.cards.push_back(card_to_move);
-            };
-            if (src_column.hidden_cards > 0 && src_column.cards.is_empty()) {
-                src_column.hidden_cards = src_column.hidden_cards - 1;
-                let card = reveal_card(&mut game.available_cards, random, ctx);
-                src_column.cards.push_back(card);
-                event::emit(CardRevealed { card });
-            };
-        };
+        let dest_top = *dest_column.cards.borrow(dest_column.cards.length() - 1);
+        assert!(!is_ace(dest_top), ECannotPlaceOnAce);
+        assert!(can_place_on_column(card, dest_top), EInvalidPlacement);
+    };
+
+    // Move all cards from the specified index to the destination
+    while (src_column.cards.length() > index) {
+        let card_to_move = src_column.cards.remove(index);
+        dest_column.cards.push_back(card_to_move);
+    };
+
+    // Reveal hidden card if source column is now empty
+    if (src_column.hidden_cards > 0 && src_column.cards.is_empty()) {
+        src_column.hidden_cards = src_column.hidden_cards - 1;
+        let card = reveal_card(&mut game.available_cards, random, ctx);
+        src_column.cards.push_back(card);
+        event::emit(CardRevealed { card });
     };
     game.player_moves = game.player_moves + 1;
     game.columns.insert(dest_column, dest_column_index);
@@ -330,29 +278,15 @@ entry fun from_pile_to_column(
     let pile = game.piles.borrow_mut(pile_index);
     let column = game.columns.borrow_mut(column_index);
     let pile_card = pile.cards.pop_back();
-    // if the column is empty, the card must be a king
+
     if (column.cards.is_empty()) {
-        assert!(pile_card % 13 == 12, ENotKingCard);
+        assert!(is_king(pile_card), ENotKingCard);
         column.cards.push_back(pile_card);
     } else {
-        let last_card_index = column.cards.length() - 1;
-        let column_card = column.cards.borrow(last_card_index);
-        // edge case where the column card is an ace
-        assert!(*column_card % 13 != 0, ECannotPlaceOnAce);
-        let pile_card_mod = pile_card % 13;
-        if (pile_card >= HEARTS_INDEX) {
-            assert!(
-                (pile_card_mod == *column_card - CLUBS_INDEX - 1) || (*column_card >= SPADES_INDEX && pile_card_mod  == *column_card - SPADES_INDEX - 1),
-                EInvalidPlacement,
-            );
-            column.cards.push_back(pile_card);
-        } else {
-            assert!(
-                (pile_card_mod == *column_card - HEARTS_INDEX - 1) || (*column_card >= DIAMONDS_INDEX && pile_card_mod == *column_card - DIAMONDS_INDEX - 1),
-                EInvalidPlacement,
-            );
-            column.cards.push_back(pile_card);
-        };
+        let column_top = *column.cards.borrow(column.cards.length() - 1);
+        assert!(!is_ace(column_top), ECannotPlaceOnAce);
+        assert!(can_place_on_column(pile_card, column_top), EInvalidPlacement);
+        column.cards.push_back(pile_card);
     };
     game.player_moves = game.player_moves + 1;
 }
@@ -433,6 +367,61 @@ fun reveal_card(available_cards: &mut vector<u64>, random: &Random, ctx: &mut Tx
     // A card is removed from the stack of the available cards based on the modulo of the timestamp.
     // Module length will ensure that we cannot get out of bounds.
     available_cards.remove(cardToRemove)
+}
+
+// =================== Helper Functions ===================
+
+/// Get the rank of a card (0 = Ace, 1 = 2, ..., 12 = King)
+fun get_rank(card: u64): u64 {
+    card % 13
+}
+
+/// Check if a card is red (Hearts or Diamonds)
+fun is_red_card(card: u64): bool {
+    card >= HEARTS_INDEX // >= 26 → Heart / Diamond
+}
+
+/// Check if a card is an Ace
+fun is_ace(card: u64): bool {
+    get_rank(card) == 0
+}
+
+/// Check if a card is a King
+fun is_king(card: u64): bool {
+    get_rank(card) == 12
+}
+
+/// Get the suit index of a card (0 = Clubs, 1 = Spades, 2 = Hearts, 3 = Diamonds)
+fun get_suit(card: u64): u64 {
+    card / 13
+}
+
+/// Check if two cards are the same suit
+fun same_suit(card1: u64, card2: u64): bool {
+    get_suit(card1) == get_suit(card2)
+}
+
+/// Check if a card can be placed on another card in a column
+/// Rules: different color, one rank lower, cannot place on Ace
+fun can_place_on_column(moving_card: u64, target_card: u64): bool {
+    if (is_ace(target_card)) {
+        false // Cannot place anything on an Ace
+    } else {
+        is_red_card(moving_card) != is_red_card(target_card) &&
+        get_rank(moving_card) == get_rank(target_card) - 1
+    }
+}
+
+/// Check if a card can be placed on a pile
+/// Rules: same suit, one rank higher, or Ace on empty pile
+fun can_place_on_pile(moving_card: u64, pile_cards: &vector<u64>): bool {
+    if (pile_cards.is_empty()) {
+        is_ace(moving_card)
+    } else {
+        let pile_top = *pile_cards.borrow(pile_cards.length() - 1);
+        same_suit(moving_card, pile_top) && 
+        get_rank(moving_card) == get_rank(pile_top) + 1
+    }
 }
 
 #[test_only]

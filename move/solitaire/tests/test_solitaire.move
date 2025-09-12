@@ -46,9 +46,9 @@ fun init_normal_game_scenario_helper(): Scenario {
     scenario.next_tx(PLAYER);
     {
         let mut clock = clock::create_for_testing(test_scenario::ctx(scenario));
-        clock::set_for_testing(&mut clock, 30);
+        clock.set_for_testing(30);
         solitaire::init_normal_game(&clock, &random_state, test_scenario::ctx(scenario));
-        clock::destroy_for_testing(clock);
+        clock.destroy_for_testing();
         test_scenario::return_shared(random_state);
     };
     scenario_val
@@ -63,10 +63,10 @@ fun init_easy_game_scenario_helper(): Scenario {
     scenario.next_tx(PLAYER);
     {
         let mut clock = clock::create_for_testing(test_scenario::ctx(scenario));
-        clock::set_for_testing(&mut clock, 30);
+        clock.set_for_testing(30);
         solitaire::init_easy_game(&clock, &random_state, test_scenario::ctx(scenario));
         test_scenario::return_shared(random_state);
-        clock::destroy_for_testing(clock);
+        clock.destroy_for_testing();
     };
     scenario_val
 }
@@ -1191,9 +1191,9 @@ public fun from_deck_to_column_invalid_unauthorized_player() {
     scenario.next_tx(PLAYER);
     {
         let mut clock = clock::create_for_testing(test_scenario::ctx(scenario));
-        clock::set_for_testing(&mut clock, 30);
+        clock.set_for_testing(30);
         solitaire::init_normal_game(&clock, &random_state, test_scenario::ctx(scenario));
-        clock::destroy_for_testing(clock);
+        clock.destroy_for_testing();
     };
     scenario.next_tx(@0xBAD); // Different player tries to access
     {
@@ -1314,9 +1314,9 @@ public fun open_deck_card_invalid_unauthorized_player() {
     scenario.next_tx(PLAYER);
     {
         let mut clock = clock::create_for_testing(test_scenario::ctx(scenario));
-        clock::set_for_testing(&mut clock, 30);
+        clock.set_for_testing(30);
         solitaire::init_normal_game(&clock, &random_state, test_scenario::ctx(scenario));
-        clock::destroy_for_testing(clock);
+        clock.destroy_for_testing();
     };
     scenario.next_tx(@0xBAD); // Different player tries to access
     {
@@ -1336,9 +1336,9 @@ public fun rotate_open_deck_cards_invalid_unauthorized_player() {
     scenario.next_tx(PLAYER);
     {
         let mut clock = clock::create_for_testing(test_scenario::ctx(scenario));
-        clock::set_for_testing(&mut clock, 30);
+        clock.set_for_testing(30);
         solitaire::init_normal_game(&clock, &random_state, test_scenario::ctx(scenario));
-        clock::destroy_for_testing(clock);
+        clock.destroy_for_testing();
     };
     // First open all deck cards
     scenario.next_tx(PLAYER);
