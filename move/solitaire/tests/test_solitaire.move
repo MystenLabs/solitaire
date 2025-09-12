@@ -18,7 +18,8 @@ use solitaire::solitaire::{
     EInvalidPileIndex,
     EGameNotFinished,
     EGameHasFinished,
-    EInvalidTurnDeckCard
+    EInvalidTurnDeckCard,
+    EUnauthorizedPlayer
 };
 use sui::clock;
 use sui::random;
@@ -27,7 +28,6 @@ use sui::test_scenario::{Self, Scenario};
 // Test error codes
 const ETestColumnNotEmpty: u64 = 901;
 const ETestIncorrectNumberOfCardsInColumnAfterMove: u64 = 902;
-const ETestTimeEndNotGreaterThanTimeStart: u64 = 903;
 
 const PLAYER: address = @0xCAFE;
 const SYSTEM_ADDRESS: address = @0x0;
@@ -1014,25 +1014,6 @@ public fun from_pile_to_column_invalid_spades_K_on_hearts_A() {
     }
 }
 
-#[test, expected_failure(abort_code = EGameHasFinished)]
-public fun pile_to_column_invalid_has_finished() {
-    let mut scenario_val = init_normal_game_scenario_helper();
-    let scenario = &mut scenario_val;
-    test_scenario::next_tx(scenario, PLAYER);
-    {
-        // Setup
-        let mut game = test_scenario::take_from_sender<Game>(scenario);
-        let mut clock = clock::create_for_testing(test_scenario::ctx(scenario));
-
-        // Run test
-        solitaire::cheat_fill_all_piles(&mut game);
-        clock::set_for_testing(&mut clock, 2008);
-        solitaire::finish_game(&mut game, &clock, test_scenario::ctx(scenario));
-        solitaire::from_pile_to_column(&mut game, 0, 1, test_scenario::ctx(scenario));
-
-        abort
-    }
-}
 
 #[test]
 public fun turn_deck_card_valid_reveal_all_and_iterate_2_times() {
@@ -1090,16 +1071,8 @@ public fun finish_game_valid_finished() {
     {
         let random_state = scenario.take_shared<random::Random>();
         let mut game = test_scenario::take_from_sender<Game>(scenario);
-        let mut clock = clock::create_for_testing(test_scenario::ctx(scenario));
         solitaire::cheat_fill_all_piles(&mut game);
-        clock::set_for_testing(&mut clock, 2009);
-        solitaire::finish_game(&mut game, &clock, test_scenario::ctx(scenario));
-        assert!(
-            solitaire::check_time_end_greater_than_time_start(&game),
-            ETestTimeEndNotGreaterThanTimeStart,
-        );
-        clock::destroy_for_testing(clock);
-        test_scenario::return_to_sender(scenario, game);
+        solitaire::finish_game(game, test_scenario::ctx(scenario));
         test_scenario::return_shared(random_state);
     };
     scenario_val.end();
@@ -1111,9 +1084,327 @@ public fun finish_game_invalid_not_finished() {
     let scenario = &mut scenario_val;
     test_scenario::next_tx(scenario, PLAYER);
     {
-        let mut game = test_scenario::take_from_sender<Game>(scenario);
-        let clock = clock::create_for_testing(test_scenario::ctx(scenario));
-        solitaire::finish_game(&mut game, &clock, test_scenario::ctx(scenario));
+        let game = test_scenario::take_from_sender<Game>(scenario);
+        solitaire::finish_game(game, test_scenario::ctx(scenario));
         abort
     }
+}
+
+#[test]
+public fun delete_unfinished_game_valid() {
+    let mut scenario_val = init_normal_game_scenario_helper();
+    let scenario = &mut scenario_val;
+    test_scenario::next_tx(scenario, PLAYER);
+    {
+        let game = test_scenario::take_from_sender<Game>(scenario);
+        // Game is unfinished by default, so this should succeed
+        solitaire::delete_unfinished_game(game, test_scenario::ctx(scenario));
+    };
+    scenario_val.end();
+}
+
+#[test, expected_failure(abort_code = EGameHasFinished)]
+public fun delete_unfinished_game_invalid_already_finished() {
+    let mut scenario_val = init_normal_game_scenario_helper();
+    let scenario = &mut scenario_val;
+    test_scenario::next_tx(scenario, PLAYER);
+    {
+        let mut game = test_scenario::take_from_sender<Game>(scenario);
+        // Fill all piles to make the game finished
+        solitaire::cheat_fill_all_piles(&mut game);
+        // This should fail because the game is now finished
+        solitaire::delete_unfinished_game(game, test_scenario::ctx(scenario));
+        abort
+    }
+}
+
+#[test]
+public fun delete_unfinished_game_valid_partially_complete() {
+    let mut scenario_val = init_normal_game_scenario_helper();
+    let scenario = &mut scenario_val;
+    test_scenario::next_tx(scenario, PLAYER);
+    {
+        let mut game = test_scenario::take_from_sender<Game>(scenario);
+        // Fill only 3 out of 4 piles completely (leaving one incomplete)
+        solitaire::cheat_place_card_to_pile(&mut game, 0, 0); // Clubs A
+        solitaire::cheat_place_card_to_pile(&mut game, 1, 0); // Clubs 2
+        solitaire::cheat_place_card_to_pile(&mut game, 2, 0); // Clubs 3
+        solitaire::cheat_place_card_to_pile(&mut game, 3, 0); // Clubs 4
+        solitaire::cheat_place_card_to_pile(&mut game, 4, 0); // Clubs 5
+        solitaire::cheat_place_card_to_pile(&mut game, 5, 0); // Clubs 6
+        solitaire::cheat_place_card_to_pile(&mut game, 6, 0); // Clubs 7
+        solitaire::cheat_place_card_to_pile(&mut game, 7, 0); // Clubs 8
+        solitaire::cheat_place_card_to_pile(&mut game, 8, 0); // Clubs 9
+        solitaire::cheat_place_card_to_pile(&mut game, 9, 0); // Clubs 10
+        solitaire::cheat_place_card_to_pile(&mut game, 10, 0); // Clubs J
+        solitaire::cheat_place_card_to_pile(&mut game, 11, 0); // Clubs Q
+        solitaire::cheat_place_card_to_pile(&mut game, 12, 0); // Clubs K
+
+        // Fill pile 1 (Spades) completely
+        solitaire::cheat_place_card_to_pile(&mut game, 13, 1); // Spades A
+        solitaire::cheat_place_card_to_pile(&mut game, 14, 1); // Spades 2
+        solitaire::cheat_place_card_to_pile(&mut game, 15, 1); // Spades 3
+        solitaire::cheat_place_card_to_pile(&mut game, 16, 1); // Spades 4
+        solitaire::cheat_place_card_to_pile(&mut game, 17, 1); // Spades 5
+        solitaire::cheat_place_card_to_pile(&mut game, 18, 1); // Spades 6
+        solitaire::cheat_place_card_to_pile(&mut game, 19, 1); // Spades 7
+        solitaire::cheat_place_card_to_pile(&mut game, 20, 1); // Spades 8
+        solitaire::cheat_place_card_to_pile(&mut game, 21, 1); // Spades 9
+        solitaire::cheat_place_card_to_pile(&mut game, 22, 1); // Spades 10
+        solitaire::cheat_place_card_to_pile(&mut game, 23, 1); // Spades J
+        solitaire::cheat_place_card_to_pile(&mut game, 24, 1); // Spades Q
+        solitaire::cheat_place_card_to_pile(&mut game, 25, 1); // Spades K
+
+        // Fill pile 2 (Hearts) completely
+        solitaire::cheat_place_card_to_pile(&mut game, 26, 2); // Hearts A
+        solitaire::cheat_place_card_to_pile(&mut game, 27, 2); // Hearts 2
+        solitaire::cheat_place_card_to_pile(&mut game, 28, 2); // Hearts 3
+        solitaire::cheat_place_card_to_pile(&mut game, 29, 2); // Hearts 4
+        solitaire::cheat_place_card_to_pile(&mut game, 30, 2); // Hearts 5
+        solitaire::cheat_place_card_to_pile(&mut game, 31, 2); // Hearts 6
+        solitaire::cheat_place_card_to_pile(&mut game, 32, 2); // Hearts 7
+        solitaire::cheat_place_card_to_pile(&mut game, 33, 2); // Hearts 8
+        solitaire::cheat_place_card_to_pile(&mut game, 34, 2); // Hearts 9
+        solitaire::cheat_place_card_to_pile(&mut game, 35, 2); // Hearts 10
+        solitaire::cheat_place_card_to_pile(&mut game, 36, 2); // Hearts J
+        solitaire::cheat_place_card_to_pile(&mut game, 37, 2); // Hearts Q
+        solitaire::cheat_place_card_to_pile(&mut game, 38, 2); // Hearts K
+
+        // Leave pile 3 (Diamonds) with only a few cards - incomplete
+        solitaire::cheat_place_card_to_pile(&mut game, 39, 3); // Diamonds A
+        solitaire::cheat_place_card_to_pile(&mut game, 40, 3); // Diamonds 2
+        solitaire::cheat_place_card_to_pile(&mut game, 41, 3); // Diamonds 3
+
+        // This should succeed because pile 3 is incomplete (only 3 cards instead of 13)
+        solitaire::delete_unfinished_game(game, test_scenario::ctx(scenario));
+    };
+    scenario_val.end();
+}
+
+#[test]
+public fun open_deck_card_valid() {
+    let mut scenario_val = init_normal_game_scenario_helper();
+    let scenario = &mut scenario_val;
+    test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
+    random::create_for_testing(test_scenario::ctx(scenario));
+    test_scenario::next_tx(scenario, PLAYER);
+    {
+        let random_state = scenario.take_shared<random::Random>();
+        let mut game = test_scenario::take_from_sender<Game>(scenario);
+        // Should successfully open a deck card
+        solitaire::open_deck_card(&mut game, &random_state, test_scenario::ctx(scenario));
+        test_scenario::return_to_sender(scenario, game);
+        test_scenario::return_shared(random_state);
+    };
+    scenario_val.end();
+}
+
+#[test, expected_failure(abort_code = EUnauthorizedPlayer)]
+public fun from_deck_to_column_invalid_unauthorized_player() {
+    let mut scenario_val = test_scenario::begin(SYSTEM_ADDRESS);
+    let scenario = &mut scenario_val;
+    random::create_for_testing(test_scenario::ctx(scenario));
+    scenario.next_tx(SYSTEM_ADDRESS);
+    let random_state = scenario.take_shared<random::Random>();
+    scenario.next_tx(PLAYER);
+    {
+        let mut clock = clock::create_for_testing(test_scenario::ctx(scenario));
+        clock::set_for_testing(&mut clock, 30);
+        solitaire::init_normal_game(&clock, &random_state, test_scenario::ctx(scenario));
+        clock::destroy_for_testing(clock);
+    };
+    scenario.next_tx(@0xBAD); // Different player tries to access
+    {
+        let mut game = test_scenario::take_from_address<Game>(scenario, PLAYER); // Game belongs to PLAYER
+        // This should fail with unauthorized player since @0xBAD is trying to access PLAYER's game
+        solitaire::from_deck_to_column(&mut game, 0, test_scenario::ctx(scenario));
+        abort
+    }
+}
+
+#[test, expected_failure(abort_code = ECannotPlaceOnAce)]
+public fun from_deck_to_column_invalid_place_on_ace() {
+    let mut scenario_val = init_normal_game_scenario_helper();
+    let scenario = &mut scenario_val;
+    test_scenario::next_tx(scenario, PLAYER);
+    {
+        let mut game = test_scenario::take_from_sender<Game>(scenario);
+        // Place an Ace in column 0
+        solitaire::cheat_place_card_to_column(&mut game, 0, 0); // Clubs Ace
+        // Try to place any card on the Ace from deck
+        solitaire::cheat_open_card_to_deck(&mut game, 1); // Clubs 2
+        solitaire::from_deck_to_column(&mut game, 0, test_scenario::ctx(scenario));
+        abort
+    }
+}
+
+#[test, expected_failure(abort_code = ECannotPlaceOnAce)]
+public fun from_pile_to_column_invalid_place_on_ace() {
+    let mut scenario_val = init_normal_game_scenario_helper();
+    let scenario = &mut scenario_val;
+    test_scenario::next_tx(scenario, PLAYER);
+    {
+        let mut game = test_scenario::take_from_sender<Game>(scenario);
+        // Place an Ace in column 0
+        solitaire::cheat_place_card_to_column(&mut game, 0, 0); // Clubs Ace
+        // Place a card in pile and try to move it to ace column
+        solitaire::cheat_place_card_to_pile(&mut game, 1, 0); // Clubs 2 in pile
+        solitaire::from_pile_to_column(&mut game, 0, 0, test_scenario::ctx(scenario));
+        abort
+    }
+}
+
+#[test, expected_failure(abort_code = ECannotPlaceOnAce)]
+public fun from_column_to_column_invalid_place_on_ace() {
+    let mut scenario_val = init_normal_game_scenario_helper();
+    let scenario = &mut scenario_val;
+    test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
+    random::create_for_testing(test_scenario::ctx(scenario));
+    test_scenario::next_tx(scenario, PLAYER);
+    {
+        let random_state = scenario.take_shared<random::Random>();
+        let mut game = test_scenario::take_from_sender<Game>(scenario);
+        // Place an Ace in column 0
+        solitaire::cheat_place_card_to_column(&mut game, 0, 0); // Clubs Ace
+        // Place a 2 in column 1
+        solitaire::cheat_place_card_to_column(&mut game, 1, 1); // Clubs 2
+        // Try to move 2 onto Ace - should fail
+        solitaire::from_column_to_column(&mut game, 1, 1, 0, &random_state, test_scenario::ctx(scenario));
+        abort
+    }
+}
+
+#[test]
+public fun test_hidden_card_reveal_from_column_to_pile() {
+    let mut scenario_val = init_normal_game_scenario_helper();
+    let scenario = &mut scenario_val;
+    test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
+    random::create_for_testing(test_scenario::ctx(scenario));
+    test_scenario::next_tx(scenario, PLAYER);
+    {
+        let random_state = scenario.take_shared<random::Random>();
+        let mut game = test_scenario::take_from_sender<Game>(scenario);
+        // Set up column 0 with a single visible card and some hidden cards
+        solitaire::remove_all_from_column(&mut game, 0);
+        solitaire::cheat_place_card_to_column(&mut game, 26, 0); // Hearts A
+        
+        // Move the visible card to pile, which should reveal a hidden card
+        solitaire::from_column_to_pile(&mut game, 0, 0, &random_state, test_scenario::ctx(scenario));
+        
+        test_scenario::return_to_sender(scenario, game);
+        test_scenario::return_shared(random_state);
+    };
+    scenario_val.end();
+}
+
+#[test]
+public fun test_hidden_card_reveal_from_column_to_column() {
+    let mut scenario_val = init_normal_game_scenario_helper();
+    let scenario = &mut scenario_val;
+    test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
+    random::create_for_testing(test_scenario::ctx(scenario));
+    test_scenario::next_tx(scenario, PLAYER);
+    {
+        let random_state = scenario.take_shared<random::Random>();
+        let mut game = test_scenario::take_from_sender<Game>(scenario);
+        // Set up source column with a single visible card
+        solitaire::remove_all_from_column(&mut game, 0);
+        solitaire::cheat_place_card_to_column(&mut game, 25, 0); // Spades K
+        // Set up empty destination column
+        solitaire::remove_all_from_column(&mut game, 1);
+        
+        // Move King to empty column, should reveal hidden card in source
+        solitaire::from_column_to_column(&mut game, 0, 25, 1, &random_state, test_scenario::ctx(scenario));
+        
+        test_scenario::return_to_sender(scenario, game);
+        test_scenario::return_shared(random_state);
+    };
+    scenario_val.end();
+}
+
+#[test, expected_failure(abort_code = EUnauthorizedPlayer)]
+public fun open_deck_card_invalid_unauthorized_player() {
+    let mut scenario_val = test_scenario::begin(SYSTEM_ADDRESS);
+    let scenario = &mut scenario_val;
+    random::create_for_testing(test_scenario::ctx(scenario));
+    scenario.next_tx(SYSTEM_ADDRESS);
+    let random_state = scenario.take_shared<random::Random>();
+    scenario.next_tx(PLAYER);
+    {
+        let mut clock = clock::create_for_testing(test_scenario::ctx(scenario));
+        clock::set_for_testing(&mut clock, 30);
+        solitaire::init_normal_game(&clock, &random_state, test_scenario::ctx(scenario));
+        clock::destroy_for_testing(clock);
+    };
+    scenario.next_tx(@0xBAD); // Different player tries to access
+    {
+        let mut game = test_scenario::take_from_address<Game>(scenario, PLAYER);
+        solitaire::open_deck_card(&mut game, &random_state, test_scenario::ctx(scenario));
+        abort
+    }
+}
+
+#[test, expected_failure(abort_code = EUnauthorizedPlayer)]
+public fun rotate_open_deck_cards_invalid_unauthorized_player() {
+    let mut scenario_val = test_scenario::begin(SYSTEM_ADDRESS);
+    let scenario = &mut scenario_val;
+    random::create_for_testing(test_scenario::ctx(scenario));
+    scenario.next_tx(SYSTEM_ADDRESS);
+    let random_state = scenario.take_shared<random::Random>();
+    scenario.next_tx(PLAYER);
+    {
+        let mut clock = clock::create_for_testing(test_scenario::ctx(scenario));
+        clock::set_for_testing(&mut clock, 30);
+        solitaire::init_normal_game(&clock, &random_state, test_scenario::ctx(scenario));
+        clock::destroy_for_testing(clock);
+    };
+    // First open all deck cards
+    scenario.next_tx(PLAYER);
+    {
+        let mut game = test_scenario::take_from_sender<Game>(scenario);
+        let mut i = 0;
+        while (i < 24) {
+            solitaire::open_deck_card(&mut game, &random_state, test_scenario::ctx(scenario));
+            i = i + 1;
+        };
+        test_scenario::return_to_sender(scenario, game);
+    };
+    scenario.next_tx(@0xBAD); // Different player tries to access
+    {
+        let mut game = test_scenario::take_from_address<Game>(scenario, PLAYER);
+        solitaire::rotate_open_deck_cards(&mut game, test_scenario::ctx(scenario));
+        abort
+    }
+}
+
+#[test]
+public fun color_validation_red_on_black_comprehensive() {
+    let mut scenario_val = init_normal_game_scenario_helper();
+    let scenario = &mut scenario_val;
+    test_scenario::next_tx(scenario, PLAYER);
+    {
+        let mut game = test_scenario::take_from_sender<Game>(scenario);
+        // Test Hearts card (red) on Clubs card (black)
+        solitaire::cheat_place_card_to_column(&mut game, 11, 0); // Clubs Q (black)
+        solitaire::cheat_open_card_to_deck(&mut game, 36); // Hearts J (red)
+        solitaire::from_deck_to_column(&mut game, 0, test_scenario::ctx(scenario));
+        test_scenario::return_to_sender(scenario, game);
+    };
+    scenario_val.end();
+}
+
+#[test]
+public fun color_validation_black_on_red_comprehensive() {
+    let mut scenario_val = init_normal_game_scenario_helper();
+    let scenario = &mut scenario_val;
+    test_scenario::next_tx(scenario, PLAYER);
+    {
+        let mut game = test_scenario::take_from_sender<Game>(scenario);
+        // Test Spades card (black) on Diamonds card (red)
+        solitaire::cheat_place_card_to_column(&mut game, 50, 0); // Diamonds Q (red)
+        solitaire::cheat_open_card_to_deck(&mut game, 23); // Spades J (black)
+        solitaire::from_deck_to_column(&mut game, 0, test_scenario::ctx(scenario));
+        test_scenario::return_to_sender(scenario, game);
+    };
+    scenario_val.end();
 }

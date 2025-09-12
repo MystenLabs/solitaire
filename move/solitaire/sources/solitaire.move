@@ -20,7 +20,6 @@ const EInvalidPileIndex: u64 = 10;
 const EGameNotFinished: u64 = 11;
 const EGameHasFinished: u64 = 12;
 const EInvalidTurnDeckCard: u64 = 13;
-const EGameHasNotFinished: u64 = 14;
 const EUnauthorizedPlayer: u64 = 15;
 
 // =================== Constants ===================
@@ -43,7 +42,6 @@ public struct Game has key {
     available_cards: vector<u64>,
     player: address,
     start_time: u64,
-    end_time: u64,
     player_moves: u64,
     difficulty: String,
 }
@@ -103,7 +101,6 @@ entry fun init_normal_game(clock: &Clock, random: &Random, ctx: &mut TxContext) 
         player: ctx.sender(),
         player_moves: 0,
         start_time: clock.timestamp_ms(),
-        end_time: 0,
         difficulty: b"NORMAL".to_string(),
     };
 
@@ -112,12 +109,7 @@ entry fun init_normal_game(clock: &Clock, random: &Random, ctx: &mut TxContext) 
 
 /// An easy game has all the Aces placed on the Piles by default.
 entry fun init_easy_game(clock: &Clock, random: &Random, ctx: &mut TxContext) {
-    let mut i: u64 = 0;
-    let mut available_cards = vector[];
-    while (i < CARD_COUNT) {
-        available_cards.push_back(i);
-        i = i + 1;
-    };
+    let mut available_cards = vector::tabulate!(CARD_COUNT, |i| i);
 
     let deck = Deck {
         hidden_cards: 20,
@@ -141,16 +133,14 @@ entry fun init_easy_game(clock: &Clock, random: &Random, ctx: &mut TxContext) {
         player: ctx.sender(),
         player_moves: 0,
         start_time: clock.timestamp_ms(),
-        end_time: 0,
         difficulty: b"EASY".to_string(),
     };
 
     transfer::transfer(game, ctx.sender());
 }
 
-entry fun from_deck_to_column(game: &mut Game, column_index: u64, ctx: &mut TxContext) {
+entry fun from_deck_to_column(game: &mut Game, column_index: u64, ctx: &TxContext) {
     assert!(game.player == ctx.sender(), EUnauthorizedPlayer);
-    assert!(game.end_time == 0, EGameHasFinished);
     assert!(column_index < COLUMN_COUNT, EInvalidColumnIndex);
     assert!(game.deck.cards.length() > 0, ENoAvailableDeckCard);
     let column = game.columns.borrow_mut(column_index);
@@ -185,9 +175,8 @@ entry fun from_deck_to_column(game: &mut Game, column_index: u64, ctx: &mut TxCo
     game.player_moves = game.player_moves + 1;
 }
 
-entry fun from_deck_to_pile(game: &mut Game, pile_index: u64, ctx: &mut TxContext) {
+entry fun from_deck_to_pile(game: &mut Game, pile_index: u64, ctx: &TxContext) {
     assert!(game.player == ctx.sender(), EUnauthorizedPlayer);
-    assert!(game.end_time == 0, EGameHasFinished);
     assert!(pile_index < PILE_COUNT, EInvalidPileIndex);
     assert!(game.deck.cards.length() > 0, ENoAvailableDeckCard);
     let deck_card = game.deck.cards.pop_back();
@@ -216,7 +205,6 @@ entry fun from_column_to_pile(
     ctx: &mut TxContext,
 ) {
     assert!(game.player == ctx.sender(), EUnauthorizedPlayer);
-    assert!(game.end_time == 0, EGameHasFinished);
     assert!(column_index < COLUMN_COUNT, EInvalidColumnIndex);
     assert!(pile_index < PILE_COUNT, EInvalidPileIndex);
     let column = game.columns.borrow_mut(column_index);
@@ -259,7 +247,6 @@ entry fun from_column_to_column(
     ctx: &mut TxContext,
 ) {
     assert!(game.player == ctx.sender(), EUnauthorizedPlayer);
-    assert!(game.end_time == 0, EGameHasFinished);
     assert!(src_column_index < COLUMN_COUNT, EInvalidColumnIndex);
     assert!(dest_column_index < COLUMN_COUNT, EInvalidColumnIndex);
     if (src_column_index == dest_column_index) {
@@ -335,10 +322,9 @@ entry fun from_pile_to_column(
     game: &mut Game,
     pile_index: u64,
     column_index: u64,
-    ctx: &mut TxContext,
+    ctx: &TxContext,
 ) {
     assert!(game.player == ctx.sender(), EUnauthorizedPlayer);
-    assert!(game.end_time == 0, EGameHasFinished);
     assert!(pile_index < PILE_COUNT, EInvalidPileIndex);
     assert!(column_index < COLUMN_COUNT, EInvalidColumnIndex);
     let pile = game.piles.borrow_mut(pile_index);
@@ -374,7 +360,6 @@ entry fun from_pile_to_column(
 /// This function is used to reveal a card from the deck if there are still hidden cards.
 entry fun open_deck_card(game: &mut Game, random: &Random, ctx: &mut TxContext) {
     assert!(game.player == ctx.sender(), EUnauthorizedPlayer);
-    assert!(game.end_time == 0, EGameHasFinished);
     assert!(game.deck.hidden_cards > 0, ENoMoreHiddenCards);
     game.deck.hidden_cards = game.deck.hidden_cards - 1;
     let card = reveal_card(&mut game.available_cards, random, ctx);
@@ -387,7 +372,6 @@ entry fun open_deck_card(game: &mut Game, random: &Random, ctx: &mut TxContext) 
 /// The top card is placed at the bottom which makes the next card in the deck `top card`
 public fun rotate_open_deck_cards(game: &mut Game, ctx: &mut TxContext) {
     assert!(game.player == ctx.sender(), EUnauthorizedPlayer);
-    assert!(game.end_time == 0, EGameHasFinished);
     assert!(game.deck.hidden_cards == 0, EInvalidTurnDeckCard);
     assert!(game.deck.cards.length() > 0, ENoAvailableDeckCard);
     let card = game.deck.cards.remove(0);
@@ -396,48 +380,28 @@ public fun rotate_open_deck_cards(game: &mut Game, ctx: &mut TxContext) {
 }
 
 /// This funtion needs to be called when the player has finished the game.
-public fun finish_game(game: &mut Game, clock: &Clock, _ctx: &mut TxContext) {
-    assert!(game.end_time == 0, EGameHasFinished);
-    let mut i = 0;
-    while (i < PILE_COUNT) {
-        let pile = game.piles.borrow(i);
-        assert!(pile.cards.length() == 13, EGameNotFinished);
-        i = i + 1;
-    };
-    game.end_time = clock.timestamp_ms();
+public fun finish_game(game: Game, _ctx: &mut TxContext) {
+    assert!(game.piles.all!(|pile| pile.cards.length() == 13), EGameNotFinished);
+    delete_game(game);
 }
 
 public fun delete_unfinished_game(game: Game, _ctx: &mut TxContext) {
-    assert!(game.end_time == 0, EGameHasNotFinished);
+    // Validate that the game is not finished by checking that at least one pile is incomplete
+    assert!(game.piles.any!(|pile| pile.cards.length() < 13), EGameHasFinished);
+    delete_game(game);
+}
+
+fun delete_game(game: Game) {
     let Game {
         id,
         deck,
-        mut piles,
-        mut columns,
+        piles,
+        columns,
         ..,
     } = game;
-
     let Deck { .. } = deck;
-
-    let mut i = 0;
-    while (i < PILE_COUNT) {
-        let pile = piles.pop_back();
-        let Pile { .. } = pile;
-        i = i + 1;
-    };
-    piles.destroy_empty();
-
-    let mut j = 0;
-    while (j < COLUMN_COUNT) {
-        let column = columns.pop_back();
-        let Column {
-            hidden_cards: _,
-            cards: _,
-        } = column;
-        j = j + 1;
-    };
-    columns.destroy_empty();
-
+    piles.destroy!(|pile| { let Pile { .. } = pile; });
+    columns.destroy!(|column| { let Column { .. } = column; });
     id.delete();
 }
 
@@ -449,18 +413,13 @@ fun set_up_columns(
     random: &Random,
     ctx: &mut TxContext,
 ): vector<Column> {
-    let mut columns = vector[];
-    let mut i: u64 = 0;
-    while (i < COLUMN_COUNT) {
+    vector::tabulate!(COLUMN_COUNT, |i| {
         let card = reveal_card(available_cards, random, ctx);
-        let column = Column {
+        Column {
             hidden_cards: i,
             cards: vector::singleton<u64>(card),
-        };
-        columns.push_back(column);
-        i = i + 1;
-    };
-    columns
+        }
+    })
 }
 
 fun reveal_card(available_cards: &mut vector<u64>, random: &Random, ctx: &mut TxContext): u64 {
@@ -468,7 +427,8 @@ fun reveal_card(available_cards: &mut vector<u64>, random: &Random, ctx: &mut Tx
     let mut random_generator = random.new_generator(ctx);
 
     let length = available_cards.length();
-    let cardToRemove = random_generator.generate_u64_in_range(0, length);
+    let cardToRemove = if (length == 1) 0
+    else random_generator.generate_u64_in_range(0, length - 1);
 
     // A card is removed from the stack of the available cards based on the modulo of the timestamp.
     // Module length will ensure that we cannot get out of bounds.
@@ -501,18 +461,18 @@ public fun cheat_open_card_to_deck(game: &mut Game, card: u64) {
 
 #[test_only]
 public fun remove_all_from_deck(game: &mut Game) {
-    while (!game.deck.cards.is_empty()) {
+    game.deck.cards.length().do!(|_| {
         game.deck.cards.pop_back();
-    };
+    });
 }
 
 #[test_only]
 // Use this when you want a test to interact with an empty column.
 public fun remove_all_from_column(game: &mut Game, column_index: u64) {
     let column = game.columns.borrow_mut(column_index);
-    while (!column.cards.is_empty()) {
+    column.cards.length().do!(|_| {
         column.cards.pop_back();
-    };
+    });
 }
 
 #[test_only]
@@ -539,22 +499,15 @@ public fun cheat_place_card_to_pile(game: &mut Game, card: u64, pile_index: u64)
 
 #[test_only]
 public fun cheat_fill_all_piles(game: &mut Game) {
-    let mut i: u64 = 0;
     let indexes = vector<u64>[CLUBS_INDEX, SPADES_INDEX, HEARTS_INDEX, DIAMONDS_INDEX];
-    while (i < PILE_COUNT) {
+    indexes.length().do!(|i| {
         let pile = game.piles.borrow_mut(i);
+        let card_index = indexes[i];
         while (pile.cards.length() < 13) {
-            let card_index = indexes.borrow(i);
-            let card: u64 = *card_index + pile.cards.length();
+            let card: u64 = card_index + pile.cards.length();
             pile.cards.push_back(card);
         };
-        i = i + 1;
-    };
-}
-
-#[test_only]
-public fun check_time_end_greater_than_time_start(game: &Game): bool {
-    game.end_time > game.start_time
+    });
 }
 
 // We consider the following mapping between Move Contract and Application:

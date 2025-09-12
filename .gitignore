@@ -28,6 +28,7 @@ build/
 # Move
 move/solitaire/Move.lock
 move/solitaire/build
+move/solitaire/package_summaries
 
 # env files under the setup directory
 setup/*.env
@@ -41,5 +42,3 @@ app/.env
 app/.env.local*
 app/.env.test*
 app/.env.main*
-
-move/solitaire/package_summaries
