@@ -27,7 +27,7 @@ const { networkConfig } = createNetworkConfig({
 });
 
 export const ProvidersAndLayout = ({ children }: ChildrenProps) => {
-  const _ = useRegisterServiceWorker();
+  // const _ = useRegisterServiceWorker();
   return (
     <QueryClientProvider client={queryClient}>
       <SuiClientProvider
