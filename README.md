@@ -10,7 +10,7 @@ The Blockchain-based Single Player Solitaire Game is designed to provide a decen
 
 In this on-chain version of Klondike solitaire, the player creates a game whose rules are entirely governed by the smart contract. 
 The player has the ability to choose between two modes: Normal mode which is the original Klondike solitaire and Easy mode which is a game with all the Aces placed on the piles.
-After initiating the game, the player has to place all the cards starting from Ace to King of each suit to the respective pile. The allowed moves are opening one deck card each time, placing a card from deck to column or a pile, placing a card from column to a different column or a pile and placing a card from pile to column. When the player manages to place all cards to the 4 piles, he needs to click the button “View Results” to register the win onchain and be able to view the history of past games.
+After initiating the game, the player has to place all the cards starting from Ace to King of each suit to the respective pile. The allowed moves are opening one deck card each time, placing a card from deck to column or a pile, placing a card from column to a different column or a pile and placing a card from pile to column. When the player manages to place all cards to the 4 piles, he needs to click the button "View Results" to register the win onchain and be able to view the history of past games.
 
 ### Smart Contracts
 
@@ -53,15 +53,15 @@ The `Deck` object starts with all the cards hidden, and each time a card is reve
 The piles vector consists of the 4 piles and each `Pile` object has the cards that are placed on top of it. 
 The columns vector consists of the 7 columns and each `Column` object has a number of hidden_cards and a vector with the cards that are placed on it.
 The `available_cards` vector contains all the cards that are not revealed yet.
+
 **Game as Owned Object:**
 Each game created with the function `init_normal_game` or `init_easy_game` is a single owned object by the account who invokes one of those functions. With that approach we ensure that move transactions are executed with low latency since we take advantage of the fast path. 
 
-**Randomisation:**
+**Randomization:**
 
-Until a native solution is provided for accessing random values, we are using the [clock module](https://docs.sui.io/guides/developer/sui-101/access-time) that utilizes an on-chain clock when we need to pick a single random card. 
-There is a limitation that we can get a clock value only once per transaction block. 
+The game utilizes Sui's native onchain randomness API for all random card operations, ensuring truly unpredictable and verifiable randomness. This implementation leverages Sui's built-in randomness beacon, which provides cryptographically secure random values that are deterministic within each transaction but unpredictable across transactions.
 
-This means that if we need to have more than one random number (i.e. more than one random card pick such in game initialization), we had to create our own pseudorandom function: `pseudo_random(seed: **u64**)`. 
+The randomness is used primarily during game initialization for card shuffling and deck setup. The randomness API ensures that each game starts with a properly shuffled deck while maintaining the integrity and fairness that blockchain gaming requires.
 
 ### Frontend
 
