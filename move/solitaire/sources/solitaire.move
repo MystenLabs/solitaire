@@ -20,7 +20,7 @@ const EInvalidPileIndex: u64 = 10;
 const EGameNotFinished: u64 = 11;
 const EGameHasFinished: u64 = 12;
 const EInvalidTurnDeckCard: u64 = 13;
-const EUnauthorizedPlayer: u64 = 15;
+const EUnauthorizedPlayer: u64 = 14;
 
 // =================== Constants ===================
 const CARD_COUNT: u64 = 52;
