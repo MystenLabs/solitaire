@@ -9,7 +9,7 @@ import { Toaster } from "react-hot-toast";
 import table from "../../public/Table.svg";
 import { InfoIcon } from "./InfoIcon";
 import { RegisterEnokiWallets } from "@/contexts/RegisterEnokiWallets";
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import {
   createNetworkConfig,
@@ -18,7 +18,7 @@ import {
 } from "@mysten/dapp-kit";
 
 // Create QueryClient instance outside component to prevent recreation on every render
-const queryClient = new QueryClient()
+const queryClient = new QueryClient();
 
 const { networkConfig } = createNetworkConfig({
   [process.env.NEXT_PUBLIC_SUI_NETWORK_NAME!]: {
@@ -37,11 +37,10 @@ export const ProvidersAndLayout = ({ children }: ChildrenProps) => {
         <RegisterEnokiWallets />
         <WalletProvider autoConnect slushWallet={{ name: "Solitaire PoC" }}>
           <main
-            className={`min-h-screen w-screen`}
+            className={`min-h-screen w-screen bg-left-bottom md:bg-bottom`}
             style={{
               backgroundImage: `url(${table.src})`, // Set the table image as background
               backgroundSize: "cover",
-              backgroundPosition: "bottom",
               backgroundRepeat: "no-repeat",
             }}
           >
@@ -51,7 +50,7 @@ export const ProvidersAndLayout = ({ children }: ChildrenProps) => {
                 does not involve real money or the opportunity to win real
                 money.
               </span>
-            </div>
+           </div>
             {children}
             <InfoIcon />
             <Toaster

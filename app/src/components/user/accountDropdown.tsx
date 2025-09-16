@@ -40,10 +40,7 @@ export const AccountDropdown = () => {
             <div className={"shrink-0"}>
               <Image src={google} alt={"Logo of google"} />
             </div>
-            <div className="text-center text-white text-base font-normal font-['Mysten Walter Alte'] leading-tight">
-                {
-                    // TODO: Check if the email can be added
-                }
+            <div className="text-center text-white text-sm hidden md:block md:text-base font-normal font-['Mysten Walter Alte'] leading-tight">
               {formatString(address ?? "", 10)}
             </div>
             <CaretDownIcon color={"white"} />

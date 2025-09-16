@@ -177,12 +177,13 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
         }));
         move.setMoves((prevMoves: number) => prevMoves + 1);
       } catch (e) {
+        console.error("Transaction Failed at clickDeck (open deck card):", e);
         toast.error("Transaction Failed");
         // Fetch onchain Game and set the state again
         try {
           await handleFailedTransaction();
         } catch (fetchError) {
-          console.error("Failed to fetch game", fetchError);
+          console.error("Failed to fetch game at clickDeck (open deck card):", fetchError);
           toast.error("Failed to update game");
     }
       }
@@ -200,11 +201,12 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
         });
         move.setMoves((prevMoves: number) => prevMoves + 1);
       } catch (e) {
+        console.error("Transaction Failed at clickDeck (rotate open deck cards):", e);
         toast.error("Transaction Failed");
         try {
           await handleFailedTransaction();
         } catch (fetchError) {
-          console.error("Failed to fetch game", fetchError);
+          console.error("Failed to fetch game at clickDeck (rotate open deck cards):", fetchError);
           toast.error("Failed to update game");
     }
       }
@@ -218,11 +220,12 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
       await handleFromDeckToPile(game.id, pileIndex);
       move.setMoves((prevMoves: number) => prevMoves + 1);
     } catch (e) {
+      console.error("Transaction Failed at deckToPile:", e);
       toast.error("Transaction Failed");
       try {
         await handleFailedTransaction();
       } catch (fetchError) {
-        console.error("Failed to fetch game", fetchError);
+        console.error("Failed to fetch game at deckToPile:", fetchError);
         toast.error("Failed to update game");
   }
     } finally {
@@ -237,11 +240,12 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
       await handleFromDeckToColumn(game.id, columnIndex);
       move.setMoves((prevMoves: number) => prevMoves + 1);
     } catch (e) {
+      console.error("Transaction Failed at deckToColumn:", e);
       toast.error("Transaction Failed");
       try {
         await handleFailedTransaction();
       } catch (fetchError) {
-        console.error("Failed to fetch game", fetchError);
+        console.error("Failed to fetch game at deckToColumn:", fetchError);
         toast.error("Failed to update game");
   }
     } finally {
@@ -274,11 +278,12 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
         );
       }
     } catch (e) {
+      console.error("Transaction Failed at columnToPile:", e);
       toast.error("Transaction Failed");
       try {
         await handleFailedTransaction();
       } catch (fetchError) {
-        console.error("Failed to fetch game", fetchError);
+        console.error("Failed to fetch game at columnToPile:", fetchError);
         toast.error("Failed to update game");
   }
     } finally {
@@ -317,11 +322,12 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
         );
       }
     } catch (e) {
+      console.error("Transaction Failed at columnToColumn:", e);
       toast.error("Transaction Failed");
       try {
         await handleFailedTransaction();
       } catch (fetchError) {
-        console.error("Failed to fetch game", fetchError);
+        console.error("Failed to fetch game at columnToColumn:", fetchError);
         toast.error("Failed to update game");
   }
     } finally {
@@ -335,11 +341,12 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
       await handleFromPileToColumn(game.id, pileIndex, columnIndex);
       move.setMoves((prevMoves: number) => prevMoves + 1);
     } catch (e) {
+      console.error("Transaction Failed at pileToColumn:", e);
       toast.error("Transaction Failed");
       try {
         await handleFailedTransaction();
       } catch (fetchError) {
-        console.error("Failed to fetch game", fetchError);
+        console.error("Failed to fetch game at pileToColumn:", fetchError);
         toast.error("Failed to update game");
   }
     } finally {
@@ -352,6 +359,7 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
       await handleFinishGame(game.id);
       setWonModal(true);
     } catch (e) {
+      console.error("Transaction Failed at finishGame:", e);
       toast.error("Transaction Failed");
     }
   };
@@ -386,24 +394,24 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
     return (
       <div className="relative">
         <div
-          className="aboslute top-0 h-[166px] min-w-[120px]"
+          className="aboslute top-0"
           style={{ rotate: "-5deg" }}
         >
-          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} />
+          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} className="h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]"/>
         </div>
         <div
-          className="absolute top-0 h-[166px] min-w-[120px]"
+          className="absolute top-0 h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]"
           style={{ rotate: "3deg" }}
         >
-          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} />
+          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} className="h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]"/>
         </div>
         <div
           className={`${
             isMoveLoading ? "cursor-wait" : "cursor-pointer"
-          } absolute top-0 h-[166px] min-w-[120px]`}
+          } absolute top-0 h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]`}
           style={{ rotate: "none" }}
         >
-          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} />
+          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} className="h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]"/>
         </div>
       </div>
     );
@@ -411,7 +419,7 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
 
   return (
     <DndContext onDragEnd={handleDragEnd} autoScroll={false}>
-      <div className="px-60 h-full w-full flex flex-col items-center space-y-7 pt-14 gap-y-36">
+      <div className="px-10 md:px-20 lg:px-40 xl:px-60 h-full w-full flex flex-col items-center space-y-7 pt-14 gap-y-36">
         <ul className="w-full h-200 flex justify-between items-center">
           {/* Set up card deck */}
           <button
@@ -423,7 +431,7 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
             {!!deck.hidden_cards || deck.open_cards !== deck.cards.length ? (
               deckRotated()
             ) : deck.cards.length !== 0 ? (
-              <button className="flex justify-center items-center w-[120px] h-[166px]">
+              <button className="flex justify-center items-center w-[80px] md:w-[120px] h-[110px] md:h-[166px]">
                 <Image
                   src={circleArrow}
                   alt={"circle-arrow"}
@@ -432,17 +440,17 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
                 />
               </button>
             ) : (
-              <div className="w-[120px] h-[166px]"></div>
+              <div className="w-[80px] md:w-[120px] h-[110px] md:h-[166px]"></div>
             )}
           </button>
 
           {/* Place where the open deck cards are being displayed */}
-          <li className="min-w-[120px] h-[166px]" key={"openCard"}>
+          <li className="min-w-[80px] md:min-w-[120px] h-[110px] md:h-[166px]" key={"openCard"}>
             {openCards()}
           </li>
 
           {/* Empty placeholder */}
-          <li className="w-[120px] h-[166px] flex-shrink-0"></li>
+          <li className="w-[80px] md:w-[120px] h-[110px] md:h-[166px] flex-shrink-0"></li>
 
           {/* Set up piles */}
           {piles.map((pile, index) => (

@@ -77,7 +77,6 @@ public struct CardRevealed has copy, drop {
 entry fun init_normal_game(clock: &Clock, random: &Random, ctx: &mut TxContext) {
     // Initialize the stack with all the available cards.
     let mut available_cards = vector::tabulate!(CARD_COUNT, |i| i);
-
     // Initialize the Deck with 24 hidden cards and an empty vector of cards.
     let deck = Deck {
         hidden_cards: 24,

@@ -10,15 +10,16 @@ import { Button } from "@/components/ui/button";
 export const InfoIcon = () => {
   return (
     <>
-      <div className="absolute bottom-0 left-0 p-20">
+      <div className="fixed bottom-2 left-2 md:bottom-8 md:left-8 z-50">
         <Dialog>
           <DialogTrigger asChild>
             <Button
-              className="w-[40px] h-[40px] relative bg-white hover:bg-gray-100 h-rounded-[10px] border-[1px] border-[#CCCCCC] opacity-80"
+              className="w-[40px] h-[40px] relative bg-white hover:bg-gray-100 rounded-[10px] border-[1px] border-[#CCCCCC] opacity-80 p-0"
             >
-              <Image src={infoLogo}
-                     alt="Info"
-                     fill={true}
+              <Image
+                src={infoLogo}
+                alt="Info"
+                fill={true}
               />
             </Button>
           </DialogTrigger>

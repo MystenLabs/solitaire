@@ -8,7 +8,7 @@ export function EmptyDroppable(props: any) {
     });
 
     return (
-        <div ref={setNodeRef} key={'empty-pile-droppable'} className={"h-[166px] w-[120px]"}>
+        <div ref={setNodeRef} key={'empty-pile-droppable'} className={"h-[110px] md:h-[166px] w-[80px] md:w-[120px]"}>
             {props.children}
         </div>
     );

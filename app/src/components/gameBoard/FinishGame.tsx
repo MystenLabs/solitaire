@@ -18,7 +18,7 @@ export default function FinishGame({ finishGame }: Props) {
       </div>
       <button
         onClick={finishGame}
-        className="bg-black px-5 py-4 bg-black rounded-lg justify-center items-center gap-2 inline-flex"
+        className="bg-black px-5 py-4 rounded-lg justify-center items-center gap-2 inline-flex"
       >
         <div className="text-white text-base font-bold">View Results</div>
       </button>

@@ -39,9 +39,9 @@ export function getClient(): SuiClient {
 }
 
 export async function setupSuiClient() {
-	const keypair = Ed25519Keypair.fromSecretKey(
-		fromBase64(ADMIN_SECRET_KEY).slice(1)
-	  );
+  // `sui keytool export --key-identity <addr>`
+  // suipriv...
+	const keypair = Ed25519Keypair.fromSecretKey(ADMIN_SECRET_KEY);
 	const client = getClient();
 	return new TestToolbox(keypair, client);
 
@@ -61,5 +61,6 @@ export async function executeTransactionBlock(
 		},
 	});
 	expect(resp.effects?.status.status).toEqual('success');
+  await toolbox.client.waitForTransaction({ digest: resp.digest });
 	return resp;
 }
