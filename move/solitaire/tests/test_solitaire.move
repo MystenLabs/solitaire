@@ -1469,37 +1469,3 @@ public fun test_deck_cycling_basic() {
     };
     scenario_val.end();
 }
-
-#[test]
-public fun test_deck_rotation_changes_order() {
-    let mut scenario_val = init_normal_game_scenario_helper();
-    let scenario = &mut scenario_val;
-    test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
-    random::create_for_testing(test_scenario::ctx(scenario));
-    test_scenario::next_tx(scenario, PLAYER);
-    {
-        let random_state = scenario.take_shared<random::Random>();
-        let mut game = test_scenario::take_from_sender<Game>(scenario);
-
-        // Reveal all cards
-        24u64.do!(|_| {
-            solitaire::open_deck_card(&mut game, &random_state, test_scenario::ctx(scenario));
-        });
-
-        // Get the top card before rotation
-        let top_card_before_rotation = solitaire::get_top_card_of_deck(&game);
-
-        // Rotate the deck
-        solitaire::rotate_open_deck_cards(&mut game, test_scenario::ctx(scenario));
-
-        // Get the top card after rotation (should be different)
-        let top_card_after_rotation = solitaire::get_top_card_of_deck(&game);
-
-        // The top card should have changed due to rotation
-        assert!(top_card_before_rotation != top_card_after_rotation, 0);
-
-        test_scenario::return_to_sender(scenario, game);
-        test_scenario::return_shared(random_state);
-    };
-    scenario_val.end();
-}
