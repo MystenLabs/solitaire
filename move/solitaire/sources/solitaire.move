@@ -322,7 +322,6 @@ public fun rotate_open_deck_cards(game: &mut Game, ctx: &mut TxContext) {
     assert!(game.deck.hidden_cards == 0 || game.deck.has_revealed_all_cards, EInvalidTurnDeckCard);
     assert!(game.deck.cards.length() > 0, ENoAvailableDeckCard);
 
-
     // If this is the first rotation after revealing all cards, set up cycling mode
     game.deck.has_revealed_all_cards = true;
     game.deck.hidden_cards = game.deck.cards.length() - 1;
