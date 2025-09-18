@@ -24,6 +24,7 @@ use solitaire::solitaire::{
 use sui::clock;
 use sui::random;
 use sui::test_scenario::{Self, Scenario};
+use std::debug;
 
 // Test error codes
 const ETestColumnNotEmpty: u64 = 901;

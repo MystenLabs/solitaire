@@ -300,7 +300,8 @@ entry fun open_deck_card(game: &mut Game, random: &Random, ctx: &mut TxContext) 
     if (game.deck.has_revealed_all_cards) {
         game.player_moves = game.player_moves + 1;
         game.deck.hidden_cards = game.deck.hidden_cards - 1;
-        let card = game.deck.cards.pop_back();
+        let card = game.deck.cards[0];
+        game.deck.cards.remove(0);
         game.deck.cards.push_back(card);
         event::emit(CardRevealed { card });
     } else {
