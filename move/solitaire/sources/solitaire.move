@@ -326,10 +326,8 @@ public fun rotate_open_deck_cards(game: &mut Game, ctx: &mut TxContext) {
     game.deck.cards.push_back(card);
 
     // If this is the first rotation after revealing all cards, set up cycling mode
-    if (!game.deck.has_revealed_all_cards) {
-        game.deck.has_revealed_all_cards = true;
-        game.deck.hidden_cards = game.deck.cards.length() - 1;
-    };
+    game.deck.has_revealed_all_cards = true;
+    game.deck.hidden_cards = game.deck.cards.length() - 1;
 
     game.player_moves = game.player_moves + 1;
 }
