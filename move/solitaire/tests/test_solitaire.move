@@ -1434,7 +1434,7 @@ public fun color_validation_black_on_red_comprehensive() {
 }
 
 #[test]
-public fun test_deck_cycling_basic() {
+public fun deck_cycling_after_revealing_all_cards() {
     let mut scenario_val = init_normal_game_scenario_helper();
     let scenario = &mut scenario_val;
     test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
