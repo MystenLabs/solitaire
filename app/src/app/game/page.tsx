@@ -49,7 +49,7 @@ const GamePage = () => {
         isMoveLoading ? "cursor-wait" : "cursor-default"
       }`}
     >
-      <div className="fixed top-[80px] md:relative md:top-0 left-0 right-0 z-10 flex pt-4 px-4 md:px-20 justify-between items-center bg-transparent md:mt-16">
+      <div className="flex pt-4 px-4 md:px-20 justify-between items-center bg-transparent mt-[80px] sm:mt-[60px] md:mt-12">
         <div className="logo text-white text-[14px] md:text-[28px] font-bold font-['Mysten Walter Alte']">
           Mysten Solitaire
         </div>
@@ -80,7 +80,7 @@ const GamePage = () => {
         )}
         <AccountDropdown />
       </div>
-      <div className="flex-1 overflow-x-auto overflow-hidden pt-[200px] md:pt-12 xl:pt-20">
+      <div className="flex-1 overflow-x-auto overflow-hidden pt-4 md:pt-12 xl:pt-20">
         {!game ? (
           <div className="flex flex-col justify-center items-center flex-1 px-4 md:px-0">
             <DifficultySelection onGameCreation={onGameCreation} />
