@@ -21,7 +21,7 @@ import circleArrow from "../../../public/circle-arrow-icon.svg";
 import { LoadingContext } from "@/contexts/LoadingProvider";
 import FinishGame from "./FinishGame";
 import WonModal from "./WonModal";
-import {useEffect} from "react";
+import { useEffect } from "react";
 import { Game } from "@/models/game";
 
 interface GameProps {
@@ -36,7 +36,7 @@ interface MoveProps {
   setMoves: any;
 }
 
-export default function GameBoard({ game, move }: { game: GameProps, move: MoveProps}) {
+export default function GameBoard({ game, move }: { game: GameProps, move: MoveProps }) {
   const [deck, setDeck] = useState<DeckProps>({
     hidden_cards: game.deck.hidden_cards,
     open_cards: 0,
@@ -142,17 +142,17 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
 
   const handleFailedTransaction = async () => {
     const onchainGame = await getGameObjectDetails(game.id);
-          const newGame = new Game(onchainGame);
-          setDeck((prevDeck) => {
-            return {
-              ...prevDeck,
-              hidden_cards: newGame.deck.hidden_cards,
-              open_cards: prevDeck.open_cards,
-              cards: newGame.deck.cards,
-            }
-          });
-          setColumns(newGame.columns);
-          setPiles(newGame.piles);
+    const newGame = new Game(onchainGame);
+    setDeck((prevDeck) => {
+      return {
+        ...prevDeck,
+        hidden_cards: newGame.deck.hidden_cards,
+        open_cards: prevDeck.open_cards,
+        cards: newGame.deck.cards,
+      }
+    });
+    setColumns(newGame.columns);
+    setPiles(newGame.piles);
   }
 
   const clickDeck = async () => {
@@ -185,11 +185,11 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
         } catch (fetchError) {
           console.error("Failed to fetch game at clickDeck (open deck card):", fetchError);
           toast.error("Failed to update game");
-    }
+        }
       }
     } else {
       try {
-        const res = await handleRotateOpenDeckCards(game.id);
+        await handleRotateOpenDeckCards(game.id);
         setDeck((prevDeck) => {
           const rotatedCard = prevDeck.cards.splice(0, 1)[0];
           return {
@@ -208,7 +208,7 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
         } catch (fetchError) {
           console.error("Failed to fetch game at clickDeck (rotate open deck cards):", fetchError);
           toast.error("Failed to update game");
-    }
+        }
       }
     }
     setIsMoveLoading(false);
@@ -227,7 +227,7 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
       } catch (fetchError) {
         console.error("Failed to fetch game at deckToPile:", fetchError);
         toast.error("Failed to update game");
-  }
+      }
     } finally {
       setIsMoveLoading(false);
       checkIfFinished();
@@ -247,7 +247,7 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
       } catch (fetchError) {
         console.error("Failed to fetch game at deckToColumn:", fetchError);
         toast.error("Failed to update game");
-  }
+      }
     } finally {
       setIsMoveLoading(false);
     }
@@ -285,7 +285,7 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
       } catch (fetchError) {
         console.error("Failed to fetch game at columnToPile:", fetchError);
         toast.error("Failed to update game");
-  }
+      }
     } finally {
       setIsMoveLoading(false);
       checkIfFinished();
@@ -329,7 +329,7 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
       } catch (fetchError) {
         console.error("Failed to fetch game at columnToColumn:", fetchError);
         toast.error("Failed to update game");
-  }
+      }
     } finally {
       setIsMoveLoading(false);
     }
@@ -348,7 +348,7 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
       } catch (fetchError) {
         console.error("Failed to fetch game at pileToColumn:", fetchError);
         toast.error("Failed to update game");
-  }
+      }
     } finally {
       setIsMoveLoading(false);
     }
@@ -397,21 +397,20 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
           className="aboslute top-0"
           style={{ rotate: "-5deg" }}
         >
-          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} className="h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]"/>
+          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} className="h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]" />
         </div>
         <div
           className="absolute top-0 h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]"
           style={{ rotate: "3deg" }}
         >
-          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} className="h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]"/>
+          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} className="h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]" />
         </div>
         <div
-          className={`${
-            isMoveLoading ? "cursor-wait" : "cursor-pointer"
-          } absolute top-0 h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]`}
+          className={`${isMoveLoading ? "cursor-wait" : "cursor-pointer"
+            } absolute top-0 h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]`}
           style={{ rotate: "none" }}
         >
-          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} className="h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]"/>
+          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} className="h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]" />
         </div>
       </div>
     );
@@ -474,7 +473,7 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
           ))}
         </ul>
         {isFinished && <FinishGame finishGame={finishGame} />}
-        {wonModal && <WonModal gameId={game.id} moves={move.moves}/>}
+        {wonModal && <WonModal gameId={game.id} moves={move.moves} />}
       </div>
     </DndContext>
   );

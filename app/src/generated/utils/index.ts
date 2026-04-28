@@ -13,21 +13,21 @@ export function getPureBcsSchema(typeTag: string | TypeTag): BcsType<any> | null
 	const parsedTag = typeof typeTag === 'string' ? TypeTagSerializer.parseFromStr(typeTag) : typeTag;
 
 	if ('u8' in parsedTag) {
-		return bcs.U8;
+		return bcs.u8();
 	} else if ('u16' in parsedTag) {
-		return bcs.U16;
+		return bcs.u16();
 	} else if ('u32' in parsedTag) {
-		return bcs.U32;
+		return bcs.u32();
 	} else if ('u64' in parsedTag) {
-		return bcs.U64;
+		return bcs.u64();
 	} else if ('u128' in parsedTag) {
-		return bcs.U128;
+		return bcs.u128();
 	} else if ('u256' in parsedTag) {
-		return bcs.U256;
+		return bcs.u256();
 	} else if ('address' in parsedTag) {
 		return bcs.Address;
 	} else if ('bool' in parsedTag) {
-		return bcs.Bool;
+		return bcs.bool();
 	} else if ('vector' in parsedTag) {
 		const type = getPureBcsSchema(parsedTag.vector);
 		return type ? bcs.vector(type) : null;
@@ -40,7 +40,7 @@ export function getPureBcsSchema(typeTag: string | TypeTag): BcsType<any> | null
 				(structTag.module === 'ascii' || structTag.module === 'string') &&
 				structTag.name === 'String'
 			) {
-				return bcs.String;
+				return bcs.string();
 			}
 
 			if (structTag.module === 'option' && structTag.name === 'Option') {

@@ -6,12 +6,12 @@ import { ChildrenProps } from "@/types/ChildrenProps";
 import { Spinner } from "@/components/general/Spinner";
 import React, { useEffect } from "react";
 import { LoadingProvider } from "@/contexts/LoadingProvider";
-import { useCurrentAccount, useCurrentWallet } from "@mysten/dapp-kit";
+import { useCurrentAccount, useWalletConnection } from "@mysten/dapp-kit-react";
 import { useRouter } from "next/navigation";
 
 export default function MemberRootLayout({ children }: ChildrenProps) {
   const currentAccount = useCurrentAccount();
-	const { isConnecting } = useCurrentWallet();
+	const { isConnecting } = useWalletConnection();
   const router = useRouter();
 
   useEffect(() => {

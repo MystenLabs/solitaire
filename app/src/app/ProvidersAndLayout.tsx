@@ -9,33 +9,14 @@ import { Toaster } from "react-hot-toast";
 import table from "../../public/Table.svg";
 import { InfoIcon } from "./InfoIcon";
 import { RegisterEnokiWallets } from "@/contexts/RegisterEnokiWallets";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
-import {
-  createNetworkConfig,
-  SuiClientProvider,
-  WalletProvider,
-} from "@mysten/dapp-kit";
-
-// Create QueryClient instance outside component to prevent recreation on every render
-const queryClient = new QueryClient();
-
-const { networkConfig } = createNetworkConfig({
-  [process.env.NEXT_PUBLIC_SUI_NETWORK_NAME!]: {
-    url: process.env.NEXT_PUBLIC_SUI_NETWORK!,
-  },
-});
+import { DAppKitProvider } from "@mysten/dapp-kit-react";
+import { dAppKit } from "@/dappKit";
 
 export const ProvidersAndLayout = ({ children }: ChildrenProps) => {
   const _ = useRegisterServiceWorker();
   return (
-    <QueryClientProvider client={queryClient}>
-      <SuiClientProvider
-        networks={networkConfig}
-        defaultNetwork={process.env.NEXT_PUBLIC_SUI_NETWORK_NAME!}
-      >
+    <DAppKitProvider dAppKit={dAppKit}>
         <RegisterEnokiWallets />
-        <WalletProvider autoConnect slushWallet={{ name: "Solitaire PoC" }}>
           <main
             className={`min-h-screen w-screen bg-left-bottom md:bg-bottom`}
             style={{
@@ -60,8 +41,6 @@ export const ProvidersAndLayout = ({ children }: ChildrenProps) => {
               }}
             />
           </main>
-        </WalletProvider>
-      </SuiClientProvider>
-    </QueryClientProvider>
+    </DAppKitProvider>
   );
 };

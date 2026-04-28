@@ -1,8 +1,7 @@
 // Copyright (c) Mysten Labs, Inc.
 // SPDX-License-Identifier: Apache-2.0
-import { useSui } from "./useSui";
 import { Game } from "@/models/game";
-import { useCurrentAccount, useSignTransaction } from "@mysten/dapp-kit";
+import { useCurrentAccount, useCurrentClient, useDAppKit } from "@mysten/dapp-kit-react";
 import { toBase64 } from "@mysten/sui/utils";
 import {
   initNormalGame,
@@ -24,9 +23,17 @@ interface CardRevealedEvent {
 }
 
 export const useSolitaireActions = () => {
-  const { suiClient } = useSui();
+  const suiClient = useCurrentClient();
+  const dAppKit = useDAppKit();
   const currentAccount = useCurrentAccount();
-  const { mutateAsync: signTransaction } = useSignTransaction();
+
+  const requireCurrentSender = () => {
+    const sender = currentAccount?.address;
+    if (!sender) {
+      throw new Error("No connected wallet account. Please sign in again.");
+    }
+    return sender;
+  };
 
   const handleFromDeckToColumn = async (
     gameId: string,
@@ -66,9 +73,9 @@ export const useSolitaireActions = () => {
 
     const cardRevealedEvent = txResult.events?.find(
       (event) =>
-        event.type ===
+        event.eventType ===
         `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::CardRevealed`
-    )?.parsedJson as CardRevealedEvent;
+    )?.json as unknown as CardRevealedEvent;
 
     return cardRevealedEvent?.card;
   };
@@ -88,9 +95,9 @@ export const useSolitaireActions = () => {
 
     const cardRevealedEvent = txResult.events?.find(
       (event) =>
-        event.type ===
+        event.eventType ===
         `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::CardRevealed`
-    )?.parsedJson as CardRevealedEvent;
+    )?.json as unknown as CardRevealedEvent;
 
     return cardRevealedEvent?.card;
   };
@@ -118,9 +125,9 @@ export const useSolitaireActions = () => {
 
     const cardRevealedEvent = txResult.events?.find(
       (event) =>
-        event.type ===
+        event.eventType ===
         `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::CardRevealed`
-    )?.parsedJson as CardRevealedEvent;
+    )?.json as unknown as CardRevealedEvent;
 
     return cardRevealedEvent?.card;
   };
@@ -153,11 +160,25 @@ export const useSolitaireActions = () => {
   };
 
   async function getGameObjectDetails(objectId: string | undefined) {
+    if (!objectId) {
+      throw new Error("Missing game object id");
+    }
     return await suiClient.getObject({
-      id: objectId!,
-      options: { showContent: true },
+      objectId,
+      include: { json: true },
     });
   }
+
+  const getCreatedGameObjectId = (txResult: any) => {
+    const changedObjects: any[] = txResult.effects?.changedObjects ?? [];
+
+    return changedObjects.find(
+      (object) =>
+        object.idOperation === "Created" &&
+        txResult.objectTypes?.[object.objectId] ===
+          `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::Game`
+    )?.objectId;
+  };
 
   const handleExecuteInitNormalGame = async () => {
     const tx = new Transaction();
@@ -166,9 +187,8 @@ export const useSolitaireActions = () => {
     }));
     const txResult = await executeTransaction(tx);
 
-    let gameObjectRes = await getGameObjectDetails(
-      txResult.effects?.created![0].reference.objectId
-    );
+    const gameId = getCreatedGameObjectId(txResult);
+    let gameObjectRes = await getGameObjectDetails(gameId);
     return new Game(gameObjectRes);
   };
 
@@ -179,13 +199,15 @@ export const useSolitaireActions = () => {
     }));
     const txResult = await executeTransaction(tx);
 
-    let gameObjectRes = await getGameObjectDetails(
-      txResult.effects?.created![0].reference.objectId
-    );
+    const gameId = getCreatedGameObjectId(txResult);
+    let gameObjectRes = await getGameObjectDetails(gameId);
     return new Game(gameObjectRes);
   };
 
   const executeTransaction = async (tx: Transaction) => {
+    const sender = requireCurrentSender();
+    tx.setSenderIfNotSet(sender);
+
     const txBytes = await tx.build({
       client: suiClient,
       onlyTransactionKind: true,
@@ -196,7 +218,7 @@ export const useSolitaireActions = () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         transactionKindBytes: toBase64(txBytes),
-        sender: currentAccount?.address!,
+        sender,
       }),
     });
 
@@ -210,7 +232,7 @@ export const useSolitaireActions = () => {
         digest: string;
       };
 
-    const { signature } = await signTransaction({
+    const { signature } = await dAppKit.signTransaction({
       transaction: sponsoredBytes,
     });
 
@@ -228,31 +250,30 @@ export const useSolitaireActions = () => {
       digest: string;
     };
 
-    await suiClient.waitForTransaction({
+    const txResult = await suiClient.waitForTransaction({
       digest: executedDigest,
       timeout: 10_000,
-    });
-
-    const txResult = await suiClient.getTransactionBlock({
-      digest: executedDigest,
-      options: {
-        showEffects: true,
-        showEvents: true,
-        showObjectChanges: false,
+      include: {
+        effects: true,
+        events: true,
+        objectTypes: true,
       },
     });
 
-    const status = txResult.effects?.status?.status;
+    const executedTx = txResult.$kind === "Transaction"
+      ? txResult.Transaction
+      : txResult.FailedTransaction;
+    const status = executedTx.status.success;
 
-    if (status !== "success") {
+    if (!status) {
       throw new Error(
         `Transaction failed: ${
-          txResult.effects?.status?.error ?? "unknown error"
+          executedTx.status.error?.message ?? "unknown error"
         }`
       );
     }
 
-    return txResult;
+    return executedTx;
   };
 
   return {
