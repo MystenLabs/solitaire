@@ -1,7 +1,7 @@
 // Copyright (c) Mysten Labs, Inc.
 // SPDX-License-Identifier: Apache-2.0
 import { ChildrenProps } from '@/types/ChildrenProps';
-import { createContext, useContext, useState } from 'react';
+import { createContext, useState } from 'react';
 
 // Create the context with a default value
 export const LoadingContext = createContext({

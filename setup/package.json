@@ -10,8 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@mysten/enoki": "^0.1.4",
-    "@mysten/sui": "1.38.0",
+    "@mysten/enoki": "^1.0.4",
+    "@mysten/sui": "^2.16.0",
     "dotenv": "^16.0.3",
     "typescript": "^5.0.4"
   },

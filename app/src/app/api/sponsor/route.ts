@@ -7,6 +7,19 @@ import { getSolitaireMoveCallTargets } from "@/constants/solitaireMoveCalls";
 export async function POST(req: NextRequest) {
   try {
     const { transactionKindBytes, sender } = await req.json();
+    if (!sender || sender === "0x0" || /^0x0+$/.test(sender)) {
+      return NextResponse.json(
+        { error: "Invalid sender address" },
+        { status: 400 }
+      );
+    }
+    const packageAddress = process.env.NEXT_PUBLIC_PACKAGE_ADDRESS;
+
+    if (!packageAddress) {
+      throw new Error("Missing NEXT_PUBLIC_PACKAGE_ADDRESS");
+    }
+
+    const allowedMoveCallTargets = getSolitaireMoveCallTargets(packageAddress);
 
     const sponsored = await enokiClient.createSponsoredTransaction({
       network: process.env.NEXT_PUBLIC_SUI_NETWORK_NAME as

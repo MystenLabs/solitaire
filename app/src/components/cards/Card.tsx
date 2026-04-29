@@ -18,7 +18,7 @@ export const Card = ({ id, children, marginTop, draggable = true }: { id: number
         disabled: isHiddenCard || !draggable || isMoveLoading,
     });
 
-    const {isOver, setNodeRef: setDroppableNodeRef} = useDroppable({
+    const {setNodeRef: setDroppableNodeRef} = useDroppable({
         id: cardId,
         disabled: isHiddenCard,
     });

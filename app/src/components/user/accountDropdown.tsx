@@ -13,8 +13,8 @@ import { CaretDownIcon } from "@radix-ui/react-icons";
 
 import {
   useCurrentAccount,
-  useDisconnectWallet,
-} from "@mysten/dapp-kit";
+  useDAppKit,
+} from "@mysten/dapp-kit-react";
 
 import toast from "react-hot-toast";
 import { formatString } from "@/helpers/formatString";
@@ -23,7 +23,7 @@ import { useRouter } from "next/navigation";
 export const AccountDropdown = () => {
   const currentAccount = useCurrentAccount();
   const address = currentAccount?.address;
-  const { mutate: disconnect } = useDisconnectWallet();
+  const dAppKit = useDAppKit();
   const router = useRouter();
 
   const copyAddress = () => {
@@ -50,8 +50,9 @@ export const AccountDropdown = () => {
       <DropdownMenuContent>
         <DropdownMenuItem
           onSelect={() => {
-             disconnect()
-             router.push("/") 
+             dAppKit.disconnectWallet().finally(() => {
+              router.push("/");
+             });
           }}
           className={
             "select-none rounded-[36px] border border-white px-14 py-1 text-center text-white bg-white bg-opacity-10 text-base leading-tight cursor-pointer"

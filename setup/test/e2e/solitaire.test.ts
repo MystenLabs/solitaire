@@ -11,16 +11,11 @@ import {
   rotateOpenDeckCards
 } from "../../../app/src/generated/solitaire/solitaire";
 import {Transaction} from "@mysten/sui/transactions";
-import {ObjectOwner} from "@mysten/sui/client";
 
 interface ObjectCreated {
-  digest: string;
   objectId: string;
-  objectType: string;
-  owner: ObjectOwner;
-  sender: string;
-  type: "created";
-  version: string;
+  idOperation: string;
+  outputState: string;
 }
 
 interface Column {
@@ -56,6 +51,15 @@ interface GameObject {
   start_time: number;
 }
 
+const getCreatedGameObjectId = (result: any, packageId: string) => {
+  const changedObjects = result.effects?.changedObjects ?? [];
+  return (changedObjects as ObjectCreated[]).find(
+    (object) =>
+      object.idOperation === "Created" &&
+      result.objectTypes?.[object.objectId] === `${packageId}::solitaire::Game`
+  )?.objectId;
+};
+
 describe("Interacting with the Smart Contract", () => {
   let toolbox: TestToolbox;
   let packageId: string;
@@ -71,21 +75,17 @@ describe("Interacting with the Smart Contract", () => {
       package: packageId,
     }));
     const result = await executeTransactionBlock(toolbox, tx);
-    const game = result.objectChanges?.filter(
-      (object) =>
-        object.type === "created" &&
-        object.objectType === `${packageId}::solitaire::Game`
-    );
-    expect(game).toBeDefined();
-    if (game) {
+    const gameId = getCreatedGameObjectId(result, packageId);
+    expect(gameId).toBeDefined();
+    if (gameId) {
       toolbox.client
         .getObject({
-          id: (game[0] as ObjectCreated).objectId,
-          options: {showContent: true},
+          objectId: gameId,
+          include: { json: true },
         })
         .then((result) => {
-          if (result.data?.content?.dataType === 'moveObject') {
-            expect((result.data?.content?.fields as unknown as GameObject).difficulty).toEqual('NORMAL');
+          if (result.object?.json) {
+            expect((result.object.json as unknown as GameObject).difficulty).toEqual('NORMAL');
           }
         });
     }
@@ -97,22 +97,17 @@ describe("Interacting with the Smart Contract", () => {
       package: packageId,
     }));
     const result = await executeTransactionBlock(toolbox, tx);
-    const game = result.objectChanges?.filter(
-      (object) =>
-        object.type === "created" &&
-        object.objectType === `${packageId}::solitaire::Game`
-    );
-    expect(game).toBeDefined();
-
-    if (game) {
+    const gameId = getCreatedGameObjectId(result, packageId);
+    expect(gameId).toBeDefined();
+    if (gameId) {
       toolbox.client
         .getObject({
-          id: (game[0] as ObjectCreated).objectId,
-          options: {showContent: true},
+          objectId: gameId,
+          include: { json: true },
         })
         .then((result) => {
-          if (result.data?.content?.dataType === 'moveObject') {
-            expect((result.data?.content?.fields as unknown as GameObject).difficulty).toEqual('EASY');
+          if (result.object?.json) {
+            expect((result.object.json as unknown as GameObject).difficulty).toEqual('EASY');
           }
         });
     }
@@ -127,21 +122,17 @@ describe("Interacting with the Smart Contract", () => {
       package: packageId,
     }));
     let result = await executeTransactionBlock(toolbox, tx);
-    const game = result.objectChanges?.filter(
-      (object) =>
-        object.type === "created" &&
-        object.objectType === `${packageId}::solitaire::Game`
-    );
-    expect(game).toBeDefined();
+    const gameId = getCreatedGameObjectId(result, packageId);
+    expect(gameId).toBeDefined();
 
     let testGame: GameObject;
-    if (game) {
+    if (gameId) {
       const gameResult = await toolbox.client.getObject({
-        id: (game[0] as ObjectCreated).objectId,
-        options: {showContent: true},
+        objectId: gameId,
+        include: { json: true },
       });
-      if (gameResult.data?.content?.dataType === 'moveObject') {
-        testGame = (gameResult.data?.content?.fields as unknown as GameObject);
+      if (gameResult.object?.json) {
+        testGame = (gameResult.object.json as unknown as GameObject);
       }
     }
 
@@ -155,12 +146,12 @@ describe("Interacting with the Smart Contract", () => {
     await executeTransactionBlock(toolbox, tx);
     const obj = await toolbox.client
       .getObject({
-        id: testGame!.id.id,
-        options: {showContent: true},
+        objectId: testGame!.id.id,
+        include: { json: true },
       })
 
-    if (obj.data?.content?.dataType === 'moveObject') {
-      firstCard = (obj.data?.content?.fields as unknown as GameObject).deck.fields.cards[0];
+    if (obj.object?.json) {
+      firstCard = (obj.object.json as unknown as GameObject).deck.fields.cards[0];
     }
 
     let hiddenDeckCards = 23;
@@ -177,12 +168,12 @@ describe("Interacting with the Smart Contract", () => {
     }
     toolbox.client
       .getObject({
-        id: testGame!.id.id,
-        options: {showContent: true},
+        objectId: testGame!.id.id,
+        include: { json: true },
       })
       .then((result) => {
-        if (result.data?.content?.dataType === 'moveObject') {
-          expect((result.data?.content?.fields as unknown as GameObject).deck.fields.hidden_cards).toEqual("0");
+        if (result.object?.json) {
+          expect((result.object.json as unknown as GameObject).deck.fields.hidden_cards).toEqual("0");
         }
       });
 
@@ -195,12 +186,12 @@ describe("Interacting with the Smart Contract", () => {
     await executeTransactionBlock(toolbox, tx);
     toolbox.client
       .getObject({
-        id: testGame!.id.id,
-        options: {showContent: true},
+        objectId: testGame!.id.id,
+        include: { json: true },
       })
       .then((result) => {
-        if (result.data?.content?.dataType === 'moveObject') {
-          expect((result.data?.content?.fields as unknown as GameObject).deck.fields.cards[23]).toEqual(firstCard);
+        if (result.object?.json) {
+          expect((result.object.json as unknown as GameObject).deck.fields.cards[23]).toEqual(firstCard);
         }
       });
   });

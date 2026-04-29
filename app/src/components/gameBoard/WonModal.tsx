@@ -5,8 +5,7 @@ import Image from "next/image";
 import arrowIcon from "../../../public/iconRight.svg";
 import { CaretDownIcon, CaretUpIcon } from "@radix-ui/react-icons";
 import { useEffect, useState } from "react";
-import { useSui } from "@/hooks/useSui";
-import { useCurrentAccount } from "@mysten/dapp-kit";
+import { useCurrentAccount, useCurrentClient } from "@mysten/dapp-kit-react";
 import GameHistory from "./GameHistory";
 
 
@@ -30,21 +29,19 @@ export interface Game extends GameFields {
 export default function WonModal({ gameId, moves }: Props) {
   const [showHistory, setShowHistory] = useState(false);
   const [games, setGames] = useState<Game[]>([]);
-  const { suiClient } = useSui();
+  const suiClient = useCurrentClient() as any;
   const account = useCurrentAccount();
 
   useEffect(() => {
     const getGame = async () => {
       const allData = [];
       try {
-        let { nextCursor, hasNextPage, data } = await suiClient.getOwnedObjects(
+        let { cursor: nextCursor, hasNextPage, objects: data } = await suiClient.listOwnedObjects(
           {
             owner: account?.address!,
-            filter: {
-              StructType: `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::Game`,
-            },
-            options: {
-              showContent: true,
+            type: `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::Game`,
+            include: {
+              json: true,
             },
           }
         );
@@ -52,30 +49,28 @@ export default function WonModal({ gameId, moves }: Props) {
         allData.push(...data);
 
         while (!!hasNextPage) {
-          const resp = await suiClient.getOwnedObjects({
+          const resp = await suiClient.listOwnedObjects({
             owner: account?.address!,
-            filter: {
-              StructType: `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::Game`,
-            },
-            options: {
-              showContent: true,
+            type: `${process.env.NEXT_PUBLIC_PACKAGE_ADDRESS}::solitaire::Game`,
+            include: {
+              json: true,
             },
             ...(!!hasNextPage && { cursor: nextCursor }),
           });
           hasNextPage = resp.hasNextPage;
-          nextCursor = resp.nextCursor;
-          data = resp.data;
+          nextCursor = resp.cursor;
+          data = resp.objects;
           allData.push(...data);
         }
         if (allData.length !== 0) {
           const endedGames = allData.filter(
             (game) =>
-              (game.data?.content as unknown as GameFields).fields.end_time !==
+              (game.json as unknown as GameFields).fields.end_time !==
               "0"
           );
           const games = endedGames.map((game) => {
-            const fields = game.data?.content as unknown as GameFields;
-            const id = game.data?.objectId;
+            const fields = game.json as unknown as GameFields;
+            const id = game.objectId;
             return { id, ...fields };
           });
           games.sort((a, b) => {return Number(b.fields.end_time) - Number(a.fields.end_time)})
@@ -87,7 +82,7 @@ export default function WonModal({ gameId, moves }: Props) {
       }
     };
     getGame();
-  }, [account?.address]);
+  }, [account?.address, gameId, suiClient]);
 
   return ReactDOM.createPortal(
     <div className="fixed inset-0 h-screen w-screen bg-black bg-opacity-60 flex flex-col items-center justify-center z-100">

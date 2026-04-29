@@ -1,11 +1,12 @@
 // Copyright (c) Mysten Labs, Inc.
 // SPDX-License-Identifier: Apache-2.0
-import { useSuiClientContext } from "@mysten/dapp-kit";
+import { useCurrentClient, useCurrentNetwork } from "@mysten/dapp-kit-react";
 import { isEnokiNetwork, registerEnokiWallets } from "@mysten/enoki";
 import { useEffect } from "react";
 
 export const RegisterEnokiWallets = () => {
-  const { client, network } = useSuiClientContext();
+  const client = useCurrentClient();
+  const network = useCurrentNetwork();
 
   useEffect(() => {
     if (!isEnokiNetwork(network)) return;

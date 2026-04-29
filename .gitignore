@@ -20,6 +20,8 @@ lerna-debug.log*
 pnpm-debug.log*
 sui.log*
 
+.pnpm-store/
+
 # Dependency and build-related directories
 node_modules/
 dist/
