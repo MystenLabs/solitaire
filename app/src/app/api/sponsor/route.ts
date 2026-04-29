@@ -29,10 +29,9 @@ export async function POST(req: NextRequest) {
       transactionKindBytes,
       sender: sender,
       allowedAddresses: [sender],
-      // Restrict sponsorship only to the Solitaire gameplay Move calls.
-      allowedMoveCallTargets,
-    } as Parameters<typeof enokiClient.createSponsoredTransaction>[0] & {
-      allowedMoveCallTargets?: string[];
+      allowedMoveCallTargets: getSolitaireMoveCallTargets(
+        process.env.NEXT_PUBLIC_PACKAGE_ADDRESS!
+      ),
     });
 
     return NextResponse.json({

@@ -24,6 +24,7 @@ use solitaire::solitaire::{
 use sui::clock;
 use sui::random;
 use sui::test_scenario::{Self, Scenario};
+use std::debug;
 
 // Test error codes
 const ETestColumnNotEmpty: u64 = 901;
@@ -1024,6 +1025,30 @@ public fun turn_deck_card_valid_reveal_all_and_iterate_2_times() {
     scenario_val.end();
 }
 
+#[test]
+public fun rotate_deck_and_reveal_all_cards() {
+    let mut scenario_val = init_normal_game_scenario_helper();
+    let scenario = &mut scenario_val;
+    test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
+    random::create_for_testing(test_scenario::ctx(scenario));
+    random::create_for_testing(test_scenario::ctx(scenario));
+    test_scenario::next_tx(scenario, PLAYER);
+    {
+        let random_state = scenario.take_shared<random::Random>();
+        let mut game = test_scenario::take_from_sender<Game>(scenario);
+        24u64.do!(|_| {
+            solitaire::open_deck_card(&mut game, &random_state, test_scenario::ctx(scenario));
+        });
+        // iterate the whole deck 2 times
+        solitaire::rotate_open_deck_cards(&mut game, test_scenario::ctx(scenario));
+        solitaire::open_deck_card(&mut game, &random_state, test_scenario::ctx(scenario));
+
+        test_scenario::return_to_sender(scenario, game);
+        test_scenario::return_shared(random_state);
+    };
+    scenario_val.end();
+}
+
 #[test, expected_failure(abort_code = EInvalidTurnDeckCard)]
 public fun invalid_turn_deck_card() {
     let mut scenario_val = init_normal_game_scenario_helper();
@@ -1404,6 +1429,43 @@ public fun color_validation_black_on_red_comprehensive() {
         solitaire::cheat_open_card_to_deck(&mut game, 23); // Spades J (black)
         solitaire::from_deck_to_column(&mut game, 0, test_scenario::ctx(scenario));
         test_scenario::return_to_sender(scenario, game);
+    };
+    scenario_val.end();
+}
+
+#[test]
+public fun deck_cycling_after_revealing_all_cards() {
+    let mut scenario_val = init_normal_game_scenario_helper();
+    let scenario = &mut scenario_val;
+    test_scenario::next_tx(scenario, SYSTEM_ADDRESS);
+    random::create_for_testing(test_scenario::ctx(scenario));
+    test_scenario::next_tx(scenario, PLAYER);
+    {
+        let random_state = scenario.take_shared<random::Random>();
+        let mut game = test_scenario::take_from_sender<Game>(scenario);
+
+        // First, reveal all 24 cards from the deck
+        24u64.do!(|_| {
+            solitaire::open_deck_card(&mut game, &random_state, test_scenario::ctx(scenario));
+        });
+
+        // Store the initial deck size
+        let initial_deck_size = solitaire::get_deck_cards_length(&game);
+
+        // Now call rotate_open_deck_cards to enable cycling
+        solitaire::rotate_open_deck_cards(&mut game, test_scenario::ctx(scenario));
+
+        // After rotation, we should be able to cycle through the existing cards
+        // Call open_deck_card a few times to verify it cycles through existing cards
+        3u64.do!(|_| {
+            solitaire::open_deck_card(&mut game, &random_state, test_scenario::ctx(scenario));
+        });
+
+        // Verify deck size hasn't changed (no new cards added)
+        assert!(solitaire::get_deck_cards_length(&game) == initial_deck_size, 0);
+
+        test_scenario::return_to_sender(scenario, game);
+        test_scenario::return_shared(random_state);
     };
     scenario_val.end();
 }

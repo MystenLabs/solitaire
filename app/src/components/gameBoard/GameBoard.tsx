@@ -39,8 +39,9 @@ interface MoveProps {
 export default function GameBoard({ game, move }: { game: GameProps, move: MoveProps }) {
   const [deck, setDeck] = useState<DeckProps>({
     hidden_cards: game.deck.hidden_cards,
-    open_cards: 0,
-    cards: [],
+    open_cards: Math.max(game.deck.cards.length - game.deck.hidden_cards, 0),
+    cards: game.deck.cards,
+    has_revealed_all_cards: game.deck.has_revealed_all_cards ?? false,
   });
   const [piles, setPiles] = useState<PileProps[]>(game.piles);
   const [columns, setColumns] = useState<ColumnProps[]>(game.columns);
@@ -144,11 +145,17 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
     const onchainGame = await getGameObjectDetails(game.id);
     const newGame = new Game(onchainGame);
     setDeck((prevDeck) => {
+      const syncedOpenCards = Math.max(
+        newGame.deck.cards.length - newGame.deck.hidden_cards,
+        0
+      );
       return {
         ...prevDeck,
         hidden_cards: newGame.deck.hidden_cards,
-        open_cards: prevDeck.open_cards,
         cards: newGame.deck.cards,
+        has_revealed_all_cards: newGame.deck.has_revealed_all_cards,
+        // Keep local open_cards aligned with on-chain deck state.
+        open_cards: syncedOpenCards,
       }
     });
     setColumns(newGame.columns);
@@ -156,57 +163,69 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
   }
 
   const clickDeck = async () => {
-    if (!deck.hidden_cards && deck.cards.length === deck.open_cards) {
-      setDeck((prevDeck) => ({
-        ...prevDeck,
-        hidde_cards: prevDeck.hidden_cards,
-        open_cards: 0,
-        cards: [...prevDeck.cards],
-      }));
-      return;
-    }
-    setIsMoveLoading(true);
-    if (deck.hidden_cards !== 0) {
+    if (!deck.hidden_cards && deck.cards.length > 0) {
+      setIsMoveLoading(true);
       try {
-        const newCard = await handleOpenDeckCard(game.id);
+        await handleRotateOpenDeckCards(game.id);
         setDeck((prevDeck) => ({
-          ...prevDeck, // Spread the previous deck to copy its properties
-          hidden_cards: prevDeck.hidden_cards - 1, // Subtract 1 from hidden_cards
-          open_cards: prevDeck.open_cards + 1, // Add 1 to open_cards
-          cards: [...prevDeck.cards, newCard], // Add newCard to the end of cards array
+          ...prevDeck,
+          hidden_cards: prevDeck.cards.length > 0 ? prevDeck.cards.length - 1 : 0,
+          // After reset there is already one visible top card in cycle mode.
+          open_cards: prevDeck.cards.length > 0 ? 1 : 0,
+          cards: [...prevDeck.cards],
+          has_revealed_all_cards: true,
         }));
         move.setMoves((prevMoves: number) => prevMoves + 1);
       } catch (e) {
-        console.error("Transaction Failed at clickDeck (open deck card):", e);
+        console.error("Transaction Failed at clickDeck (reset deck cycle):", e);
         toast.error("Transaction Failed");
-        // Fetch onchain Game and set the state again
         try {
           await handleFailedTransaction();
         } catch (fetchError) {
-          console.error("Failed to fetch game at clickDeck (open deck card):", fetchError);
+          console.error("Failed to fetch game at clickDeck (reset deck cycle):", fetchError);
           toast.error("Failed to update game");
         }
+      } finally {
+        setIsMoveLoading(false);
       }
-    } else {
+      return;
+    }
+
+    setIsMoveLoading(true);
+    if (deck.hidden_cards !== 0) {
+      const isCyclingMode = deck.has_revealed_all_cards;
       try {
-        await handleRotateOpenDeckCards(game.id);
+        const newCard = await handleOpenDeckCard(game.id);
         setDeck((prevDeck) => {
-          const rotatedCard = prevDeck.cards.splice(0, 1)[0];
+          if (isCyclingMode) {
+            const cycledCards = [...prevDeck.cards];
+            const firstCard = cycledCards.shift();
+            if (firstCard !== undefined) {
+              cycledCards.push(firstCard);
+            }
+            return {
+              ...prevDeck,
+              hidden_cards: prevDeck.hidden_cards - 1,
+              open_cards: prevDeck.open_cards + 1,
+              cards: cycledCards,
+            };
+          }
+
           return {
             ...prevDeck,
-            hidden_cards: 0,
+            hidden_cards: prevDeck.hidden_cards - 1,
             open_cards: prevDeck.open_cards + 1,
-            cards: [...prevDeck.cards, rotatedCard],
+            cards: [...prevDeck.cards, newCard],
           };
         });
         move.setMoves((prevMoves: number) => prevMoves + 1);
       } catch (e) {
-        console.error("Transaction Failed at clickDeck (rotate open deck cards):", e);
+        console.error("Transaction Failed at clickDeck (open deck card):", e);
         toast.error("Transaction Failed");
         try {
           await handleFailedTransaction();
         } catch (fetchError) {
-          console.error("Failed to fetch game at clickDeck (rotate open deck cards):", fetchError);
+          console.error("Failed to fetch game at clickDeck (open deck card):", fetchError);
           toast.error("Failed to update game");
         }
       }
