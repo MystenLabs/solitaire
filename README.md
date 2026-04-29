@@ -1,4 +1,4 @@
-# ♠️ ♥️ Solitaire  ♣️ ♦️
+# ♠️ ♥️ Solitaire ♣️ ♦️
 
 ### Introduction
 
@@ -8,7 +8,7 @@ The Blockchain-based Single Player Solitaire Game is designed to provide a decen
 
 ### Gameplay
 
-In this on-chain version of Klondike solitaire, the player creates a game whose rules are entirely governed by the smart contract. 
+In this on-chain version of Klondike solitaire, the player creates a game whose rules are entirely governed by the smart contract.
 The player has the ability to choose between two modes: Normal mode which is the original Klondike solitaire and Easy mode which is a game with all the Aces placed on the piles.
 After initiating the game, the player has to place all the cards starting from Ace to King of each suit to the respective pile. The allowed moves are opening one deck card each time, placing a card from deck to column or a pile, placing a card from column to a different column or a pile and placing a card from pile to column. When the player manages to place all cards to the 4 piles, he needs to click the button "View Results" to register the win onchain and be able to view the history of past games.
 
@@ -50,12 +50,12 @@ As mentioned above the entire game is an onchain object which is represented by 
 
 The `Deck` object starts with all the cards hidden, and each time a card is revealed, it is added in the card vector of the Deck, with the `open_deck_card` function. Once all cards are revealed, the function `rotate_open_deck_cards` is used to get the next card.
 
-The piles vector consists of the 4 piles and each `Pile` object has the cards that are placed on top of it. 
+The piles vector consists of the 4 piles and each `Pile` object has the cards that are placed on top of it.
 The columns vector consists of the 7 columns and each `Column` object has a number of hidden_cards and a vector with the cards that are placed on it.
 The `available_cards` vector contains all the cards that are not revealed yet.
 
 **Game as Owned Object:**
-Each game created with the function `init_normal_game` or `init_easy_game` is a single owned object by the account who invokes one of those functions. With that approach we ensure that move transactions are executed with low latency since we take advantage of the fast path. 
+Each game created with the function `init_normal_game` or `init_easy_game` is a single owned object by the account who invokes one of those functions. With that approach we ensure that move transactions are executed with low latency since we take advantage of the fast path.
 
 **Randomization:**
 
@@ -65,14 +65,14 @@ The randomness is used primarily during game initialization for card shuffling a
 
 ### Frontend
 
-In the development of our frontend, we have leveraged Next.js alongside React, as well as the [Sui TypeScript SDK](https://github.com/MystenLabs/sui/tree/main/sdk/typescript) to facilitate interactions with the smart contract. 
-To enhance the user experience, we have integrated the game rules directly within the frontend interface. 
-This  approach ensures that users are guided through legal gameplay, preventing potential transaction errors whenever an illegal move is attempted.
+In the development of our frontend, we have leveraged Next.js alongside React, as well as the [Sui TypeScript SDK](https://github.com/MystenLabs/sui/tree/main/sdk/typescript) to facilitate interactions with the smart contract.
+To enhance the user experience, we have integrated the game rules directly within the frontend interface.
+This approach ensures that users are guided through legal gameplay, preventing potential transaction errors whenever an illegal move is attempted.
 
 ### System Overview
 
 A C4 diagram is available to visually represent all the aforementioned components and their interactions here: [https://github.com/MystenLabs/solitaire/tree/main/docs](https://github.com/MystenLabs/solitaire/tree/main/docs).
 To access the diagram you can either:
 
-1. Copy+paste the contents of **[workspace.dsl](https://github.com/MystenLabs/solitaire/blob/main/docs/workspace.dsl)** to the [structurizr’s DSL](https://structurizr.com/dsl)  
+1. Copy+paste the contents of **[workspace.dsl](https://github.com/MystenLabs/solitaire/blob/main/docs/workspace.dsl)** to the [structurizr’s DSL](https://structurizr.com/dsl)
 2. Run `docker compose up` and access the diagram on `localhost:8080`

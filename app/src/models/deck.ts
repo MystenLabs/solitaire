@@ -4,4 +4,5 @@ export interface Deck {
     cards: String[];
     hidden_cards: number;
     open_cards: number;
+    has_revealed_all_cards: boolean;
 }
