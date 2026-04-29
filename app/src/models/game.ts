@@ -30,6 +30,7 @@ export class Game {
             cards: deckCards,
             open_cards: 0,
             hidden_cards: deckHiddenCards,
+            has_revealed_all_cards: contents.deck.fields.has_revealed_all_cards ?? false,
         };
         this.piles = contents.piles.map(
             (pile: any): Pile => {

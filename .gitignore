@@ -24,6 +24,7 @@ sui.log*
 node_modules/
 dist/
 build/
+.pnpm-store/
 
 # Move
 move/solitaire/Move.lock

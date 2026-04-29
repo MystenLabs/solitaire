@@ -51,6 +51,7 @@ public struct Game has key {
 public struct Deck has store {
     hidden_cards: u64,
     cards: vector<u64>,
+    has_revealed_all_cards: bool,
 }
 
 /// This is a Pile of cards that should be ordered from Ace to King of the same suit.
@@ -81,6 +82,7 @@ entry fun init_normal_game(clock: &Clock, random: &Random, ctx: &mut TxContext) 
     let deck = Deck {
         hidden_cards: 24,
         cards: vector[],
+        has_revealed_all_cards: false,
     };
 
     // Initialize the Piles with an empty vector of cards.
@@ -113,6 +115,7 @@ entry fun init_easy_game(clock: &Clock, random: &Random, ctx: &mut TxContext) {
     let deck = Deck {
         hidden_cards: 20,
         cards: vector[],
+        has_revealed_all_cards: false,
     };
 
     let piles = vector[
@@ -294,21 +297,35 @@ entry fun from_pile_to_column(
 entry fun open_deck_card(game: &mut Game, random: &Random, ctx: &mut TxContext) {
     assert!(game.player == ctx.sender(), EUnauthorizedPlayer);
     assert!(game.deck.hidden_cards > 0, ENoMoreHiddenCards);
-    game.deck.hidden_cards = game.deck.hidden_cards - 1;
-    let card = reveal_card(&mut game.available_cards, random, ctx);
-    game.deck.cards.push_back(card);
-    game.player_moves = game.player_moves + 1;
-    event::emit(CardRevealed { card });
+    if (game.deck.has_revealed_all_cards) {
+        game.player_moves = game.player_moves + 1;
+        game.deck.hidden_cards = game.deck.hidden_cards - 1;
+        let card = game.deck.cards[0];
+        game.deck.cards.remove(0);
+        game.deck.cards.push_back(card);
+        event::emit(CardRevealed { card });
+    } else {
+        game.deck.hidden_cards = game.deck.hidden_cards - 1;
+        let card = reveal_card(&mut game.available_cards, random, ctx);
+        game.deck.cards.push_back(card);
+        game.player_moves = game.player_moves + 1;
+        event::emit(CardRevealed { card });
+    }
 }
 
 /// This function is used to cycle through the open deck cards and rotate their order, one at a time.
 /// The top card is placed at the bottom which makes the next card in the deck `top card`
+/// After going through all cards, this allows cycling through the deck again.
 public fun rotate_open_deck_cards(game: &mut Game, ctx: &mut TxContext) {
     assert!(game.player == ctx.sender(), EUnauthorizedPlayer);
-    assert!(game.deck.hidden_cards == 0, EInvalidTurnDeckCard);
+    // Allow rotation when hidden_cards == 0 OR when we're already in cycling mode
+    assert!(game.deck.hidden_cards == 0 || game.deck.has_revealed_all_cards, EInvalidTurnDeckCard);
     assert!(game.deck.cards.length() > 0, ENoAvailableDeckCard);
-    let card = game.deck.cards.remove(0);
-    game.deck.cards.push_back(card);
+
+    // If this is the first rotation after revealing all cards, set up cycling mode
+    game.deck.has_revealed_all_cards = true;
+    game.deck.hidden_cards = game.deck.cards.length() - 1;
+
     game.player_moves = game.player_moves + 1;
 }
 
@@ -437,6 +454,11 @@ public fun get_top_card_of_deck(game: &Game): u64 {
     let length = game.deck.cards.length();
     let card = game.deck.cards.borrow(length - 1);
     *card
+}
+
+#[test_only]
+public fun get_deck_cards_length(game: &Game): u64 {
+    game.deck.cards.length()
 }
 
 #[test_only]

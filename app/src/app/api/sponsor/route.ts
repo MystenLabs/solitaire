@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 import { NextRequest, NextResponse } from "next/server";
 import { enokiClient } from "../EnokiClient";
+import { getSolitaireMoveCallTargets } from "@/constants/solitaireMoveCalls";
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,6 +16,9 @@ export async function POST(req: NextRequest) {
       transactionKindBytes,
       sender: sender,
       allowedAddresses: [sender],
+      allowedMoveCallTargets: getSolitaireMoveCallTargets(
+        process.env.NEXT_PUBLIC_PACKAGE_ADDRESS!
+      ),
     });
 
     return NextResponse.json({

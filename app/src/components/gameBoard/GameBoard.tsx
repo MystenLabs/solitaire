@@ -21,7 +21,7 @@ import circleArrow from "../../../public/circle-arrow-icon.svg";
 import { LoadingContext } from "@/contexts/LoadingProvider";
 import FinishGame from "./FinishGame";
 import WonModal from "./WonModal";
-import {useEffect} from "react";
+import { useEffect } from "react";
 import { Game } from "@/models/game";
 
 interface GameProps {
@@ -36,11 +36,12 @@ interface MoveProps {
   setMoves: any;
 }
 
-export default function GameBoard({ game, move }: { game: GameProps, move: MoveProps}) {
+export default function GameBoard({ game, move }: { game: GameProps, move: MoveProps }) {
   const [deck, setDeck] = useState<DeckProps>({
     hidden_cards: game.deck.hidden_cards,
-    open_cards: 0,
-    cards: [],
+    open_cards: Math.max(game.deck.cards.length - game.deck.hidden_cards, 0),
+    cards: game.deck.cards,
+    has_revealed_all_cards: game.deck.has_revealed_all_cards ?? false,
   });
   const [piles, setPiles] = useState<PileProps[]>(game.piles);
   const [columns, setColumns] = useState<ColumnProps[]>(game.columns);
@@ -142,73 +143,91 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
 
   const handleFailedTransaction = async () => {
     const onchainGame = await getGameObjectDetails(game.id);
-          const newGame = new Game(onchainGame);
-          setDeck((prevDeck) => {
-            return {
-              ...prevDeck,
-              hidden_cards: newGame.deck.hidden_cards,
-              open_cards: prevDeck.open_cards,
-              cards: newGame.deck.cards,
-            }
-          });
-          setColumns(newGame.columns);
-          setPiles(newGame.piles);
+    const newGame = new Game(onchainGame);
+    setDeck((prevDeck) => {
+      const syncedOpenCards = Math.max(
+        newGame.deck.cards.length - newGame.deck.hidden_cards,
+        0
+      );
+      return {
+        ...prevDeck,
+        hidden_cards: newGame.deck.hidden_cards,
+        cards: newGame.deck.cards,
+        has_revealed_all_cards: newGame.deck.has_revealed_all_cards,
+        // Keep local open_cards aligned with on-chain deck state.
+        open_cards: syncedOpenCards,
+      }
+    });
+    setColumns(newGame.columns);
+    setPiles(newGame.piles);
   }
 
   const clickDeck = async () => {
-    if (!deck.hidden_cards && deck.cards.length === deck.open_cards) {
-      setDeck((prevDeck) => ({
-        ...prevDeck,
-        hidde_cards: prevDeck.hidden_cards,
-        open_cards: 0,
-        cards: [...prevDeck.cards],
-      }));
+    if (!deck.hidden_cards && deck.cards.length > 0) {
+      setIsMoveLoading(true);
+      try {
+        await handleRotateOpenDeckCards(game.id);
+        setDeck((prevDeck) => ({
+          ...prevDeck,
+          hidden_cards: prevDeck.cards.length > 0 ? prevDeck.cards.length - 1 : 0,
+          // After reset there is already one visible top card in cycle mode.
+          open_cards: prevDeck.cards.length > 0 ? 1 : 0,
+          cards: [...prevDeck.cards],
+          has_revealed_all_cards: true,
+        }));
+        move.setMoves((prevMoves: number) => prevMoves + 1);
+      } catch (e) {
+        console.error("Transaction Failed at clickDeck (reset deck cycle):", e);
+        toast.error("Transaction Failed");
+        try {
+          await handleFailedTransaction();
+        } catch (fetchError) {
+          console.error("Failed to fetch game at clickDeck (reset deck cycle):", fetchError);
+          toast.error("Failed to update game");
+        }
+      } finally {
+        setIsMoveLoading(false);
+      }
       return;
     }
+
     setIsMoveLoading(true);
     if (deck.hidden_cards !== 0) {
+      const isCyclingMode = deck.has_revealed_all_cards;
       try {
         const newCard = await handleOpenDeckCard(game.id);
-        setDeck((prevDeck) => ({
-          ...prevDeck, // Spread the previous deck to copy its properties
-          hidden_cards: prevDeck.hidden_cards - 1, // Subtract 1 from hidden_cards
-          open_cards: prevDeck.open_cards + 1, // Add 1 to open_cards
-          cards: [...prevDeck.cards, newCard], // Add newCard to the end of cards array
-        }));
+        setDeck((prevDeck) => {
+          if (isCyclingMode) {
+            const cycledCards = [...prevDeck.cards];
+            const firstCard = cycledCards.shift();
+            if (firstCard !== undefined) {
+              cycledCards.push(firstCard);
+            }
+            return {
+              ...prevDeck,
+              hidden_cards: prevDeck.hidden_cards - 1,
+              open_cards: prevDeck.open_cards + 1,
+              cards: cycledCards,
+            };
+          }
+
+          return {
+            ...prevDeck,
+            hidden_cards: prevDeck.hidden_cards - 1,
+            open_cards: prevDeck.open_cards + 1,
+            cards: [...prevDeck.cards, newCard],
+          };
+        });
         move.setMoves((prevMoves: number) => prevMoves + 1);
       } catch (e) {
         console.error("Transaction Failed at clickDeck (open deck card):", e);
         toast.error("Transaction Failed");
-        // Fetch onchain Game and set the state again
         try {
           await handleFailedTransaction();
         } catch (fetchError) {
           console.error("Failed to fetch game at clickDeck (open deck card):", fetchError);
           toast.error("Failed to update game");
-    }
-      }
-    } else {
-      try {
-        const res = await handleRotateOpenDeckCards(game.id);
-        setDeck((prevDeck) => {
-          const rotatedCard = prevDeck.cards.splice(0, 1)[0];
-          return {
-            ...prevDeck,
-            hidden_cards: 0,
-            open_cards: prevDeck.open_cards + 1,
-            cards: [...prevDeck.cards, rotatedCard],
-          };
-        });
-        move.setMoves((prevMoves: number) => prevMoves + 1);
-      } catch (e) {
-        console.error("Transaction Failed at clickDeck (rotate open deck cards):", e);
-        toast.error("Transaction Failed");
-        try {
-          await handleFailedTransaction();
-        } catch (fetchError) {
-          console.error("Failed to fetch game at clickDeck (rotate open deck cards):", fetchError);
-          toast.error("Failed to update game");
-    }
+        }
       }
     }
     setIsMoveLoading(false);
@@ -227,7 +246,7 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
       } catch (fetchError) {
         console.error("Failed to fetch game at deckToPile:", fetchError);
         toast.error("Failed to update game");
-  }
+      }
     } finally {
       setIsMoveLoading(false);
       checkIfFinished();
@@ -247,7 +266,7 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
       } catch (fetchError) {
         console.error("Failed to fetch game at deckToColumn:", fetchError);
         toast.error("Failed to update game");
-  }
+      }
     } finally {
       setIsMoveLoading(false);
     }
@@ -285,7 +304,7 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
       } catch (fetchError) {
         console.error("Failed to fetch game at columnToPile:", fetchError);
         toast.error("Failed to update game");
-  }
+      }
     } finally {
       setIsMoveLoading(false);
       checkIfFinished();
@@ -329,7 +348,7 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
       } catch (fetchError) {
         console.error("Failed to fetch game at columnToColumn:", fetchError);
         toast.error("Failed to update game");
-  }
+      }
     } finally {
       setIsMoveLoading(false);
     }
@@ -348,7 +367,7 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
       } catch (fetchError) {
         console.error("Failed to fetch game at pileToColumn:", fetchError);
         toast.error("Failed to update game");
-  }
+      }
     } finally {
       setIsMoveLoading(false);
     }
@@ -397,21 +416,20 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
           className="aboslute top-0"
           style={{ rotate: "-5deg" }}
         >
-          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} className="h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]"/>
+          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} className="h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]" />
         </div>
         <div
           className="absolute top-0 h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]"
           style={{ rotate: "3deg" }}
         >
-          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} className="h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]"/>
+          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} className="h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]" />
         </div>
         <div
-          className={`${
-            isMoveLoading ? "cursor-wait" : "cursor-pointer"
-          } absolute top-0 h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]`}
+          className={`${isMoveLoading ? "cursor-wait" : "cursor-pointer"
+            } absolute top-0 h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]`}
           style={{ rotate: "none" }}
         >
-          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} className="h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]"/>
+          <Image src={cardIdToSvg(-1)} alt={`Hidden Card`} className="h-[110px] md:h-[166px] min-w-[80px] md:min-w-[120px]" />
         </div>
       </div>
     );
@@ -474,7 +492,7 @@ export default function GameBoard({ game, move }: { game: GameProps, move: MoveP
           ))}
         </ul>
         {isFinished && <FinishGame finishGame={finishGame} />}
-        {wonModal && <WonModal gameId={game.id} moves={move.moves}/>}
+        {wonModal && <WonModal gameId={game.id} moves={move.moves} />}
       </div>
     </DndContext>
   );
